@@ -26,8 +26,8 @@
     "description": "검색창 하나로 나라를 접수한 초록색 회사. 사내 카페 커피가 맛있다."
   },
   {
-    "id": "company_ls",
-    "name": "LS",
+    "id": "company_elgee",
+    "name": "엘쥐",
     "grade": "S",
     "industry": "가전·화학",
     "cultureTags": ["family_like", "performance"],
@@ -65,8 +65,8 @@
     "description": "영어 이름으로 서로를 부르는 수평 문화. 노란 캐릭터 굿즈가 사무실에 넘친다."
   },
   {
-    "id": "company_sg",
-    "name": "SG",
+    "id": "company_escake",
+    "name": "에스케익",
     "grade": "A",
     "industry": "에너지·통신",
     "cultureTags": ["performance", "bureaucratic"],
