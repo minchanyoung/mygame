@@ -112,6 +112,10 @@ export const NpcGenerationConfigSchema = z
 export type NpcGenerationConfig = z.infer<typeof NpcGenerationConfigSchema>;
 
 const ChanceSchema = z.number().min(0).max(1);
+/** 등급별 추첨 가중치 (예: { "A": 1, "B": 3, "C": 4 }) */
+const GradeWeightsSchema = z
+  .partialRecord(CompanyGradeSchema, z.number().int().min(1).max(1000))
+  .refine((w) => Object.keys(w).length > 0, '최소 1개 등급');
 const gradeRecord = <T extends z.ZodType>(schema: T) =>
   z.object(
     Object.fromEntries(COMPANY_GRADES.map((g) => [g, schema])) as Record<(typeof COMPANY_GRADES)[number], T>,
@@ -149,7 +153,10 @@ export const GameRulesSchema = z
         /** (평판 - 50) × 이 값 */
         reputationFactor: z.number().min(0).max(0.01),
         rejectionMentalCost: z.number().int().min(0).max(30),
-        offerTiers: z.array(z.array(CompanyGradeSchema).min(1)).length(3),
+        /** 지원 카드 3장의 등급 추첨 가중치 (이직 등 일반 구직) */
+        offerTiers: z.array(GradeWeightsSchema).length(3),
+        /** 첫 구직 카드 1·2장의 등급 가중치. S는 넣지 않고, 높은 등급일수록 낮은 가중치 */
+        firstJobOfferTiers: z.array(GradeWeightsSchema).length(2),
         /** §26.4 첫 구직의 세 번째 카드는 이 등급·합격 확정 */
         firstJobGuaranteedGrade: CompanyGradeSchema,
       })
@@ -171,12 +178,26 @@ export const GameRulesSchema = z
      */
     annualReview: z
       .object({
+        /** 평가 항목 가중치: 업무 성과(올해 업무 사건 성공률), 상사 평가, 동료 협업, 평판, 근태·컨디션 */
         weights: z
           .object({
+            performance: z.number().int().min(0),
+            boss: z.number().int().min(0),
+            peers: z.number().int().min(0),
             reputation: z.number().int().min(0),
-            bossTrust: z.number().int().min(0),
-            bossFavor: z.number().int().min(0),
-            successRate: z.number().int().min(0),
+            condition: z.number().int().min(0),
+          })
+          .strict(),
+        /** 등급별 성과급 (월급 대비 ‰, 1000 = 한 달 치) */
+        bonusPermilleByGrade: z.record(ReviewGradeSchema, z.number().int().min(0).max(10000)),
+        /** 등급별 상사 코멘트 후보 ({boss} {me} 사용 가능) */
+        comments: z.record(ReviewGradeSchema, z.array(z.string().min(1).max(200)).min(1)),
+        /** 이 등급들이면 경고 플래그를 세운다 (예: D → 성과 개선 프로그램) */
+        warningFlag: z
+          .object({
+            grades: z.array(ReviewGradeSchema).min(1),
+            key: ContentIdSchema,
+            expiresInMonths: z.number().int().min(1).max(36),
           })
           .strict(),
         /** 등급 하한 점수 (S ≥ A ≥ B ≥ C, 그 아래는 D) */
@@ -198,8 +219,18 @@ export const GameRulesSchema = z
     monthly: z
       .object({
         taxPermille: z.number().int().min(0).max(900),
-        livingCost: z.number().int().min(0),
+        /** 고정 생활비 항목 (원) */
+        livingCosts: z
+          .object({
+            housing: z.number().int().min(0),
+            food: z.number().int().min(0),
+            transport: z.number().int().min(0),
+            misc: z.number().int().min(0),
+          })
+          .strict(),
         debtInterestPermille: z.number().int().min(0).max(100),
+        /** 빚이 있으면 매달 갚는 원금 상한 (원) */
+        debtRepayment: z.number().int().min(0),
         naturalChange: z.partialRecord(ResourceKeySchema, z.number().int().min(-20).max(20)),
       })
       .strict(),
@@ -259,7 +290,10 @@ export const ContentPackSchema = z
     companies: z.array(CompanyDefinitionSchema),
     npcPersonalities: z.array(NpcPersonalityDefinitionSchema),
     npcGeneration: NpcGenerationConfigSchema,
+    /** 일상 칸 폴백 (평온한 한 달) */
     fallbackEventId: EventIdSchema,
+    /** 업무 칸 폴백 (평범한 업무일) */
+    workFallbackEventId: EventIdSchema,
     events: z.array(EventDefinitionSchema),
     endings: EndingsSchema,
   })

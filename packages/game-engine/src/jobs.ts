@@ -94,18 +94,22 @@ export function generateJobOffers(state: GameRunState, content: ContentIndex): J
   const usedCompanies = new Set<string>();
   const firstSearch = isFirstJobSearch(state);
 
-  return hiring.offerTiers.map((tierGrades, tier) => {
+  // 첫 구직: S 없음 + 높은 등급일수록 낮은 가중치, 세 번째는 F 확정 (§26.4)
+  const tiers: Array<Partial<Record<CompanyGrade, number>>> = firstSearch
+    ? [...hiring.firstJobOfferTiers, { [hiring.firstJobGuaranteedGrade]: 1 }]
+    : hiring.offerTiers;
+
+  return tiers.map((weights, tier) => {
     const guaranteed = firstSearch && tier === 2;
-    const grades = guaranteed ? [hiring.firstJobGuaranteedGrade] : tierGrades;
-    const candidates = content.pack.companies.filter(
-      (c) => grades.includes(c.grade) && !usedCompanies.has(c.id),
+    // 등급을 가중치로 먼저 뽑고(남은 회사가 있는 등급만), 그 등급에서 회사를 고른다
+    const available = (Object.entries(weights) as Array<[CompanyGrade, number]>).filter(([g]) =>
+      content.pack.companies.some((c) => c.grade === g && !usedCompanies.has(c.id)),
     );
-    if (candidates.length === 0) {
-      throw new EngineError(
-        'UNKNOWN_REFERENCE',
-        `no company available for tier ${tier} (${grades.join(',')})`,
-      );
+    if (available.length === 0) {
+      throw new EngineError('UNKNOWN_REFERENCE', `no company available for tier ${tier}`);
     }
+    const grade = available[rng.weightedIndex(available.map(([, w]) => w))]![0];
+    const candidates = content.pack.companies.filter((c) => c.grade === grade && !usedCompanies.has(c.id));
     const company = rng.pick(candidates);
     usedCompanies.add(company.id);
 

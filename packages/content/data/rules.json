@@ -18,9 +18,13 @@
     "reputationFactor": 0.002,
     "rejectionMentalCost": 5,
     "offerTiers": [
-      ["S", "A", "B"],
-      ["B", "C"],
-      ["D", "F"]
+      { "S": 1, "A": 2, "B": 3 },
+      { "B": 1, "C": 2 },
+      { "D": 1, "F": 1 }
+    ],
+    "firstJobOfferTiers": [
+      { "A": 1, "B": 3, "C": 5 },
+      { "B": 1, "C": 3, "D": 4 }
     ],
     "firstJobGuaranteedGrade": "F"
   },
@@ -32,17 +36,42 @@
     "recoveryWeightBonus": 25
   },
   "annualReview": {
-    "weights": { "reputation": 4, "bossTrust": 3, "bossFavor": 1, "successRate": 2 },
+    "weights": { "performance": 3, "boss": 3, "peers": 1, "reputation": 2, "condition": 1 },
     "gradeThresholds": { "S": 75, "A": 62, "B": 48, "C": 35 },
     "raisePermilleByGrade": { "S": 80, "A": 50, "B": 30, "C": 10, "D": 0 },
     "reputationDeltaByGrade": { "S": 5, "A": 3, "B": 0, "C": 0, "D": -2 },
+    "bonusPermilleByGrade": { "S": 2000, "A": 1000, "B": 500, "C": 0, "D": 0 },
+    "comments": {
+      "S": [
+        "{me} 씨 없었으면 올해 우리 팀 실적표는 백지였을 겁니다. 내년엔 더 큰 일 맡깁시다.",
+        "솔직히 말하면, 내 자리가 조금 불안해질 정도였어요. 수고 많았습니다."
+      ],
+      "A": [
+        "기대 이상이었어요. 다만 내년엔 존재감을 조금 더 보여주면 좋겠네요.",
+        "안정적으로 잘 해줬습니다. 이 페이스면 승진 이야기도 나올 겁니다."
+      ],
+      "B": [
+        "무난했어요. 무난한 게 나쁜 건 아닌데… 기억에 남는 한 방이 없었네요.",
+        "딱 평균입니다. 회사는 평균을 좋아하지만, 평균을 기억하진 않아요."
+      ],
+      "C": [
+        "올해는 좀 아쉽네요. 내년 목표는 저랑 같이 다시 잡아봅시다.",
+        "가끔 {me} 씨가 어디서 뭘 하는지 모르겠다는 말이 들려요."
+      ],
+      "D": [
+        "솔직하게 말할게요. 이대로면 저도 감싸주기 어렵습니다. 성과 개선 프로그램에 들어가게 될 거예요.",
+        "인사팀에서 먼저 연락이 올 겁니다. 이번이 마지막 기회라고 생각하세요."
+      ]
+    },
+    "warningFlag": { "grades": ["D"], "key": "performance_warning", "expiresInMonths": 6 },
     "traitAdjustments": { "officeStigma": { "1": -5, "2": -15 }, "socialSkill": { "2": 3 } }
   },
   "monthly": {
     "taxPermille": 150,
-    "livingCost": 1300000,
+    "livingCosts": { "housing": 550000, "food": 450000, "transport": 150000, "misc": 150000 },
     "debtInterestPermille": 5,
-    "naturalChange": { "health": 1, "mental": 1, "focus": 2 }
+    "debtRepayment": 200000,
+    "naturalChange": { "health": 2, "mental": 3, "focus": 2, "reputation": 1 }
   },
   "salary": {
     "baseAnnualByGrade": {

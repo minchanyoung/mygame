@@ -17,6 +17,7 @@ import { MonthSummary } from './screens/MonthSummary';
 import { JobOffers } from './screens/JobOffers';
 import { ProfileForm } from './screens/ProfileForm';
 import { Start } from './screens/Start';
+import { StoryResult } from './screens/StoryResult';
 import { Workplace } from './screens/Workplace';
 
 type Screen =
@@ -28,6 +29,8 @@ export function App() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  // 선택 직후 결과 대화를 본 이야기(occurrenceId). 이 값과 다르면 결과 화면을 먼저 보여준다.
+  const [seenStory, setSeenStory] = useState<string | null>(null);
   // 같은 행동의 재시도는 같은 idempotencyKey를 써서 서버에서 한 번만 적용되게 한다
   const pendingKey = useRef<{ action: string; key: string } | null>(null);
 
@@ -75,7 +78,10 @@ export function App() {
   }, [screen]);
 
   // 화면 단계가 바뀌면 맨 위로 (모바일에서 이전 화면 스크롤 위치가 남지 않게)
-  const phaseKey = screen.kind === 'run' ? `${screen.view.phase}:${screen.view.turn.turnIndex}` : screen.kind;
+  const phaseKey =
+    screen.kind === 'run'
+      ? `${screen.view.phase}:${screen.view.turn.turnIndex}:${screen.view.activeEvent?.occurrenceId ?? ''}:${seenStory ?? ''}`
+      : screen.kind;
   useEffect(() => {
     try {
       window.scrollTo({ top: 0 });
@@ -145,99 +151,121 @@ export function App() {
     body = <ProfileForm busy={busy} onSubmit={createRun} onBack={() => setScreen({ kind: 'start' })} />;
   } else {
     const { view } = screen;
-    switch (view.phase) {
-      case 'CHARACTER_SELECTION':
-        body = (
-          <CharacterSelect
-            view={view}
-            busy={busy}
-            onConfirm={(cardId) =>
-              command(
-                `character:${cardId}`,
-                async (s, v, key) => (await api.chooseCharacter(s, cardId, v.revision, key)).view,
-              )
-            }
-          />
-        );
-        break;
-      case 'JOB_OFFERS':
-        body = (
-          <JobOffers
-            view={view}
-            busy={busy}
-            onApply={(offerId) =>
-              command(`apply:${offerId}`, async (s, v, key) => {
-                const res = await api.applyJob(s, offerId, v.revision, key);
-                setNotice(
-                  res.result.hired
-                    ? `${res.result.companyName ?? '회사'}에 합격했습니다!`
-                    : `${res.result.companyName ?? '회사'} 불합격… ${res.result.joinedCompanyName ?? '확정 회사'}에 입사했습니다.`,
-                );
-                return res.view;
-              })
-            }
-          />
-        );
-        break;
-      case 'MONTH_START':
-        body = (
-          <Workplace
-            view={view}
-            busy={busy}
-            onHome={() => setScreen({ kind: 'start' })}
-            onStartMonth={() =>
-              command(
-                `start:${view.turn.turnIndex}`,
-                async (s, v, key) => (await api.startMonth(s, v.revision, key)).view,
-              )
-            }
-          />
-        );
-        break;
-      case 'EVENT_PENDING':
-        body = (
-          <EventScreen
-            view={view}
-            busy={busy}
-            onChoose={(occurrenceId, choiceId) =>
-              command(
-                `choose:${occurrenceId}:${choiceId}`,
-                async (s, v, key) => (await api.choose(s, occurrenceId, choiceId, v.revision, key)).view,
-              )
-            }
-          />
-        );
-        break;
-      case 'MONTH_SUMMARY':
-        body = (
-          <MonthSummary
-            view={view}
-            busy={busy}
-            onNext={() =>
-              command(
-                `next:${view.turn.turnIndex}`,
-                async (s, v, key) => (await api.nextMonth(s, v.revision, key)).view,
-              )
-            }
-          />
-        );
-        break;
-      case 'GAME_OVER':
-        body = (
-          <EndingScreen
-            view={view}
-            onHome={() => setScreen({ kind: 'start' })}
-            onNewGame={() => {
-              saveSession(null);
-              setSavedSession(null);
-              setScreen({ kind: 'profile' });
-            }}
-          />
-        );
-        break;
-      default:
-        body = null;
-    }
+    const story = view.lastStory;
+    const showStory =
+      story !== null &&
+      story.occurrenceId !== seenStory &&
+      ((view.phase === 'EVENT_PENDING' && view.activeEvent?.occurrenceId !== story.occurrenceId) ||
+        view.phase === 'MONTH_SUMMARY');
+    if (showStory) {
+      body = (
+        <StoryResult
+          story={story}
+          meName={view.profile.displayName}
+          nextLabel={
+            view.phase === 'EVENT_PENDING'
+              ? `다음 · ${view.activeEvent?.slot === 'life' ? '퇴근 후 일상' : '다음 업무'}`
+              : view.pendingEnding
+                ? '그 후…'
+                : `${view.turn.monthOfYear}월 결산 보기`
+          }
+          onContinue={() => setSeenStory(story.occurrenceId)}
+        />
+      );
+    } else
+      switch (view.phase) {
+        case 'CHARACTER_SELECTION':
+          body = (
+            <CharacterSelect
+              view={view}
+              busy={busy}
+              onConfirm={(cardId) =>
+                command(
+                  `character:${cardId}`,
+                  async (s, v, key) => (await api.chooseCharacter(s, cardId, v.revision, key)).view,
+                )
+              }
+            />
+          );
+          break;
+        case 'JOB_OFFERS':
+          body = (
+            <JobOffers
+              view={view}
+              busy={busy}
+              onApply={(offerId) =>
+                command(`apply:${offerId}`, async (s, v, key) => {
+                  const res = await api.applyJob(s, offerId, v.revision, key);
+                  setNotice(
+                    res.result.hired
+                      ? `${res.result.companyName ?? '회사'}에 합격했습니다!`
+                      : `${res.result.companyName ?? '회사'} 불합격… ${res.result.joinedCompanyName ?? '확정 회사'}에 입사했습니다.`,
+                  );
+                  return res.view;
+                })
+              }
+            />
+          );
+          break;
+        case 'MONTH_START':
+          body = (
+            <Workplace
+              view={view}
+              busy={busy}
+              onHome={() => setScreen({ kind: 'start' })}
+              onStartMonth={() =>
+                command(
+                  `start:${view.turn.turnIndex}`,
+                  async (s, v, key) => (await api.startMonth(s, v.revision, key)).view,
+                )
+              }
+            />
+          );
+          break;
+        case 'EVENT_PENDING':
+          body = (
+            <EventScreen
+              view={view}
+              busy={busy}
+              onChoose={(occurrenceId, choiceId) =>
+                command(
+                  `choose:${occurrenceId}:${choiceId}`,
+                  async (s, v, key) => (await api.choose(s, occurrenceId, choiceId, v.revision, key)).view,
+                )
+              }
+            />
+          );
+          break;
+        case 'MONTH_SUMMARY':
+          body = (
+            <MonthSummary
+              view={view}
+              busy={busy}
+              onNext={() =>
+                command(
+                  `next:${view.turn.turnIndex}`,
+                  async (s, v, key) => (await api.nextMonth(s, v.revision, key)).view,
+                )
+              }
+            />
+          );
+          break;
+        case 'GAME_OVER':
+          body = (
+            <EndingScreen
+              view={view}
+              onHome={() => setScreen({ kind: 'start' })}
+              onNewGame={() => {
+                saveSession(null);
+                setSavedSession(null);
+                setScreen({ kind: 'profile' });
+              }}
+            />
+          );
+          break;
+        default:
+          body = null;
+      }
   }
 
   const playtest =

@@ -53,6 +53,7 @@ export function createRun(input: CreateRunInput, content: ContentIndex): GameRun
     scheduledEvents: [],
     eventOccurrences: [],
     activeEvent: null,
+    pendingEvents: [],
     npcs: [],
     npcAssignments: [],
     eventHistory: [{ turnIndex: 0, kind: 'RUN_CREATED', summary: '새 인생 시작' }],

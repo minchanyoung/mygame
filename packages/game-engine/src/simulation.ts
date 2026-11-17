@@ -95,18 +95,21 @@ export function autoPlay(seed: string, policy: AutoPlayPolicy, content: ContentI
     if (state.phase === 'GAME_OVER') break;
     try {
       state = startMonth(state, content);
-      const choiceId = pickChoice(state, policy, policyRng, content);
-      if (!choiceId) {
-        return {
-          seed,
-          endingType: null,
-          category: null,
-          age: null,
-          months: i,
-          stuck: `no choice in ${state.activeEvent?.eventId}`,
-        };
+      // 한 달에 사건이 여러 개 (업무 → 일상)
+      for (let guard = 0; state.phase === 'EVENT_PENDING' && guard < 5; guard++) {
+        const choiceId = pickChoice(state, policy, policyRng, content);
+        if (!choiceId) {
+          return {
+            seed,
+            endingType: null,
+            category: null,
+            age: null,
+            months: i,
+            stuck: `no choice in ${state.activeEvent?.eventId}`,
+          };
+        }
+        state = chooseInMonth(state, choiceId, content).state;
       }
-      state = chooseInMonth(state, choiceId, content).state;
       state = nextMonth(state, content, now);
     } catch (err) {
       const msg = err instanceof EngineError ? `${err.code}: ${err.message}` : String(err);

@@ -154,6 +154,8 @@ export interface PublicNpc {
 export interface PublicChoice {
   id: string;
   label: string;
+  /** 고르면 메신저에 보내는 내 답장 */
+  reply: string;
   description?: string;
   enabled: boolean;
   lockedHint?: string;
@@ -186,45 +188,85 @@ export interface PublicMonthSummary {
   tax: number;
   netSalary: number;
   livingCost: number;
+  livingBreakdown: Array<{ label: string; amount: number }>;
   interest: number;
-  /** 12월 인사평가 결과 */
-  annualReview: { grade: ReviewGrade; reputationDelta: number } | null;
+  debtRepayment: number;
+  /** 12월 인사평가표 */
+  annualReview: PublicReview | null;
   /** 1월 연봉 조정 */
   salaryAdjustment: { grade: ReviewGrade | null; from: number; to: number } | null;
   resourceDelta: Resources;
   cashDelta: number;
   debtDelta: number;
-  /** 이달의 이야기: 상황 → 선택 → 판정(요인) → 결과 → 영향 */
-  event: {
-    title: string;
-    categoryLabel: string;
-    /** 상황 설명 */
-    situation: string;
-    participantName: string | null;
-    choiceLabel: string;
-    success: boolean | null;
-    verdictLabel: '성공' | '실패' | '확정';
-    /** 결과 문장 (콘텐츠 문장이 없으면 판정에 맞는 기본 문장) */
-    resultText: string;
-    /** 판정에 작용한 요인 — 수치 없이 이름과 유불리만 (§22.1) */
-    factors: Array<{ label: string; positive: boolean }>;
-    /** 이 사건으로 생긴 변화 */
-    effects: PublicEffect[];
-    /** NPC 관계 변화 — 방향만 */
-    relationChanges: string[];
-    traitChanges: string[];
-    followUpHint: string | null;
-  } | null;
+  /** 이달의 이야기들 (업무 → 일상) */
+  events: PublicStory[];
+}
+
+export interface PublicReview {
+  grade: ReviewGrade;
+  score: number;
+  reputationDelta: number;
+  items: Array<{ label: string; score: number; grade: ReviewGrade; note: string }>;
+  traitAdjustment: number;
+  bonus: number;
+  bossName: string | null;
+  comment: string;
+  /** 성과 개선 프로그램 경고 대상 */
+  warning: boolean;
+}
+
+/** 메신저 한 줄 (화자 이름은 실제 NPC로 채워짐) */
+export interface PublicChatLine {
+  side: 'other' | 'self' | 'system' | 'narration';
+  name: string | null;
+  initial: string | null;
+  text: string;
+}
+
+/** 이야기: 상황 → 선택(내 답장) → 반응 대화 → 결과 → 영향 */
+export interface PublicStory {
+  occurrenceId: string;
+  slot: 'work' | 'life';
+  title: string;
+  categoryLabel: string;
+  channelName: string;
+  /** 상황 설명 */
+  situation: string;
+  participantName: string | null;
+  choiceLabel: string;
+  /** 내가 보낸 답장 */
+  reply: string;
+  /** 선택 후 이어진 대화 */
+  aftermath: PublicChatLine[];
+  success: boolean | null;
+  verdictLabel: '성공' | '실패' | '확정';
+  /** 결과 문장 (콘텐츠 문장이 없으면 판정에 맞는 기본 문장) */
+  resultText: string;
+  /** 판정에 작용한 요인 — 수치 없이 이름과 유불리만 (§22.1) */
+  factors: Array<{ label: string; positive: boolean }>;
+  /** 이 사건으로 생긴 변화 */
+  effects: PublicEffect[];
+  /** NPC 관계 변화 — 방향만 */
+  relationChanges: string[];
+  traitChanges: string[];
+  followUpHint: string | null;
 }
 
 export interface PublicActiveEvent {
   occurrenceId: string;
   eventId: string;
+  slot: 'work' | 'life';
+  /** 이번 달 몇 번째 사건인지 (1/2) */
+  position: { index: number; total: number };
   title: string;
   description: string;
   category: string;
   /** 표시용 사건 분류 이름 (업무, 사내 공지 등) */
   categoryLabel: string;
+  /** 메신저 채널 이름 */
+  channelName: string;
+  /** 사건 시작 대화 */
+  dialogue: PublicChatLine[];
   participantName: string | null;
   participant: Omit<PublicNpc, 'npcId'> | null;
   choices: PublicChoice[];
@@ -294,6 +336,8 @@ export interface PublicRunView {
   calendar: PublicCalendar;
   /** 최근 인생 기록 (최신순, 내부 판정 수치 제외) */
   history: PublicHistoryEntry[];
+  /** 방금 끝난 사건의 이야기 (같은 달 안에서 결과 대화를 보여주기 위함) */
+  lastStory: PublicStory | null;
 }
 
 export interface CreateRunResponse {

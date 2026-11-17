@@ -1,4 +1,13 @@
-import type { Choice, Effect, EventDefinition, GameRunState, Npc, RiskLevel } from '@company-life/shared';
+import {
+  eventSlot,
+  type Choice,
+  type Effect,
+  type EventDefinition,
+  type EventSlot,
+  type GameRunState,
+  type Npc,
+  type RiskLevel,
+} from '@company-life/shared';
 import { calculateChoiceChance, riskLevel, type ChanceBreakdownItem, type ChanceResult } from './chance';
 import { matchesConditions, npcMatches, type EvalContext } from './conditions';
 import { requireFrom, type ContentIndex } from './content-index';
@@ -84,8 +93,12 @@ function occurrenceStats(state: GameRunState, content: ContentIndex) {
  * §7.3 / §21.3 후보 검증 → 추첨용 목록. 조건·쿨다운·횟수 제한·독점 그룹·연속 고위험 제한을 적용하고,
  * 선택 가능한 선택지가 하나도 없는 이벤트는 제외한다. 폴백(quiet_month)은 후보에 넣지 않는다.
  */
-export function getEligibleEvents(state: GameRunState, content: ContentIndex): EventCandidate[] {
-  const { rules, fallbackEventId } = content.pack;
+export function getEligibleEvents(
+  state: GameRunState,
+  content: ContentIndex,
+  slot?: EventSlot,
+): EventCandidate[] {
+  const { rules, fallbackEventId, workFallbackEventId } = content.pack;
   const team = currentTeamNpcs(state);
   const highRiskBlocked = state.statistics.consecutiveHighRiskMonths >= rules.highRiskStreakLimit;
   // §26.3 위험 구간이면 회복(recovery) 이벤트 가중치 가산
@@ -94,7 +107,14 @@ export function getEligibleEvents(state: GameRunState, content: ContentIndex): E
   const candidates: EventCandidate[] = [];
 
   for (const event of content.pack.events) {
-    if (event.status !== 'published' || event.id === fallbackEventId || event.scheduledOnly) continue;
+    if (
+      event.status !== 'published' ||
+      event.id === fallbackEventId ||
+      event.id === workFallbackEventId ||
+      event.scheduledOnly
+    )
+      continue;
+    if (slot && eventSlot(event) !== slot) continue;
     if (highRiskBlocked && event.highRisk) continue;
 
     const count = stats.count.get(event.id) ?? 0;
@@ -147,8 +167,12 @@ export function selectEvent(
   candidates: readonly EventCandidate[],
   rng: SeededRng,
   content: ContentIndex,
+  slot: EventSlot = 'life',
 ): EventSelection {
-  if (candidates.length === 0) return { eventId: content.pack.fallbackEventId, participantNpcId: null };
+  if (candidates.length === 0) {
+    const fallback = slot === 'work' ? content.pack.workFallbackEventId : content.pack.fallbackEventId;
+    return { eventId: fallback, participantNpcId: null };
+  }
   const picked = candidates[rng.weightedIndex(candidates.map((c) => c.weight))] as EventCandidate;
   const participant =
     picked.participants.length > 1 ? rng.pick(picked.participants) : (picked.participants[0] ?? null);
@@ -276,9 +300,7 @@ export function resolveChoice(
     roll,
     highRisk: event.highRisk ?? false,
   });
-  draft.statistics.consecutiveHighRiskMonths = event.highRisk
-    ? draft.statistics.consecutiveHighRiskMonths + 1
-    : 0;
+  // 연속 고위험 개월 수는 한 달(사건 2개)이 끝날 때 chooseInMonth가 갱신한다
   draft.eventHistory.push({
     turnIndex: state.turnIndex,
     kind: 'EVENT_RESOLVED',

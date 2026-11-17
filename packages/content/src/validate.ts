@@ -1,5 +1,6 @@
 import {
   COMPANY_GRADES,
+  eventSlot,
   ContentPackSchema,
   type Conditions,
   type ContentPack,
@@ -68,12 +69,22 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
     if (pack.companies.filter((c) => c.grade === grade).length < 2)
       add('companies', `${grade}등급 회사 2개 이상 필요`);
   }
-  for (const [ti, tier] of pack.rules.hiring.offerTiers.entries()) {
-    if (!pack.companies.some((c) => tier.includes(c.grade)))
-      add(`rules.hiring.offerTiers[${ti}]`, '해당 등급 회사 없음');
+  const tierGrades = (t: Partial<Record<string, number>>) => Object.keys(t);
+  for (const [name, tiers] of [
+    ['offerTiers', pack.rules.hiring.offerTiers],
+    ['firstJobOfferTiers', pack.rules.hiring.firstJobOfferTiers],
+  ] as const) {
+    tiers.forEach((tier, ti) => {
+      if (!pack.companies.some((c) => tierGrades(tier).includes(c.grade))) {
+        add(`rules.hiring.${name}[${ti}]`, '해당 등급 회사 없음');
+      }
+    });
   }
-  if (!pack.rules.hiring.offerTiers[2]?.every((g) => g === 'D' || g === 'F')) {
+  if (!tierGrades(pack.rules.hiring.offerTiers[2] ?? {}).every((g) => g === 'D' || g === 'F')) {
     add('rules.hiring.offerTiers[2]', '3번째 지원 카드는 F~D 대안이어야 함 (§20.2)');
+  }
+  if (pack.rules.hiring.firstJobOfferTiers.some((t) => tierGrades(t).includes('S'))) {
+    add('rules.hiring.firstJobOfferTiers', '첫 구직에는 S등급 회사가 나오면 안 됨');
   }
   for (const role of ['BOSS', 'PEER'] as const) {
     for (const polarity of ['GOOD', 'BAD'] as const) {
@@ -171,28 +182,40 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
   };
   for (const id of scheduleEdges.keys()) dfs(id, []);
 
-  // 폴백 이벤트: 조건 없이 항상 선택 가능한 선택지가 있어야 한다 (§21.3)
-  const fallback = pack.events.find((e) => e.id === pack.fallbackEventId);
-  if (!fallback) {
-    add('fallbackEventId', `폴백 이벤트 없음: ${pack.fallbackEventId}`);
-  } else {
-    if (fallback.status !== 'published') add('fallbackEventId', '폴백 이벤트는 published여야 함');
+  // 폴백 이벤트(일상·업무 칸 각각): 조건 없이 항상 선택 가능한 선택지가 있어야 한다 (§21.3)
+  for (const [key, id, slot] of [
+    ['fallbackEventId', pack.fallbackEventId, 'life'],
+    ['workFallbackEventId', pack.workFallbackEventId, 'work'],
+  ] as const) {
+    const fallback = pack.events.find((e) => e.id === id);
+    if (!fallback) {
+      add(key, `폴백 이벤트 없음: ${id}`);
+      continue;
+    }
+    if (fallback.status !== 'published') add(key, '폴백 이벤트는 published여야 함');
     if (fallback.conditions && Object.keys(fallback.conditions).length > 0)
-      add('fallbackEventId', '폴백 이벤트는 조건이 없어야 함');
+      add(key, '폴백 이벤트는 조건이 없어야 함');
+    if (eventSlot(fallback) !== slot) add(key, `폴백 이벤트는 ${slot} 칸이어야 함`);
     const safe = fallback.choices.some(
       (c) =>
         !c.visibleIf &&
         !c.enabledIf &&
         !c.outcome &&
         !(c.guaranteedEffects ?? []).some(
-          (e) => e.type === 'SKILL_SET_LEVEL' || e.type === 'NEGATIVE_TRAIT_SET_LEVEL',
+          (e) =>
+            e.type === 'SKILL_SET_LEVEL' ||
+            e.type === 'NEGATIVE_TRAIT_SET_LEVEL' ||
+            e.type === 'EMPLOYMENT_CHANGE',
         ),
     );
-    if (!safe) add('fallbackEventId', '폴백 이벤트에 무조건 선택 가능한 선택지가 필요');
+    if (!safe) add(key, '폴백 이벤트에 무조건 선택 가능한 선택지가 필요');
   }
 
-  // §26.5 실직 이벤트: 경고 플래그 선행 + 그 플래그를 세우는 다른 이벤트 + 회피 선택지
+  // §26.5 실직 이벤트: 경고 플래그 선행 + 그 플래그를 세우는 다른 이벤트(또는 연말 평가) + 회피 선택지
   const flagSetters = new Map<string, Set<string>>(); // "scope:key" → 세우는 이벤트 ID들
+  // 연말 평가가 낮은 등급에 세우는 경고 플래그도 사전 징후로 인정한다
+  const reviewFlag = pack.rules.annualReview.warningFlag.key;
+  flagSetters.set(`COMPANY:${reviewFlag}`, new Set(['(annual_review)']));
   for (const event of pack.events) {
     for (const choice of event.choices) {
       const all = [

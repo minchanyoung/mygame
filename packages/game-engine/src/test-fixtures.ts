@@ -5,6 +5,8 @@ import { loadContentPack } from '@company-life/content';
 import type { GameRunState, Npc, PlayerProfile } from '@company-life/shared';
 import { indexContent, type ContentIndex } from './content-index';
 import { openEvent } from './events';
+import { chooseInMonth, nextMonth, startMonth } from './month';
+import { toPublicActiveEvent } from './view';
 import { applyForJob } from './jobs';
 import { chooseCharacter, createRun } from './run';
 import { SeededRng } from './rng';
@@ -41,6 +43,24 @@ export function rngStateFor(kind: 'low' | 'high'): number {
 }
 export const ALWAYS_SUCCEED = rngStateFor('low');
 export const ALWAYS_FAIL = rngStateFor('high');
+
+/** 남은 사건(업무 → 일상)을 실직 경고 없는 첫 선택지로 모두 처리해 MONTH_SUMMARY까지 진행 */
+export function finishEvents(state: GameRunState): GameRunState {
+  let s = state;
+  for (let guard = 0; s.phase === 'EVENT_PENDING' && guard < 5; guard++) {
+    const view = toPublicActiveEvent(s, content)!;
+    const pick =
+      view.choices.find((c) => c.enabled && !c.fatalWarning) ?? view.choices.find((c) => c.enabled)!;
+    s = chooseInMonth(s, pick.id, content).state;
+  }
+  return s;
+}
+
+/** 한 달 전체(월 시작 → 사건 전부 → 다음 달) */
+export function playMonth(state: GameRunState, now = '2026-11-17T00:00:00.000Z'): GameRunState {
+  const s = finishEvents(startMonth(state, content));
+  return s.pendingEnding ? s : nextMonth(s, content, now);
+}
 
 export function withTraits(
   state: GameRunState,

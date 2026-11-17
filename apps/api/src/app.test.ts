@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { loadContentPack } from '@company-life/content';
-import type { CreateRunResponse, PublicRunView } from '@company-life/shared';
+import type { CreateRunResponse, PublicChoice, PublicRunView } from '@company-life/shared';
 import { buildApp } from './app';
 import { FileRunStore, MemoryRunStore, type RunStore } from './store';
 
@@ -265,14 +265,23 @@ describe('monthly loop and game over over HTTP (§26)', () => {
     expect(stale.status).toBe(409);
     expect(stale.json.code).toBe('STALE_EVENT');
 
-    const chosen = await post('choose', { occurrenceId: event.occurrenceId, choiceId: choice.id }, 3);
+    // 업무 사건 → 일상 사건 순으로 두 번 고른다
+    let chosen = await post('choose', { occurrenceId: event.occurrenceId, choiceId: choice.id }, 3);
+    let revision = 4;
+    expect(chosen.json.view.lastStory?.slot).toBe('work');
+    while (chosen.json.view.phase === 'EVENT_PENDING' && !chosen.json.view.pendingEnding) {
+      const ev = chosen.json.view.activeEvent!;
+      const c = ev.choices.find((x) => x.enabled && !x.fatalWarning) ?? ev.choices.find((x) => x.enabled)!;
+      chosen = await post('choose', { occurrenceId: ev.occurrenceId, choiceId: c.id }, revision++);
+    }
     expect(chosen.json.view.phase).toBe('MONTH_SUMMARY');
     expect(chosen.json.view.monthSummary?.netSalary).toBeGreaterThan(0);
+    expect(chosen.json.view.monthSummary?.events.length).toBeGreaterThanOrEqual(1);
 
     const result = await app.inject({ url: `/api/runs/${runId}/result`, headers });
     expect(result.statusCode).toBe(409);
 
-    const next = await post('next-month', {}, 4);
+    const next = await post('next-month', {}, revision);
     if (!chosen.json.view.pendingEnding) {
       expect(next.json.view.phase).toBe('MONTH_START');
       expect(next.json.view.turn.turnIndex).toBe(1);
@@ -292,11 +301,18 @@ describe('monthly loop and game over over HTTP (§26)', () => {
     // 체력 1 상태에서 체력이 깎이는 선택이 나올 때까지 진행 (자연 회복 +1이 있으므로 확정 경고 선택지를 고른다)
     for (let month = 0; month < 40; month++) {
       view = (await post('start-month', {}, revision++)).json.view;
-      const fatal = view.activeEvent!.choices.find((c) => c.enabled && c.fatalWarning);
-      const pick = fatal ?? view.activeEvent!.choices.find((c) => c.enabled)!;
-      view = (
-        await post('choose', { occurrenceId: view.activeEvent!.occurrenceId, choiceId: pick.id }, revision++)
-      ).json.view;
+      while (view.phase === 'EVENT_PENDING' && !view.pendingEnding) {
+        const choices: PublicChoice[] = view.activeEvent!.choices;
+        const fatal = choices.find((c) => c.enabled && c.fatalWarning);
+        const pick = fatal ?? choices.find((c) => c.enabled)!;
+        view = (
+          await post(
+            'choose',
+            { occurrenceId: view.activeEvent!.occurrenceId, choiceId: pick.id },
+            revision++,
+          )
+        ).json.view;
+      }
       if (view.pendingEnding) break;
       await store.update(runId, async (record) => ({
         record: {
@@ -387,8 +403,9 @@ describe('playtest tools over HTTP', () => {
     );
 
     const debug = (await app.inject({ url: `/api/playtest/runs/${body.runId}/debug`, headers })).json();
-    expect(
+    // 기본 40% ± 배경 특성 보정(천재형 +10, 압박에 약함 −10)
+    expect([30, 40, 50]).toContain(
       debug.activeEventChoices.find((c: { id: string }) => c.id === 'first_response').exactChancePercent,
-    ).toBe(40);
+    );
   });
 });

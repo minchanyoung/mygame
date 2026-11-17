@@ -9,7 +9,15 @@ import { getEligibleEvents } from './events';
 import { chooseInMonth, nextMonth, startMonth } from './month';
 import { currentTeamNpcs, reassignBossIfNeeded } from './npcs';
 import { playtestStartMonthWithEvent } from './playtest';
-import { ALWAYS_SUCCEED, content, employedRun, open, withTraits } from './test-fixtures';
+import {
+  ALWAYS_SUCCEED,
+  content,
+  employedRun,
+  finishEvents,
+  open,
+  playMonth,
+  withTraits,
+} from './test-fixtures';
 import { toPublicActiveEvent, toPublicView } from './view';
 
 const NOW = '2026-11-17T00:00:00.000Z';
@@ -17,14 +25,6 @@ const base: GameRunState = {
   ...employedRun(),
   resources: { health: 100, mental: 100, focus: 100, reputation: 70 },
 };
-
-/** 실직 경고가 없는 첫 선택지로 한 달 진행 */
-function playMonth(s: GameRunState): GameRunState {
-  let x = startMonth(s, content);
-  const pick = toPublicActiveEvent(x, content)!.choices.find((c) => c.enabled && !c.fatalWarning)!;
-  x = chooseInMonth(x, pick.id, content).state;
-  return x.pendingEnding ? x : nextMonth(x, content, NOW);
-}
 
 describe('§20.1 annual review (December) and salary adjustment (January)', () => {
   it('13개월 이상 진행: 12월 평가 1회, 다음 1월 연봉 조정 1회 (Phase 1 완료 기준)', () => {
@@ -106,10 +106,14 @@ describe('§20.1 annual review (December) and salary adjustment (January)', () =
       withBoss({ ...base, resources: { ...base.resources, reputation: 95 } }, 95, 95),
       content,
     );
+    // 평판·상사 평가·컨디션이 모두 낮으면 D (업무 성과는 기록 없음 = 50)
     const bad = computeAnnualReview(
-      withBoss({ ...base, resources: { ...base.resources, reputation: 15 } }, 10, 10),
+      withBoss({ ...base, resources: { health: 15, mental: 50, focus: 15, reputation: 15 } }, 10, 10),
       content,
     );
+    expect(bad.items.map((i) => i.key)).toEqual(['performance', 'boss', 'peers', 'reputation', 'condition']);
+    expect(bad.warning).toBe(true);
+    expect(bad.comment.length).toBeGreaterThan(0);
     expect(good.grade).toBe('S');
     expect(bad.grade).toBe('D');
     const neutral = withBoss({ ...base, resources: { ...base.resources, reputation: 60 } }, 60, 60);
@@ -119,11 +123,29 @@ describe('§20.1 annual review (December) and salary adjustment (January)', () =
   });
 
   it('공개 뷰: 12월 결산에 평가, 1월 결산에 연봉 조정이 보인다', () => {
-    const dec = startMonth({ ...base, turnIndex: 11 }, content);
-    const decChoice = toPublicActiveEvent(dec, content)!.choices.find((c) => c.enabled)!.id;
-    const decView = toPublicView(chooseInMonth(dec, decChoice, content).state, content);
-    expect(decView.monthSummary?.annualReview?.grade).toBeDefined();
-    expect(decView.employment.lastReviewGrade).toBe(decView.monthSummary?.annualReview?.grade);
+    const dec = finishEvents(startMonth({ ...base, turnIndex: 11 }, content));
+    const decView = toPublicView(dec, content);
+    const review = decView.monthSummary?.annualReview;
+    expect(review?.grade).toBeDefined();
+    expect(review?.items).toHaveLength(5);
+    expect(decView.employment.lastReviewGrade).toBe(review?.grade);
+    // 성과급은 현금으로 들어온다
+    if ((review?.bonus ?? 0) > 0) expect(dec.annualReviews[0]!.bonus).toBe(review!.bonus);
+  });
+
+  it('D등급이면 PIP 경고 플래그가 서고, 성과 개선 프로그램 사건이 후보가 된다', () => {
+    const boss = currentTeamNpcs(base).find((t) => t.role === 'BOSS')!.npc;
+    const dismal = {
+      ...base,
+      turnIndex: 11,
+      resources: { health: 15, mental: 60, focus: 15, reputation: 15 },
+      npcs: base.npcs.map((n) => (n.npcId === boss.npcId ? { ...n, trust: 5, favor: 5 } : n)),
+    };
+    const reviewed = processAnnualReview(dismal, content).state;
+    expect(reviewed.flags.some((f) => f.key === 'performance_warning' && f.scope === 'COMPANY')).toBe(true);
+    expect(
+      getEligibleEvents({ ...reviewed, turnIndex: 12 }, content, 'work').map((c) => c.event.id),
+    ).toContain('evt_pip');
   });
 });
 
@@ -147,10 +169,10 @@ describe('scheduled follow-up events (§7.4)', () => {
     ]);
     let s = nextMonth(patched, content, NOW);
     for (let i = 0; i < 3; i++) {
+      s = { ...s, resources: { health: 100, mental: 100, focus: 100, reputation: 70 } };
       s = startMonth(s, content);
       expect(s.activeEvent?.eventId).not.toBe('evt_tech_debt_return');
-      const pick = toPublicActiveEvent(s, content)!.choices.find((c) => c.enabled && !c.fatalWarning)!.id;
-      s = nextMonth(chooseInMonth(s, pick, content).state, content, NOW);
+      s = nextMonth(finishEvents(s), content, NOW);
     }
     s = startMonth(s, content);
     expect(s.turnIndex).toBe(4);
@@ -238,12 +260,16 @@ describe('스펙 카드 근거와 이달의 이야기', () => {
     // 결산 기록(currentMonth)이 있어야 하므로 실제 월 시작 경로로 사건을 연다
     const started = playtestStartMonthWithEvent(s, 'evt_office_dinner_crisis', content);
     const summary = chooseInMonth({ ...started, rngState: ALWAYS_SUCCEED }, 'mediate', content).state;
-    const ev = toPublicView(summary, content).monthSummary!.event!;
+    const ev = toPublicView(summary, content).monthSummary!.events[0]!;
     expect(ev.situation).toContain('말다툼');
     expect(ev.verdictLabel).toBe('성공');
     expect(ev.factors).toEqual([{ label: '공감능력 — 유리하게 작용', positive: true }]);
     expect(ev.effects.map((e) => e.text)).toEqual(['평판 +5']);
     expect(ev.relationChanges[0]).toMatch(/호감 ▲$/);
+    // 메신저 스토리텔링: 내 답장과 반응 대화
+    expect(ev.reply).toContain('노가리 제가 쏩니다');
+    expect(ev.aftermath[0]?.side).toBe('other');
+    expect(ev.channelName).toBe('팀 회식 단톡방');
     expect(JSON.stringify(ev)).not.toMatch(/0\.5|chance|roll/);
   });
 });

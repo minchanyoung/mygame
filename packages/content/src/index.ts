@@ -12,7 +12,7 @@ import { validateContentPack } from './validate';
 export * from './validate';
 
 /** 콘텐츠 버전. 데이터가 바뀌면 올린다. 새 run은 생성 시 이 버전에 고정된다 (§23.1). */
-export const CONTENT_VERSION = '2026.11.17-p1.3';
+export const CONTENT_VERSION = '2026.11.17-p1.4';
 
 const jsonClone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
 
@@ -28,6 +28,7 @@ export function rawContentPack(): unknown {
     npcPersonalities: npc.personalities,
     npcGeneration: npc.generation,
     fallbackEventId: 'evt_quiet_month',
+    workFallbackEventId: 'evt_ordinary_workday',
     events,
     endings,
   });

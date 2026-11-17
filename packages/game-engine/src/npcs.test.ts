@@ -5,7 +5,7 @@ import { content, employedRun } from './test-fixtures';
 
 const base = {
   seed: 'npc-seed',
-  companyId: 'company_junggyeon_tech',
+  companyId: 'company_coubread',
   teamId: 'DEV',
   turnIndex: 0,
   playerRank: 'STAFF' as const,

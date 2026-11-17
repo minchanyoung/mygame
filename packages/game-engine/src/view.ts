@@ -7,6 +7,14 @@ import {
   RESOURCE_LABELS,
   RISK_LABELS,
   turnInfo,
+  eventSlot,
+  type DialogueLine,
+  type EventDefinition,
+  type EventResult,
+  type PublicChatLine,
+  type PublicReview,
+  type PublicStory,
+  type ReviewDetail,
   type CharacterCard,
   type Choice,
   type Effect,
@@ -196,24 +204,107 @@ function toMonthSummary(state: GameRunState, content: ContentIndex): PublicMonth
   if (!m || state.phase !== 'MONTH_SUMMARY') return null;
   const resourceDelta = { ...state.resources };
   for (const key of RESOURCE_KEYS) resourceDelta[key] = state.resources[key] - m.start.resources[key];
-  const ev = m.eventResult;
-  const event = ev ? content.events.get(ev.eventId) : undefined;
+  const lb = m.settlement.livingBreakdown;
   return {
     turnIndex: m.turnIndex,
     grossSalary: m.settlement.grossSalary,
     tax: m.settlement.tax,
     netSalary: m.settlement.netSalary,
     livingCost: m.settlement.livingCost,
+    livingBreakdown: [
+      { label: '월세·관리비', amount: lb.housing },
+      { label: '식비', amount: lb.food },
+      { label: '교통·통신', amount: lb.transport },
+      { label: '생필품·기타', amount: lb.misc },
+    ],
     interest: m.settlement.interest,
-    annualReview: m.annualReview
-      ? { grade: m.annualReview.grade, reputationDelta: m.annualReview.reputationDelta }
-      : null,
+    debtRepayment: m.settlement.debtRepayment,
+    annualReview: m.annualReview ? toPublicReview(m.annualReview) : null,
     salaryAdjustment: m.salaryAdjustment,
     resourceDelta,
     cashDelta: state.cash - m.start.cash,
     debtDelta: state.debt - m.start.debt,
-    event: ev && event ? toStory(state, ev, event, content) : null,
+    events: m.eventResults.flatMap((ev) => {
+      const event = content.events.get(ev.eventId);
+      return event ? [toStory(state, ev, event, content)] : [];
+    }),
   };
+}
+
+const REVIEW_ITEM_LABELS: Record<string, string> = {
+  performance: '업무 성과',
+  boss: '상사 평가',
+  peers: '동료 협업',
+  reputation: '사내 평판',
+  condition: '근태·컨디션',
+};
+
+function toPublicReview(r: ReviewDetail): PublicReview {
+  return {
+    grade: r.grade,
+    score: r.score,
+    reputationDelta: r.reputationDelta,
+    items: r.items.map((i) => ({
+      label: REVIEW_ITEM_LABELS[i.key] ?? i.key,
+      score: i.score,
+      grade: i.grade,
+      note: i.note,
+    })),
+    traitAdjustment: r.traitAdjustment,
+    bonus: r.bonus,
+    bossName: r.bossName,
+    comment: r.comment,
+    warning: r.warning,
+  };
+}
+
+/** 대사의 화자 역할을 실제 인물로 바꾸고 {me} {boss} {peer} {company}를 채운다 */
+function chatLines(
+  lines: readonly DialogueLine[] | undefined,
+  state: GameRunState,
+  participant: Npc | null,
+  content: ContentIndex,
+): PublicChatLine[] {
+  const team = currentTeamNpcs(state);
+  const boss = team.find((t) => t.role === 'BOSS')?.npc ?? null;
+  const peer =
+    (participant?.role === 'PEER' ? participant : null) ?? team.find((t) => t.role === 'PEER')?.npc ?? null;
+  const company = state.employment.current
+    ? (content.companies.get(state.employment.current.companyId)?.name ?? '회사')
+    : '회사';
+  const fill = (text: string) =>
+    text
+      .replaceAll('{me}', state.profile.displayName)
+      .replaceAll('{boss}', boss?.name ?? '팀장')
+      .replaceAll('{peer}', peer?.name ?? '동료')
+      .replaceAll('{company}', company);
+  return (lines ?? []).map((l) => {
+    const text = fill(l.text);
+    switch (l.speaker) {
+      case 'SELF':
+        return { side: 'self', name: state.profile.displayName, initial: null, text };
+      case 'SYSTEM':
+        return { side: 'system', name: null, initial: null, text };
+      case 'NARRATION':
+        return { side: 'narration', name: null, initial: null, text };
+      case 'NAMED':
+        return { side: 'other', name: l.name ?? '?', initial: (l.name ?? '?').slice(0, 1), text };
+      default: {
+        const npc = l.speaker === 'BOSS' ? boss : l.speaker === 'PEER' ? peer : participant;
+        const name = npc?.name ?? (l.speaker === 'BOSS' ? '팀장' : '동료');
+        const rank = npc ? ` ${RANK_LABELS[npc.rank]}` : '';
+        return { side: 'other', name: `${name}${rank}`, initial: name.slice(0, 1), text };
+      }
+    }
+  });
+}
+
+function channelName(event: EventDefinition, state: GameRunState, participant: Npc | null): string {
+  if (event.channel) return event.channel;
+  if (eventSlot(event) === 'life') return '일상';
+  if (participant) return `${participant.name} ${RANK_LABELS[participant.rank]} · 1:1`;
+  const job = state.employment.current;
+  return job ? `${JOB_LABELS[job.jobId]}팀 단톡방` : '사내 메신저';
 }
 
 const STAT_LABELS: Record<string, string> = { favor: '호감', trust: '신뢰', rivalry: '경쟁심' };
@@ -223,14 +314,20 @@ const manwonSigned = (n: number) =>
 /** 이달의 이야기: 상황 → 선택 → 판정 요인 → 결과 → 영향. 정확한 확률·NPC 수치는 내보내지 않는다. */
 function toStory(
   state: GameRunState,
-  ev: NonNullable<NonNullable<GameRunState['currentMonth']>['eventResult']>,
-  event: NonNullable<ReturnType<ContentIndex['events']['get']>>,
+  ev: EventResult,
+  event: EventDefinition,
   content: ContentIndex,
-): NonNullable<PublicMonthSummary['event']> {
-  const occurrence = [...state.eventOccurrences].reverse().find((o) => o.eventId === ev.eventId);
-  const participant = occurrence?.participantNpcId
-    ? state.npcs.find((n) => n.npcId === occurrence.participantNpcId)
-    : undefined;
+): PublicStory {
+  const participant = ev.participantNpcId
+    ? (state.npcs.find((n) => n.npcId === ev.participantNpcId) ?? null)
+    : null;
+  const choice = event.choices.find((c) => c.id === ev.choiceId);
+  const aftermathLines =
+    ev.success === true
+      ? choice?.onSuccess?.dialogue
+      : ev.success === false
+        ? choice?.onFailure?.dialogue
+        : choice?.resultDialogue;
   const verdictLabel = ev.success === true ? '성공' : ev.success === false ? '실패' : '확정';
   const fallback =
     ev.success === true
@@ -270,11 +367,16 @@ function toStory(
   });
 
   return {
+    occurrenceId: ev.occurrenceId,
+    slot: eventSlot(event),
     title: event.title,
     categoryLabel: CATEGORY_LABELS[event.category] ?? event.category,
+    channelName: channelName(event, state, participant),
     situation: event.description,
     participantName: participant?.name ?? null,
-    choiceLabel: event.choices.find((c) => c.id === ev.choiceId)?.label ?? ev.choiceId,
+    choiceLabel: choice?.label ?? ev.choiceId,
+    reply: choice?.reply ?? choice?.label ?? ev.choiceId,
+    aftermath: chatLines(aftermathLines, state, participant, content),
     success: ev.success,
     verdictLabel,
     resultText: ev.resultText ?? fallback,
@@ -306,6 +408,7 @@ export function toPublicActiveEvent(state: GameRunState, content: ContentIndex):
       const view: PublicChoice = {
         id: c.choice.id,
         label: c.choice.label,
+        reply: c.choice.reply ?? c.choice.label,
         enabled: c.enabled,
         risk: c.risk,
         riskLabel: c.risk ? RISK_LABELS[c.risk] : null,
@@ -317,13 +420,18 @@ export function toPublicActiveEvent(state: GameRunState, content: ContentIndex):
       if (!c.enabled) view.lockedHint = lockedHint(c.choice.requirementHint, c.choice.enabledIf, content);
       return view;
     });
+  const done = state.currentMonth?.eventResults.length ?? 0;
   return {
     occurrenceId: active.occurrenceId,
     eventId: event.id,
+    slot: eventSlot(event),
+    position: { index: done + 1, total: done + 1 + state.pendingEvents.length },
     title: event.title,
     description: event.description,
     category: event.category,
     categoryLabel: CATEGORY_LABELS[event.category] ?? event.category,
+    channelName: channelName(event, state, participant),
+    dialogue: chatLines(event.dialogue, state, participant, content),
     participantName: participant?.name ?? null,
     participant: participant ? (({ npcId: _id, ...rest }) => rest)(toPublicNpc(participant, content)) : null,
     choices,
@@ -449,5 +557,10 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
     playtestModified: state.playtestModified,
     calendar: toCalendar(state, content),
     history: toHistory(state, content),
+    lastStory: (() => {
+      const ev = state.currentMonth?.eventResults.at(-1);
+      const event = ev ? content.events.get(ev.eventId) : undefined;
+      return ev && event ? toStory(state, ev, event, content) : null;
+    })(),
   };
 }

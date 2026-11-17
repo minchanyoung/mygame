@@ -388,18 +388,19 @@ describe('NPC event integration (§8.3)', () => {
         content,
       ).state.resources.mental;
     const start = competitive.resources.mental;
-    expect(m(competitive)).toBe(Math.max(0, start - 10));
-    expect(m(withTraits(competitive, { crisis: 1 }))).toBe(Math.max(0, start - 5));
+    // 실패 피해 −17 (S4 손실 강화), 위기대응력 Lv.1이면 +5 완화 → −12
+    expect(m(competitive)).toBe(Math.max(0, start - 17));
+    expect(m(withTraits(competitive, { crisis: 1 }))).toBe(Math.max(0, start - 12));
   });
 });
 
 describe('event safety rails (§21.3)', () => {
-  it('unemployed state gets no candidates (fallback quiet month is used by selection)', () => {
+  it('unemployed state gets no work-slot candidates (work fallback is used by selection)', () => {
     const unemployed = {
       ...base,
       employment: { status: 'UNEMPLOYED' as const, current: null, jobLoss: null },
     };
-    expect(eligibleIds(unemployed)).toEqual([]);
+    expect(getEligibleEvents(unemployed, content, 'work')).toEqual([]);
   });
 
   it('cooldown blocks a repeat within the window', () => {

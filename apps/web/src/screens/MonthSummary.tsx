@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { RESOURCE_KEYS, RESOURCE_LABELS, type PublicRunView } from '@company-life/shared';
+import { RESOURCE_KEYS, RESOURCE_LABELS, type PublicReview, type PublicRunView } from '@company-life/shared';
 import { formatKrw } from '../api';
 import { Icon } from '../components/Icons';
 import { Warnings } from '../components/StatusPanel';
+import { StoryOutcome, verdictOf } from './StoryResult';
 
 interface Props {
   view: PublicRunView;
@@ -14,134 +14,120 @@ const won = (n: number) => n.toLocaleString('ko-KR');
 const signedWon = (n: number) => (n > 0 ? `+${won(n)}` : n < 0 ? `−${won(-n)}` : '0');
 const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0');
 
-/**
- * MONTH_SUMMARY — 급여명세서 형식의 결산.
- * 들어오는 순간 판정 도장(승인/반려/확정)이 찍히고, 탭하거나 잠시 뒤 사라진다.
- */
+function ReviewSheet({ review, age }: { review: PublicReview; age: number }) {
+  return (
+    <div className="sheet review-sheet">
+      <div className="sheet-title">
+        <strong>연말 인사평가표</strong>
+        <span className="tiny muted">
+          {age}세 · 종합 {review.score}점
+        </span>
+      </div>
+      <div className="sheet-rows">
+        {review.items.map((it) => (
+          <div key={it.label} className="review-item">
+            <div className="sheet-row">
+              <span>{it.label}</span>
+              <span className={`grade grade-sm review-${it.grade}`}>{it.grade}</span>
+            </div>
+            <div className="review-bar" aria-hidden="true">
+              <span style={{ width: `${Math.max(4, Math.min(100, it.score))}%` }} />
+            </div>
+            <span className="tiny muted">{it.note}</span>
+          </div>
+        ))}
+        {review.traitAdjustment !== 0 && (
+          <div className="sheet-row small">
+            <span className="muted">특성 보정</span>
+            <span className="num">{signed(review.traitAdjustment)}</span>
+          </div>
+        )}
+      </div>
+      <div className="bubble-row" style={{ marginTop: 8 }}>
+        <span className="avatar avatar-small" aria-hidden="true">
+          {(review.bossName ?? '팀').slice(0, 1)}
+        </span>
+        <div className="bubble-col">
+          <span className="bubble-name">{review.bossName ?? '팀장'} · 평가 코멘트</span>
+          <p className="bubble">{review.comment}</p>
+        </div>
+      </div>
+      <div className="sheet-rows" style={{ marginTop: 8 }}>
+        <div className="sheet-row">
+          <span>최종 등급</span>
+          <span className={`grade review-${review.grade}`}>{review.grade}</span>
+        </div>
+        <div className="sheet-row">
+          <span>평판 반영</span>
+          <span className="num">{signed(review.reputationDelta)}</span>
+        </div>
+        <div className="sheet-row">
+          <span>성과급</span>
+          <strong className={`num ${review.bonus > 0 ? 'pos' : 'muted'}`}>
+            {review.bonus > 0 ? `+${formatKrw(review.bonus)}` : '없음'}
+          </strong>
+        </div>
+        <span className="tiny muted">등급은 다음 1월 연봉 조정에 반영됩니다.</span>
+      </div>
+      {review.warning && (
+        <div className="banner banner-error" role="alert" style={{ marginTop: 8 }}>
+          <Icon name="warning" />
+          <div>
+            <strong>성과 개선 대상자 지정</strong>
+            <p className="small">
+              인사팀의 성과 개선 프로그램(PIP)이 곧 시작됩니다. 실패하면 권고사직으로 이어질 수 있어요.
+            </p>
+          </div>
+        </div>
+      )}
+      <span className="stamp stamp-mid sheet-stamp stamp-slam" aria-hidden="true">
+        {review.grade}
+      </span>
+    </div>
+  );
+}
+
+/** MONTH_SUMMARY — 이달의 이야기들 + 급여명세서 + 가계부 */
 export function MonthSummary({ view, busy, onNext }: Props) {
   const m = view.monthSummary;
   const ending = view.pendingEnding;
-  const ev = m?.event;
-  const verdict = ev ? (ev.success === true ? '승인' : ev.success === false ? '반려' : '확정') : null;
-  const [showStamp, setShowStamp] = useState(verdict !== null);
-
-  useEffect(() => {
-    if (!showStamp) return;
-    const t = setTimeout(() => setShowStamp(false), 1100);
-    return () => clearTimeout(t);
-  }, [showStamp]);
-
   const nextMonth = view.turn.monthOfYear === 12 ? 1 : view.turn.monthOfYear + 1;
 
   return (
     <section className="screen">
-      {showStamp && verdict && (
-        <button
-          type="button"
-          className="stamp-overlay"
-          onClick={() => setShowStamp(false)}
-          aria-label="판정 결과 닫기"
-        >
-          <span className={`stamp stamp-big stamp-slam ${verdict === '확정' ? 'stamp-navy' : ''}`}>
-            {verdict}
-          </span>
-        </button>
-      )}
-
       <h2>
         {view.turn.monthOfYear}월 결산 <span className="small muted">{view.turn.age}세</span>
       </h2>
 
-      {ev && (
+      {m && m.events.length > 0 && (
         <article className="card story" aria-label="이달의 이야기">
-          <div className="result-card" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span
-              className={`stamp stamp-small ${verdict === '확정' ? 'stamp-navy' : ''}`}
-              aria-hidden="true"
-            >
-              {verdict}
-            </span>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-              <span
-                className="tiny muted"
-                style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}
-              >
-                <Icon name="story" size={14} /> 이달의 이야기 · {ev.categoryLabel}
-              </span>
-              <strong className="display" style={{ fontSize: '1.2rem' }}>
-                {ev.title}
-              </strong>
-            </div>
-          </div>
-
-          <div className="story-step">
-            <span className="story-label">상황{ev.participantName && ` · ${ev.participantName}`}</span>
-            <p className="small" style={{ color: 'var(--ink-2)' }}>
-              {ev.situation}
-            </p>
-          </div>
-
-          <div className="story-step">
-            <span className="story-label">나의 선택</span>
-            <strong>{ev.choiceLabel}</strong>
-          </div>
-
-          <div className="story-step">
-            <span className="story-label">결과 · {ev.verdictLabel}</span>
-            <p className="story-result">{ev.resultText}</p>
-            {ev.factors.length > 0 && (
-              <ul className="fx-list" aria-label="판정에 작용한 요인">
-                {ev.factors.map((f) => (
-                  <li key={f.label} className="factor" style={{ flexDirection: 'row' }}>
-                    <span style={{ color: f.positive ? 'var(--good)' : 'var(--danger)' }}>
-                      <Icon name={f.positive ? 'thumbUp' : 'thumbDown'} size={14} />
-                    </span>
-                    {f.label}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {(ev.effects.length > 0 || ev.relationChanges.length > 0 || ev.followUpHint) && (
-            <div className="story-step">
-              <span className="story-label">이 일로 달라진 것</span>
-              <div className="choice-meta">
-                {ev.effects.map((e) => (
-                  <span key={e.text} className={`fx fx-${e.tone}`}>
-                    {e.text}
-                  </span>
-                ))}
-                {ev.relationChanges.map((r) => (
-                  <span key={r} className="fx fx-neutral">
-                    {r}
-                  </span>
-                ))}
-              </div>
-              {ev.followUpHint && (
-                <p
-                  className="small"
-                  style={{ color: 'var(--ink-2)', display: 'flex', alignItems: 'center', gap: 6 }}
-                >
-                  <Icon name="warning" size={14} /> {ev.followUpHint}
-                </p>
-              )}
-            </div>
-          )}
-        </article>
-      )}
-
-      {ev && ev.traitChanges.length > 0 && (
-        <div className="card trait-burst flip-in" role="status">
-          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Icon name="star" /> 특성 변화
+          <span className="story-label" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Icon name="story" size={14} /> 이달의 이야기
           </span>
-          {ev.traitChanges.map((t) => (
-            <span key={t} className="display" style={{ fontSize: '1.2rem' }}>
-              {t}
-            </span>
+          {m.events.map((ev) => (
+            <details key={ev.occurrenceId} className="story-entry">
+              <summary>
+                <span
+                  className={`stamp stamp-small ${verdictOf(ev) === '확정' ? 'stamp-navy' : ''}`}
+                  aria-hidden="true"
+                >
+                  {verdictOf(ev)}
+                </span>
+                <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                  <span className="tiny muted" style={{ fontWeight: 700 }}>
+                    {ev.slot === 'work' ? '업무' : '일상'} · {ev.channelName}
+                  </span>
+                  <strong>{ev.title}</strong>
+                  <span className="small muted">→ {ev.choiceLabel}</span>
+                </span>
+              </summary>
+              <p className="small" style={{ color: 'var(--ink-2)' }}>
+                {ev.situation}
+              </p>
+              <StoryOutcome story={ev} />
+            </details>
           ))}
-        </div>
+        </article>
       )}
 
       {ending && (
@@ -156,28 +142,7 @@ export function MonthSummary({ view, busy, onNext }: Props) {
         </div>
       )}
 
-      {m?.annualReview && (
-        <div className="sheet">
-          <div className="sheet-title">
-            <strong>인사평가표</strong>
-            <span className="tiny muted">{view.turn.age}세 연말</span>
-          </div>
-          <div className="sheet-rows">
-            <div className="sheet-row">
-              <span>평가 등급</span>
-              <span className="grade">{m.annualReview.grade}</span>
-            </div>
-            <div className="sheet-row">
-              <span>평판 반영</span>
-              <span className="num">{signed(m.annualReview.reputationDelta)}</span>
-            </div>
-            <span className="tiny muted">다음 1월 연봉에 반영됩니다.</span>
-          </div>
-          <span className="stamp stamp-mid sheet-stamp stamp-slam" aria-hidden="true">
-            {m.annualReview.grade}
-          </span>
-        </div>
-      )}
+      {m?.annualReview && <ReviewSheet review={m.annualReview} age={view.turn.age} />}
 
       {m?.salaryAdjustment && (
         <div className="sheet">
@@ -253,19 +218,30 @@ export function MonthSummary({ view, busy, onNext }: Props) {
       )}
 
       {m && (
-        <div className="card" style={{ gap: 6 }}>
-          <div className="sheet-row small">
-            <span className="muted">생활비</span>
-            <span className="num">−{won(m.livingCost)}</span>
-          </div>
+        <div className="card ledger" style={{ gap: 6 }}>
+          <strong className="small" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Icon name="cash" size={16} /> 이달의 가계부
+          </strong>
+          {m.livingBreakdown.map((l) => (
+            <div key={l.label} className="sheet-row small">
+              <span className="muted">{l.label}</span>
+              <span className="num">−{won(l.amount)}</span>
+            </div>
+          ))}
           {m.interest > 0 && (
             <div className="sheet-row small">
               <span className="muted">부채 이자</span>
               <span className="num">−{won(m.interest)}</span>
             </div>
           )}
+          {m.debtRepayment > 0 && (
+            <div className="sheet-row small">
+              <span className="muted">빚 원금 상환</span>
+              <span className="num">−{won(m.debtRepayment)}</span>
+            </div>
+          )}
           <div className="sheet-row small" style={{ borderTop: '1px dashed var(--line)', paddingTop: 6 }}>
-            <strong>통장 변화</strong>
+            <strong>통장 변화 (사건 지출 포함)</strong>
             <strong className="num">
               <span className={m.cashDelta >= 0 ? 'pos' : 'neg'}>현금 {signedWon(m.cashDelta)}</span>
               {m.debtDelta !== 0 && (

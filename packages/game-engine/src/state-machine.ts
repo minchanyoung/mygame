@@ -10,7 +10,7 @@ export const TRANSITIONS: Readonly<Record<RunPhase, Partial<Record<RunCommand, r
   CHARACTER_SELECTION: { chooseCharacter: ['JOB_OFFERS'] },
   JOB_OFFERS: { apply: ['MONTH_START', 'JOB_OFFERS'] },
   MONTH_START: { startMonth: ['EVENT_PENDING', 'MONTH_SUMMARY'] },
-  EVENT_PENDING: { choose: ['MONTH_SUMMARY'] },
+  EVENT_PENDING: { choose: ['MONTH_SUMMARY', 'EVENT_PENDING'] },
   MONTH_SUMMARY: { nextMonth: ['MONTH_START', 'GAME_OVER'] },
   GAME_OVER: { getResult: ['GAME_OVER'] },
 };

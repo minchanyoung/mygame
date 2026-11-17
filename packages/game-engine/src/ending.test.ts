@@ -5,7 +5,15 @@ import { EngineError } from './errors';
 import { getEligibleEvents } from './events';
 import { chooseInMonth, nextMonth, startMonth } from './month';
 import { autoPlay } from './simulation';
-import { ALWAYS_FAIL, ALWAYS_SUCCEED, content, employedRun, open, withTraits } from './test-fixtures';
+import {
+  ALWAYS_FAIL,
+  ALWAYS_SUCCEED,
+  content,
+  employedRun,
+  finishEvents,
+  open,
+  withTraits,
+} from './test-fixtures';
 import { toPublicActiveEvent, toPublicView } from './view';
 
 const NOW = '2026-11-17T00:00:00.000Z';
@@ -184,20 +192,49 @@ describe('monthly loop (§20.1)', () => {
     const gross = Math.floor(salary / 12);
     const net = gross - Math.floor((gross * 150) / 1000);
     expect(started.phase).toBe('EVENT_PENDING');
+    const afterLiving = 1_000_000 + net - 1_300_000;
+    const repayment = Math.max(0, Math.min(10_050_000, 200_000, afterLiving));
     expect(started.currentMonth?.settlement).toEqual({
       grossSalary: gross,
       tax: gross - net,
       netSalary: net,
       livingCost: 1_300_000,
+      livingBreakdown: { housing: 550_000, food: 450_000, transport: 150_000, misc: 150_000 },
       interest: 50_000,
+      debtRepayment: repayment,
     });
     // 급여명세서: 기본급 − 공제 = 실지급
     const s2 = started.currentMonth!.settlement;
     expect(s2.grossSalary - s2.tax).toBe(s2.netSalary);
-    expect(started.cash).toBe(Math.max(0, 1_000_000 + net - 1_300_000));
-    expect(started.debt).toBe(10_050_000 + Math.max(0, -(1_000_000 + net - 1_300_000)));
-    expect(started.resources.focus).toBe(Math.min(100, s.resources.focus + 2));
+    expect(started.cash).toBe(Math.max(0, afterLiving - repayment));
+    expect(started.debt).toBe(10_050_000 - repayment + Math.max(0, -afterLiving));
+    expect(started.resources.focus).toBe(
+      Math.min(100, s.resources.focus + content.pack.rules.monthly.naturalChange.focus!),
+    );
     expect(started.activeEvent).not.toBeNull();
+    // 한 달에 사건 2개: 업무 → 일상
+    expect(started.pendingEvents).toHaveLength(1);
+  });
+
+  it('한 달에 업무 사건 1개 + 일상 사건 1개가 열리고, 둘 다 끝나야 결산으로 간다', () => {
+    const s = { ...base, resources: { health: 100, mental: 100, focus: 100, reputation: 70 } };
+    const started = startMonth(s, content);
+    const first = toPublicActiveEvent(started, content)!;
+    expect(first.slot).toBe('work');
+    expect(first.position).toEqual({ index: 1, total: 2 });
+    const mid = chooseInMonth(
+      started,
+      first.choices.find((c) => c.enabled && !c.fatalWarning)!.id,
+      content,
+    ).state;
+    expect(mid.phase).toBe('EVENT_PENDING');
+    const second = toPublicActiveEvent(mid, content)!;
+    expect(second.slot).toBe('life');
+    expect(second.position).toEqual({ index: 2, total: 2 });
+    expect(toPublicView(mid, content).lastStory?.slot).toBe('work');
+    const done = finishEvents(mid);
+    expect(done.phase).toBe('MONTH_SUMMARY');
+    expect(toPublicView(done, content).monthSummary?.events.map((e) => e.slot)).toEqual(['work', 'life']);
   });
 
   it('13개월을 진행해도 턴·나이·월이 계약대로 흐르고 같은 시드면 같은 사건 순서', () => {
@@ -205,10 +242,10 @@ describe('monthly loop (§20.1)', () => {
       let s = { ...base, resources: { health: 100, mental: 100, focus: 100, reputation: 100 } };
       const seen: string[] = [];
       for (let i = 0; i < 13; i++) {
+        s = { ...s, resources: { health: 100, mental: 100, focus: 100, reputation: 100 } };
         s = startMonth(s, content);
         seen.push(s.activeEvent!.eventId);
-        const view = toPublicActiveEvent(s, content)!;
-        s = chooseInMonth(s, view.choices.find((c) => c.enabled && !c.fatalWarning)!.id, content).state;
+        s = finishEvents(s);
         if (s.pendingEnding) break;
         s = nextMonth(s, content, NOW);
       }

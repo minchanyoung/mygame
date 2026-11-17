@@ -188,8 +188,29 @@ export type EffectType = Effect['type'];
 
 const EffectListSchema = z.array(EffectSchema).max(12);
 
+/**
+ * 사내 메신저 대사 한 줄. 화자는 역할로 지정하고 이름은 화면에서 실제 NPC로 채운다.
+ * 본문에는 {me} {boss} {peer} {company} 자리표시자를 쓸 수 있다.
+ */
+export const DialogueLineSchema = z
+  .object({
+    speaker: z.enum(['BOSS', 'PEER', 'PARTICIPANT', 'SELF', 'SYSTEM', 'NARRATION', 'NAMED']),
+    /** NAMED일 때 화자 이름 (예: 고객센터, 상무님) */
+    name: z.string().min(1).max(20).optional(),
+    text: z.string().min(1).max(300),
+  })
+  .strict()
+  .refine((l) => l.speaker !== 'NAMED' || l.name !== undefined, 'NAMED 화자는 name이 필요');
+export type DialogueLine = z.infer<typeof DialogueLineSchema>;
+export const DialogueSchema = z.array(DialogueLineSchema).max(12);
+
 export const OutcomeBranchSchema = z
-  .object({ effects: EffectListSchema, resultText: z.string().max(400).optional() })
+  .object({
+    effects: EffectListSchema,
+    resultText: z.string().max(400).optional(),
+    /** 결과 후 이어지는 메신저 대화 */
+    dialogue: DialogueSchema.optional(),
+  })
   .strict();
 
 export const ConditionalEffectSchema = z
@@ -211,6 +232,10 @@ export const ChoiceSchema = z
     /** false면 잠금 상태로 보여주고 requirementHint를 표시한다 (§22.1). */
     enabledIf: ConditionsSchema.optional(),
     requirementHint: z.string().max(80).optional(),
+    /** 선택 시 메신저에 보내는 내 답장 (없으면 label) */
+    reply: z.string().max(160).optional(),
+    /** 판정 없는 선택지의 결과 대화 */
+    resultDialogue: DialogueSchema.optional(),
     /** 판정 전 항상 적용되는 확정 효과/비용. */
     guaranteedEffects: EffectListSchema.optional(),
     /** 없으면 판정 없이 guaranteedEffects만 적용한다. */
@@ -260,6 +285,12 @@ const EventObjectSchema = z
     highRisk: z.boolean().optional(),
     /** 예약(SCHEDULE_EVENT)으로만 발생하는 후속 사건. 무작위 추첨 후보에서 제외된다 (§7.4). */
     scheduledOnly: z.boolean().optional(),
+    /** 월 2개 사건 중 어느 칸인지. 없으면 분류로 결정 (work/company/social → 업무, 그 외 → 일상) */
+    slot: z.enum(['work', 'life']).optional(),
+    /** 메신저 채널 이름 (예: "개발팀 단톡방"). 없으면 등장 인물 1:1 또는 팀 채널 */
+    channel: z.string().min(1).max(30).optional(),
+    /** 사건 시작 대화 (업무 사건은 메신저로 표시) */
+    dialogue: DialogueSchema.optional(),
     npcWeightModifiers: z.array(NpcWeightModifierSchema).max(6).optional(),
     conditions: ConditionsSchema.optional(),
     choices: z.array(ChoiceSchema).min(1).max(4),
@@ -271,6 +302,19 @@ type EventObject = z.infer<typeof EventObjectSchema>;
 function checkEventRules(event: EventObject, ctx: z.RefinementCtx): void {
   const hasNpc = event.conditions?.npc !== undefined;
   const seenChoiceIds = new Set<string>();
+
+  // PARTICIPANT 화자는 사건에 참여 NPC가 있어야 한다
+  const lines = [
+    ...(event.dialogue ?? []),
+    ...event.choices.flatMap((c) => [
+      ...(c.resultDialogue ?? []),
+      ...(c.onSuccess?.dialogue ?? []),
+      ...(c.onFailure?.dialogue ?? []),
+    ]),
+  ];
+  if (!hasNpc && lines.some((l) => l.speaker === 'PARTICIPANT')) {
+    ctx.addIssue({ code: 'custom', path: ['dialogue'], message: 'PARTICIPANT 화자는 conditions.npc가 필요' });
+  }
 
   event.choices.forEach((choice, ci) => {
     const base = ['choices', ci];
@@ -391,3 +435,13 @@ function checkEventRules(event: EventObject, ctx: z.RefinementCtx): void {
 
 export const EventDefinitionSchema = EventObjectSchema.superRefine(checkEventRules);
 export type EventDefinition = z.infer<typeof EventDefinitionSchema>;
+
+export type EventSlot = 'work' | 'life';
+
+/** 사건의 월간 칸: 명시값 우선, 없으면 분류로 결정 */
+export function eventSlot(event: Pick<EventDefinition, 'slot' | 'category'>): EventSlot {
+  if (event.slot) return event.slot;
+  return event.category === 'work' || event.category === 'company' || event.category === 'social'
+    ? 'work'
+    : 'life';
+}

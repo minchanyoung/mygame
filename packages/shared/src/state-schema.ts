@@ -139,9 +139,77 @@ export const AnnualReviewSchema = z
     companyId: CompanyIdSchema,
     grade: ReviewGradeSchema,
     score: z.number().int().min(0).max(100),
+    bonus: Krw.nonnegative(),
   })
   .strict();
 export type AnnualReview = z.infer<typeof AnnualReviewSchema>;
+
+/** 인사평가표 상세 (결산 화면 표시용) */
+export const ReviewDetailSchema = z
+  .object({
+    grade: ReviewGradeSchema,
+    score: z.number().int(),
+    reputationDelta: z.number().int(),
+    items: z.array(
+      z
+        .object({
+          key: z.enum(['performance', 'boss', 'peers', 'reputation', 'condition']),
+          score: z.number().int().min(0).max(100),
+          grade: ReviewGradeSchema,
+          note: z.string(),
+        })
+        .strict(),
+    ),
+    traitAdjustment: z.number().int(),
+    bonus: Krw.nonnegative(),
+    bossName: z.string().nullable(),
+    comment: z.string(),
+    warning: z.boolean(),
+  })
+  .strict();
+export type ReviewDetail = z.infer<typeof ReviewDetailSchema>;
+
+/** 한 사건의 결과 기록 (이달의 이야기) */
+export const EventResultSchema = z
+  .object({
+    occurrenceId: z.string(),
+    eventId: EventIdSchema,
+    choiceId: z.string(),
+    participantNpcId: z.string().nullable(),
+    success: z.boolean().nullable(),
+    resultText: z.string().nullable(),
+    traitChanges: z.array(
+      z
+        .object({
+          kind: z.enum(['SKILL', 'NEGATIVE_TRAIT']),
+          id: ContentIdSchema,
+          from: TraitLevelSchema,
+          to: TraitLevelSchema,
+        })
+        .strict(),
+    ),
+    /** 이 사건만으로 생긴 변화 (월 정산과 분리) */
+    resourceDelta: z.record(z.string(), z.number().int()),
+    cashDelta: Krw,
+    debtDelta: Krw,
+    /** 판정에 작용한 요인 (공개 시 수치 없이 이름만) */
+    factors: z.array(
+      z
+        .object({
+          source: z.enum(['SKILL', 'NEGATIVE_TRAIT', 'BACKGROUND', 'NPC', 'RESOURCE']),
+          id: z.string(),
+          level: TraitLevelSchema.nullable(),
+          positive: z.boolean(),
+        })
+        .strict(),
+    ),
+    npcChanges: z.array(
+      z.object({ npcId: z.string(), stat: NpcRelationStatSchema, delta: z.number().int() }).strict(),
+    ),
+    followUpScheduled: z.boolean(),
+  })
+  .strict();
+export type EventResult = z.infer<typeof EventResultSchema>;
 
 /** 이번 달 기록 (월말 요약 표시용) */
 export const MonthLogSchema = z
@@ -154,60 +222,35 @@ export const MonthLogSchema = z
         tax: Krw.nonnegative(),
         netSalary: Krw.nonnegative(),
         livingCost: Krw.nonnegative(),
+        livingBreakdown: z
+          .object({
+            housing: Krw.nonnegative(),
+            food: Krw.nonnegative(),
+            transport: Krw.nonnegative(),
+            misc: Krw.nonnegative(),
+          })
+          .strict(),
         interest: Krw.nonnegative(),
+        debtRepayment: Krw.nonnegative(),
       })
       .strict(),
     /** 12월이면 이번 달 처리된 인사평가 */
-    annualReview: z
-      .object({ grade: ReviewGradeSchema, score: z.number().int(), reputationDelta: z.number().int() })
-      .strict()
-      .nullable(),
+    annualReview: ReviewDetailSchema.nullable(),
     /** 1월이면 이번 달 적용된 연봉 조정 */
     salaryAdjustment: z
       .object({ grade: ReviewGradeSchema.nullable(), from: Krw.positive(), to: Krw.positive() })
       .strict()
       .nullable(),
-    eventResult: z
-      .object({
-        eventId: EventIdSchema,
-        choiceId: z.string(),
-        success: z.boolean().nullable(),
-        resultText: z.string().nullable(),
-        traitChanges: z.array(
-          z
-            .object({
-              kind: z.enum(['SKILL', 'NEGATIVE_TRAIT']),
-              id: ContentIdSchema,
-              from: TraitLevelSchema,
-              to: TraitLevelSchema,
-            })
-            .strict(),
-        ),
-        /** 이 사건만으로 생긴 변화 (월 정산과 분리) */
-        resourceDelta: z.record(z.string(), z.number().int()),
-        cashDelta: Krw,
-        debtDelta: Krw,
-        /** 판정에 작용한 요인 (공개 시 수치 없이 이름만) */
-        factors: z.array(
-          z
-            .object({
-              source: z.enum(['SKILL', 'NEGATIVE_TRAIT', 'BACKGROUND', 'NPC', 'RESOURCE']),
-              id: z.string(),
-              level: TraitLevelSchema.nullable(),
-              positive: z.boolean(),
-            })
-            .strict(),
-        ),
-        npcChanges: z.array(
-          z.object({ npcId: z.string(), stat: NpcRelationStatSchema, delta: z.number().int() }).strict(),
-        ),
-        followUpScheduled: z.boolean(),
-      })
-      .strict()
-      .nullable(),
+    /** 이번 달 사건 결과 (업무 → 일상 순) */
+    eventResults: z.array(EventResultSchema),
   })
   .strict();
 export type MonthLog = z.infer<typeof MonthLogSchema>;
+
+/** 이번 달 아직 열리지 않은 사건 (업무 다음 일상) */
+export const PendingEventSchema = z
+  .object({ eventId: EventIdSchema, participantNpcId: z.string().nullable() })
+  .strict();
 
 export const NpcSchema = z
   .object({
@@ -371,6 +414,8 @@ export const GameRunStateSchema = z
     scheduledEvents: z.array(ScheduledEventSchema),
     eventOccurrences: z.array(EventOccurrenceSchema),
     activeEvent: ActiveEventSchema.nullable(),
+    /** 이번 달 대기 중인 다음 사건 (월 2개: 업무 → 일상) */
+    pendingEvents: z.array(PendingEventSchema),
     npcs: z.array(NpcSchema),
     npcAssignments: z.array(NpcAssignmentSchema),
     eventHistory: z.array(HistoryEntrySchema),
