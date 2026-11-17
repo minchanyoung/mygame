@@ -1,0 +1,60 @@
+{
+  "startAge": 24,
+  "retireAge": 60,
+  "chanceMin": 0.05,
+  "chanceMax": 0.95,
+  "riskThresholds": { "low": 0.7, "medium": 0.4 },
+  "defaultCooldownMonths": 3,
+  "maxTraitLevel": 2,
+  "highRiskStreakLimit": 2,
+  "character": {
+    "baseResources": { "health": 70, "mental": 60, "focus": 60, "reputation": 50 },
+    "resourceJitter": 5,
+    "baseCash": 3000000
+  },
+  "hiring": {
+    "baseChanceByGrade": { "S": 0.15, "A": 0.25, "B": 0.4, "C": 0.55, "D": 0.7, "F": 0.85 },
+    "majorFitBonus": 0.1,
+    "reputationFactor": 0.002,
+    "rejectionMentalCost": 5,
+    "offerTiers": [
+      ["S", "A", "B"],
+      ["B", "C"],
+      ["D", "F"]
+    ],
+    "firstJobGuaranteedGrade": "F"
+  },
+  "gameOver": {
+    "failureBeforeAge": 50,
+    "debtLimitSalaryMultiple": 3,
+    "warningThreshold": 20,
+    "debtWarningPermille": 700,
+    "recoveryWeightBonus": 25
+  },
+  "monthly": {
+    "taxPermille": 150,
+    "livingCost": 1300000,
+    "debtInterestPermille": 5,
+    "naturalChange": { "health": 1, "mental": 1, "focus": 2 }
+  },
+  "salary": {
+    "baseAnnualByGrade": {
+      "S": 52000000,
+      "A": 44000000,
+      "B": 34000000,
+      "C": 30000000,
+      "D": 27000000,
+      "F": 23000000
+    },
+    "rangeByGrade": {
+      "S": { "min": 45000000, "max": 65000000 },
+      "A": { "min": 38000000, "max": 52000000 },
+      "B": { "min": 30000000, "max": 40000000 },
+      "C": { "min": 26000000, "max": 34000000 },
+      "D": { "min": 24000000, "max": 30000000 },
+      "F": { "min": 20000000, "max": 26000000 }
+    },
+    "jobCoefficientPermille": { "DEV": 1080, "HR": 980, "SALES": 1000, "FINANCE": 1040, "PLANNING": 1000 },
+    "roundingUnit": 100000
+  }
+}

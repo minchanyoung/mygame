@@ -1,0 +1,17 @@
+{
+  "name": "@company-life/content",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "시드 콘텐츠 데이터(이벤트·회사·특성·NPC 성향) 및 로더/검증기",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "validate": "tsx src/cli-validate.ts"
+  },
+  "dependencies": {
+    "@company-life/shared": "0.1.0"
+  }
+}

@@ -1,0 +1,121 @@
+[
+  {
+    "id": "socialSkill",
+    "polarity": "POSITIVE",
+    "name": "처세술",
+    "description": "사람 사이의 미묘한 공기를 읽고 갈등을 무마하는 힘.",
+    "maxLevel": 2,
+    "levelEffects": {
+      "1": "소규모 사내 대인관계 사건 성공률 상승",
+      "2": "임원·부서 간 협상 보너스, 전용 선택지 해금"
+    },
+    "active": true,
+    "acquireHint": "사람 사이의 갈등을 직접 풀어낼 때"
+  },
+  {
+    "id": "workSense",
+    "polarity": "POSITIVE",
+    "name": "업무 감각",
+    "description": "일의 우선순위와 함정을 본능적으로 아는 감각.",
+    "maxLevel": 2,
+    "levelEffects": { "1": "단순 프로젝트 일정 조정 성공률 상승", "2": "초대형 납기 위기 성공률 크게 상승" },
+    "active": false
+  },
+  {
+    "id": "negotiation",
+    "polarity": "POSITIVE",
+    "name": "협상력",
+    "description": "조건을 한 줄 더 끌어오는 말솜씨.",
+    "maxLevel": 2,
+    "levelEffects": { "1": "연봉 재협상 성공률 상승", "2": "대형 계약·인수 협상 성공률 크게 상승" },
+    "active": false
+  },
+  {
+    "id": "crisis",
+    "polarity": "POSITIVE",
+    "name": "위기대응력",
+    "description": "모두가 당황할 때 손이 먼저 움직이는 침착함.",
+    "maxLevel": 2,
+    "levelEffects": {
+      "1": "작은 장애·책임 공방 성공률 상승, 일부 실패 피해 완화",
+      "2": "대규모 장애를 매뉴얼처럼 처리"
+    },
+    "active": true,
+    "acquireHint": "갑작스러운 사고를 직접 수습할 때"
+  },
+  {
+    "id": "network",
+    "polarity": "POSITIVE",
+    "name": "인맥",
+    "description": "어려울 때 연락할 수 있는 사람들.",
+    "maxLevel": 2,
+    "levelEffects": { "1": "추천 채용 성공률 상승", "2": "임원 스카우트 성공률 크게 상승" },
+    "active": false
+  },
+  {
+    "id": "observation",
+    "polarity": "POSITIVE",
+    "name": "관찰력",
+    "description": "남들이 지나치는 숫자와 표정을 붙잡는 눈.",
+    "maxLevel": 2,
+    "levelEffects": { "1": "업무 실수·이상 징후 발견 성공률 상승", "2": "고난도 조사 선택지 해금" },
+    "active": true,
+    "acquireHint": "작은 이상 징후를 끝까지 파고들 때"
+  },
+  {
+    "id": "burnout",
+    "polarity": "NEGATIVE",
+    "name": "번아웃",
+    "description": "쉬어도 회복되지 않는 깊은 피로 상태 (게임 내 상태이며 의학적 진단이 아님).",
+    "maxLevel": 2,
+    "levelEffects": { "1": "휴식 사건의 체력 회복량 감소", "2": "업무 압박 사건 성공률 하락" },
+    "active": true,
+    "recoveryHint": "휴식과 생활 리듬 회복으로 극복할 수 있다"
+  },
+  {
+    "id": "fragileMind",
+    "polarity": "NEGATIVE",
+    "name": "유리멘탈",
+    "description": "공개적인 상처가 쉽게 아물지 않는 상태.",
+    "maxLevel": 2,
+    "levelEffects": { "1": "대인 갈등 사건 정신력 피해 증가", "2": "고압 협상 성공률 하락" },
+    "active": false
+  },
+  {
+    "id": "officeStigma",
+    "polarity": "NEGATIVE",
+    "name": "사내 낙인",
+    "description": "현재 회사에서 따라다니는 부당한 꼬리표.",
+    "maxLevel": 2,
+    "levelEffects": { "1": "현재 회사 내 평판 사건 불리", "2": "현재 회사 승진 심사 불리" },
+    "active": true,
+    "recoveryHint": "진상 규명이나 공식적인 명예 회복으로 벗을 수 있다"
+  },
+  {
+    "id": "workaholic",
+    "polarity": "NEGATIVE",
+    "name": "워커홀릭",
+    "description": "일을 멈추면 불안해지는 상태.",
+    "maxLevel": 2,
+    "levelEffects": { "1": "휴식 선택 시 정신력 회복 감소", "2": "회복량 추가 감소, 일부 야근 업무 보너스" },
+    "active": false
+  },
+  {
+    "id": "impulseSpending",
+    "polarity": "NEGATIVE",
+    "name": "소비 중독",
+    "description": "스트레스를 결제로 푸는 습관.",
+    "maxLevel": 2,
+    "levelEffects": { "1": "소비 사건 지출 증가", "2": "고액 소비 유혹 사건 증가" },
+    "active": false
+  },
+  {
+    "id": "distrust",
+    "polarity": "NEGATIVE",
+    "name": "불신",
+    "description": "배신의 기억 때문에 쉽게 마음을 열지 못하는 상태.",
+    "maxLevel": 2,
+    "levelEffects": { "1": "동료 협업 사건 성공률 하락", "2": "신규 NPC 신뢰 형성 사건 성공률 하락" },
+    "active": false
+  }
+]

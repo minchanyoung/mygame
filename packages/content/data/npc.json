@@ -1,0 +1,141 @@
+{
+  "personalities": [
+    {
+      "id": "MENTOR",
+      "name": "멘토형",
+      "role": "BOSS",
+      "polarity": "GOOD",
+      "description": "가르치는 걸 좋아하고 성장 기회를 준다.",
+      "statBias": { "competence": 10, "fairness": 10, "trust": 5 }
+    },
+    {
+      "id": "FAIR",
+      "name": "공정형",
+      "role": "BOSS",
+      "polarity": "GOOD",
+      "description": "평가가 투명하다.",
+      "statBias": { "fairness": 20 }
+    },
+    {
+      "id": "SUPPORTIVE",
+      "name": "지원형",
+      "role": "BOSS",
+      "polarity": "GOOD",
+      "description": "위기 때 앞에 서서 막아 준다.",
+      "statBias": { "favor": 10 }
+    },
+    {
+      "id": "AUTHORITARIAN",
+      "name": "권위형",
+      "role": "BOSS",
+      "polarity": "BAD",
+      "description": "지시는 많고 설명은 없다. 능력은 있을 수도 있다.",
+      "statBias": { "fairness": -15, "ambition": 10 }
+    },
+    {
+      "id": "CREDIT_STEALER",
+      "name": "공 가로채기",
+      "role": "BOSS",
+      "polarity": "BAD",
+      "description": "좋은 결과는 자기 몫, 나쁜 결과는 팀 몫.",
+      "statBias": { "fairness": -20, "ambition": 15 }
+    },
+    {
+      "id": "BLAME_SHIFTER",
+      "name": "책임 전가형",
+      "role": "BOSS",
+      "polarity": "BAD",
+      "description": "문제가 생기면 누군가를 먼저 찾는다.",
+      "statBias": { "fairness": -15, "trust": -5 }
+    },
+    {
+      "id": "HELPFUL",
+      "name": "협력형",
+      "role": "PEER",
+      "polarity": "GOOD",
+      "description": "먼저 도와주겠다고 말하는 동료.",
+      "statBias": { "favor": 10, "rivalry": -5 }
+    },
+    {
+      "id": "LOYAL",
+      "name": "의리형",
+      "role": "PEER",
+      "polarity": "GOOD",
+      "description": "한번 편이 되면 끝까지 간다.",
+      "statBias": { "trust": 10 }
+    },
+    {
+      "id": "SKILLED",
+      "name": "유능형",
+      "role": "PEER",
+      "polarity": "GOOD",
+      "description": "배울 점이 많은 실력자.",
+      "statBias": { "competence": 20, "rivalry": 5 }
+    },
+    {
+      "id": "COMPETITIVE",
+      "name": "경쟁형",
+      "role": "PEER",
+      "polarity": "BAD",
+      "description": "승진 경쟁에서 절대 지고 싶지 않다.",
+      "statBias": { "ambition": 20, "rivalry": 20 }
+    },
+    {
+      "id": "GOSSIPER",
+      "name": "소문형",
+      "role": "PEER",
+      "polarity": "BAD",
+      "description": "모든 소문의 출발점.",
+      "statBias": { "trust": -10 }
+    },
+    {
+      "id": "FREE_RIDER",
+      "name": "무임승차형",
+      "role": "PEER",
+      "polarity": "BAD",
+      "description": "팀 프로젝트에서 이름만 올린다.",
+      "statBias": { "competence": -15, "favor": 5 }
+    }
+  ],
+  "generation": {
+    "surnames": ["김", "이", "박", "최", "정", "강", "조", "윤", "장", "임", "한", "오", "서", "신", "권"],
+    "givenNames": [
+      "지훈",
+      "서연",
+      "민준",
+      "하은",
+      "도윤",
+      "수빈",
+      "현우",
+      "지민",
+      "예준",
+      "유진",
+      "성민",
+      "다은",
+      "준호",
+      "소영",
+      "태현",
+      "은지",
+      "동현",
+      "미정",
+      "재원",
+      "혜진"
+    ],
+    "secondaryTagChance": 0.35,
+    "baseTagWeight": 10,
+    "cultureWeightBonus": {
+      "hierarchical": { "AUTHORITARIAN": 8, "BLAME_SHIFTER": 4 },
+      "performance": { "COMPETITIVE": 8, "SKILLED": 4, "CREDIT_STEALER": 4 },
+      "family_like": { "SUPPORTIVE": 6, "LOYAL": 6, "GOSSIPER": 4 },
+      "startup": { "MENTOR": 4, "HELPFUL": 4, "FREE_RIDER": 4 },
+      "overtime": { "AUTHORITARIAN": 4, "FREE_RIDER": 4 },
+      "flexible": { "FAIR": 6, "HELPFUL": 4 },
+      "bureaucratic": { "BLAME_SHIFTER": 6, "GOSSIPER": 4 }
+    },
+    "relationInitial": {
+      "favor": { "min": 40, "max": 60 },
+      "trust": { "min": 40, "max": 60 },
+      "rivalry": { "min": 5, "max": 25 }
+    }
+  }
+}

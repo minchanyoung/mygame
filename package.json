@@ -1,0 +1,42 @@
+{
+  "name": "company-life",
+  "private": true,
+  "version": "0.1.0",
+  "description": "회사원 키우기 (가제) — 모바일 우선 선택지형 직장 로그라이크",
+  "type": "module",
+  "workspaces": [
+    "packages/shared",
+    "packages/game-engine",
+    "packages/content",
+    "apps/api",
+    "apps/web"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:api": "npm run dev -w @company-life/api",
+    "dev:web": "npm run dev -w @company-life/web",
+    "playtest": "node scripts/playtest.mjs",
+    "simulate": "npm run simulate -w @company-life/game-engine --",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "npm run build --workspaces --if-present",
+    "validate:content": "npm run validate -w @company-life/content"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.1",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.73.0",
+    "vitest": "^5.1.0"
+  }
+}

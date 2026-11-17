@@ -1,0 +1,905 @@
+[
+  {
+    "id": "evt_quiet_month",
+    "version": 1,
+    "status": "published",
+    "title": "평온한 한 달",
+    "description": "별일 없이 한 달이 지나갔다. 가끔은 이런 달도 필요하다.",
+    "category": "daily",
+    "rarity": "common",
+    "weight": 1,
+    "cooldownMonths": 0,
+    "choices": [
+      {
+        "id": "rest",
+        "label": "평범하게 한 달을 보낸다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "mental", "amount": 3 },
+          { "type": "RESOURCE_DELTA", "key": "health", "amount": 6 }
+        ],
+        "conditionalEffects": [
+          {
+            "on": "ALWAYS",
+            "when": { "negativeTraitLevels": { "burnout": { "min": 1 } } },
+            "effects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -5 }]
+          }
+        ],
+        "resultText": "조용히 숨을 고르며 한 달을 보냈다."
+      }
+    ]
+  },
+  {
+    "id": "evt_office_dinner_crisis",
+    "version": 1,
+    "status": "published",
+    "title": "회식 자리의 불화",
+    "description": "2차 자리에서 두 선배의 말다툼이 점점 커진다. 모두가 눈치만 보고 있다.",
+    "category": "social",
+    "rarity": "common",
+    "weight": 20,
+    "tags": ["회식"],
+    "conditions": { "employment": "EMPLOYED" },
+    "choices": [
+      {
+        "id": "mediate",
+        "label": "분위기를 수습한다",
+        "outcome": {
+          "baseChance": 0.4,
+          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.12 } }]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 },
+            { "type": "NPC_RELATION_DELTA", "target": "BOSS", "stat": "favor", "amount": 3 }
+          ],
+          "resultText": "농담 한마디로 공기가 풀렸다. 팀장이 고개를 끄덕인다."
+        },
+        "onFailure": {
+          "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -5 }],
+          "resultText": "괜히 끼어들었다가 둘 모두에게 눈총을 받았다."
+        }
+      },
+      {
+        "id": "leave_early",
+        "label": "조용히 먼저 일어난다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -2 },
+          { "type": "RESOURCE_DELTA", "key": "health", "amount": 2 }
+        ],
+        "resultText": "집에 일찍 들어와 푹 잤다. 다음 날 분위기는 조금 어색했다."
+      }
+    ]
+  },
+  {
+    "id": "evt_executive_faction",
+    "version": 1,
+    "status": "published",
+    "title": "임원 파벌 싸움",
+    "description": "두 임원이 서로 다른 방향을 고집하는 보고서가 당신 손을 거쳐야 한다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 6,
+    "conditions": { "employment": "EMPLOYED" },
+    "choices": [
+      {
+        "id": "negotiate",
+        "label": "양쪽을 설득해 절충안을 낸다",
+        "outcome": {
+          "baseChance": 0.25,
+          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "2": 0.2 } }]
+        },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 }] },
+        "onFailure": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -4 },
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -6 }
+          ]
+        }
+      },
+      {
+        "id": "side_with_power",
+        "label": "힘 있는 쪽 편을 든다",
+        "outcome": { "baseChance": 0.5 },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 4 }] },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -6 }] }
+      },
+      {
+        "id": "backroom_deal",
+        "label": "물밑에서 두 임원의 이해관계를 조율한다",
+        "enabledIf": { "skillLevels": { "socialSkill": { "min": 2 } } },
+        "outcome": {
+          "baseChance": 0.55,
+          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "2": 0.2 } }]
+        },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 12 }] },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }] }
+      }
+    ]
+  },
+  {
+    "id": "evt_social_breakthrough",
+    "version": 1,
+    "status": "published",
+    "special": true,
+    "title": "번지기 직전의 오해",
+    "description": "팀 내 두 동료 사이의 오해가 공개 갈등으로 번지기 직전이다. 누군가 나서야 할 것 같다.",
+    "category": "social",
+    "rarity": "rare",
+    "weight": 8,
+    "cooldownMonths": 6,
+    "maxOccurrencesPerRun": 2,
+    "conditions": { "employment": "EMPLOYED", "skillAbsent": ["socialSkill"] },
+    "choices": [
+      {
+        "id": "resolve_conflict",
+        "label": "직접 두 사람을 불러 오해를 푼다",
+        "outcome": { "baseChance": 0.4 },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 },
+            { "type": "SKILL_SET_LEVEL", "id": "socialSkill", "from": 0, "to": 1 }
+          ],
+          "resultText": "두 사람이 악수했다. 사람 사이의 공기를 다루는 법을 조금 알 것 같다."
+        },
+        "onFailure": {
+          "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -5 }],
+          "resultText": "오히려 불똥이 튀었다."
+        }
+      },
+      {
+        "id": "stay_out",
+        "label": "모른 척한다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -1 }]
+      }
+    ]
+  },
+  {
+    "id": "evt_department_mediation",
+    "version": 1,
+    "status": "published",
+    "special": true,
+    "title": "부서 통합 갈등",
+    "description": "두 부서가 하나로 합쳐지며 인사 갈등이 폭발했다. 양쪽 모두와 말이 통하는 사람은 당신뿐이다.",
+    "category": "company",
+    "rarity": "rare",
+    "weight": 6,
+    "cooldownMonths": 6,
+    "maxOccurrencesPerRun": 2,
+    "conditions": { "employment": "EMPLOYED", "skillLevels": { "socialSkill": { "min": 1, "max": 1 } } },
+    "choices": [
+      {
+        "id": "mediate",
+        "label": "중재 테이블을 직접 꾸린다",
+        "outcome": {
+          "baseChance": 0.35,
+          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1 } }]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 },
+            { "type": "SKILL_SET_LEVEL", "id": "socialSkill", "from": 1, "to": 2 }
+          ],
+          "resultText": "통합은 무사히 끝났다. 이제 당신을 찾는 사람이 많아졌다."
+        },
+        "onFailure": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -6 },
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -2 }
+          ]
+        }
+      },
+      {
+        "id": "delegate",
+        "label": "팀장에게 넘긴다",
+        "resultText": "당신의 일은 아니었다. 아마도."
+      }
+    ]
+  },
+  {
+    "id": "evt_server_outage",
+    "version": 1,
+    "status": "published",
+    "special": true,
+    "title": "금요일 오후의 전산 장애",
+    "description": "금요일 오후 6시, 사내 시스템이 멈췄다. 퇴근하려던 사람들이 하나둘 당신을 쳐다본다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 12,
+    "highRisk": true,
+    "cooldownMonths": 4,
+    "conditions": { "employment": "EMPLOYED" },
+    "choices": [
+      {
+        "id": "first_response",
+        "label": "직접 원인을 추적한다",
+        "visibleIf": { "skillAbsent": ["crisis"] },
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -5 }],
+        "outcome": { "baseChance": 0.4 },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 },
+            { "type": "SKILL_SET_LEVEL", "id": "crisis", "from": 0, "to": 1 }
+          ],
+          "resultText": "로그 한 줄에서 원인을 찾았다. 손이 떨렸지만 결국 해냈다."
+        },
+        "onFailure": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -8 },
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }
+          ]
+        }
+      },
+      {
+        "id": "lead_recovery",
+        "label": "복구 작전을 지휘한다",
+        "visibleIf": { "skillLevels": { "crisis": { "min": 1, "max": 1 } } },
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -5 }],
+        "outcome": {
+          "baseChance": 0.35,
+          "modifiers": [{ "source": "SKILL", "id": "crisis", "levels": { "1": 0.1 } }]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 10 },
+            { "type": "SKILL_SET_LEVEL", "id": "crisis", "from": 1, "to": 2 }
+          ],
+          "resultText": "회사 전체 장애를 두 시간 만에 수습했다."
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -6 }] }
+      },
+      {
+        "id": "routine_fix",
+        "label": "매뉴얼대로 침착하게 처리한다",
+        "visibleIf": { "skillLevels": { "crisis": { "min": 2 } } },
+        "outcome": {
+          "baseChance": 0.6,
+          "modifiers": [{ "source": "SKILL", "id": "crisis", "levels": { "2": 0.25 } }]
+        },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 }] },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -3 }] }
+      },
+      {
+        "id": "report_up",
+        "label": "상부에 보고하고 기다린다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -2 }]
+      }
+    ]
+  },
+  {
+    "id": "evt_document_clue",
+    "version": 1,
+    "status": "published",
+    "special": true,
+    "title": "마음에 걸리는 숫자",
+    "description": "정산 자료를 보던 중 숫자 하나가 계속 마음에 걸린다. 그냥 넘겨도 아무도 모를 것이다.",
+    "category": "work",
+    "rarity": "rare",
+    "weight": 8,
+    "cooldownMonths": 6,
+    "conditions": { "employment": "EMPLOYED" },
+    "choices": [
+      {
+        "id": "dig_in",
+        "label": "끝까지 파고든다",
+        "visibleIf": { "skillAbsent": ["observation"] },
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": -5 }],
+        "outcome": { "baseChance": 0.4 },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 },
+            { "type": "SKILL_SET_LEVEL", "id": "observation", "from": 0, "to": 1 }
+          ],
+          "resultText": "작은 입력 오류가 큰 손실로 번지기 직전에 잡아냈다."
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": -5 }] }
+      },
+      {
+        "id": "confirm_pattern",
+        "label": "과거 장부까지 대조해 정황을 확증한다",
+        "visibleIf": { "skillLevels": { "observation": { "min": 1, "max": 1 } } },
+        "outcome": {
+          "baseChance": 0.3,
+          "modifiers": [{ "source": "SKILL", "id": "observation", "levels": { "1": 0.1 } }]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 },
+            { "type": "SKILL_SET_LEVEL", "id": "observation", "from": 1, "to": 2 },
+            { "type": "FLAG_SET", "key": "found_irregularity", "scope": "COMPANY" }
+          ],
+          "resultText": "반복되는 패턴을 찾아냈다. 이건 단순 실수가 아니다."
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -5 }] }
+      },
+      {
+        "id": "ignore",
+        "label": "기분 탓으로 넘긴다",
+        "resultText": "오늘은 일찍 퇴근했다."
+      }
+    ]
+  },
+  {
+    "id": "evt_project_collapse",
+    "version": 1,
+    "status": "published",
+    "special": true,
+    "title": "무너진 마감 일정",
+    "description": "마감 일주일 전, 프로젝트 일정이 무너졌다. 누군가는 밤을 새워야 한다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 10,
+    "highRisk": true,
+    "cooldownMonths": 6,
+    "conditions": { "employment": "EMPLOYED" },
+    "choices": [
+      {
+        "id": "all_nighter",
+        "label": "밤샘으로 혼자 메운다",
+        "visibleIf": { "negativeTraitAbsent": ["burnout"] },
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -10 }],
+        "outcome": { "baseChance": 0.5 },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 }] },
+        "onFailure": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -10 },
+            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "burnout", "from": 0, "to": 1 }
+          ],
+          "resultText": "결국 마감은 놓쳤고, 몸과 마음이 텅 빈 느낌이다."
+        }
+      },
+      {
+        "id": "all_nighter_again",
+        "label": "이번에도 밤샘으로 버틴다",
+        "visibleIf": { "negativeTraitLevels": { "burnout": { "min": 1, "max": 1 } } },
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -10 }],
+        "outcome": { "baseChance": 0.45 },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 }] },
+        "onFailure": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -10 },
+            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "burnout", "from": 1, "to": 2 }
+          ],
+          "resultText": "아침에 일어나는 것조차 버거워졌다."
+        }
+      },
+      {
+        "id": "push_through",
+        "label": "지친 몸을 끌고 버틴다",
+        "visibleIf": { "negativeTraitLevels": { "burnout": { "min": 2 } } },
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -10 }],
+        "outcome": {
+          "baseChance": 0.45,
+          "modifiers": [{ "source": "NEGATIVE_TRAIT", "id": "burnout", "levels": { "2": -0.1 } }]
+        },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 }] },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -8 }] }
+      },
+      {
+        "id": "ask_help",
+        "label": "팀에 도움을 요청하고 일정을 조정한다",
+        "outcome": {
+          "baseChance": 0.6,
+          "modifiers": [{ "source": "SKILL", "id": "crisis", "levels": { "1": 0.05, "2": 0.1 } }]
+        },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 2 }] },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -4 }] }
+      }
+    ]
+  },
+  {
+    "id": "evt_burnout_recovery",
+    "version": 1,
+    "status": "published",
+    "special": true,
+    "title": "멈춰 선 주말",
+    "description": "주말 내내 아무것도 하기 싫다. 몸과 마음이 쉬라는 신호를 보낸다.",
+    "category": "life",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 4,
+    "conditions": { "negativeTraitLevels": { "burnout": { "min": 1 } } },
+    "choices": [
+      {
+        "id": "paid_leave_reset",
+        "label": "유급 휴가를 내고 재정비한다",
+        "visibleIf": { "negativeTraitLevels": { "burnout": { "min": 2, "max": 2 } } },
+        "guaranteedEffects": [{ "type": "CASH_DELTA", "amount": -300000 }],
+        "outcome": { "baseChance": 0.6 },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": 10 },
+            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "burnout", "from": 2, "to": 1 }
+          ],
+          "resultText": "오랜만에 아무 생각 없이 바다를 봤다. 조금 숨이 쉬어진다."
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": 3 }] }
+      },
+      {
+        "id": "rebuild_rhythm",
+        "label": "생활 리듬을 다시 세운다",
+        "visibleIf": { "negativeTraitLevels": { "burnout": { "min": 1, "max": 1 } } },
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [{ "source": "RESOURCE", "key": "health", "range": { "min": 60 }, "bonus": 0.1 }]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": 8 },
+            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "burnout", "from": 1, "to": 0 }
+          ],
+          "resultText": "일찍 자고 일찍 일어나는 한 달. 예전의 리듬이 돌아왔다."
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": 2 }] }
+      },
+      {
+        "id": "endure",
+        "label": "그냥 버틴다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -3 }]
+      }
+    ]
+  },
+  {
+    "id": "evt_public_blame",
+    "version": 1,
+    "status": "published",
+    "special": true,
+    "title": "회의실의 공개 질책",
+    "description": "상사가 회의 중 팀의 실수를 당신 탓으로 돌렸다. 모두의 시선이 당신에게 꽂힌다.",
+    "category": "social",
+    "rarity": "uncommon",
+    "weight": 10,
+    "highRisk": true,
+    "cooldownMonths": 6,
+    "conditions": {
+      "employment": "EMPLOYED",
+      "npc": { "role": "BOSS", "personalityAny": ["AUTHORITARIAN", "CREDIT_STEALER", "BLAME_SHIFTER"] }
+    },
+    "npcWeightModifiers": [{ "role": "BOSS", "personalityAny": ["AUTHORITARIAN"], "add": 10 }],
+    "choices": [
+      {
+        "id": "confront",
+        "label": "근거를 들어 정면으로 반박한다",
+        "visibleIf": { "negativeTraitAbsent": ["officeStigma"] },
+        "outcome": {
+          "baseChance": 0.4,
+          "modifiers": [
+            { "source": "SKILL", "id": "socialSkill", "levels": { "2": 0.2 } },
+            { "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } },
+            { "source": "NPC", "relation": { "trust": { "min": 60 } }, "bonus": 0.1 }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 },
+            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "trust", "amount": 5 }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -6 },
+            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "favor", "amount": -10 },
+            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "officeStigma", "from": 0, "to": 1 },
+            { "type": "FLAG_SET", "key": "blamed_by_boss", "scope": "NPC" }
+          ],
+          "resultText": "반박은 변명으로 받아들여졌다. 사내에 이상한 소문이 돌기 시작했다."
+        }
+      },
+      {
+        "id": "confront_again",
+        "label": "이번에는 물러서지 않는다",
+        "visibleIf": { "negativeTraitLevels": { "officeStigma": { "min": 1, "max": 1 } } },
+        "outcome": {
+          "baseChance": 0.35,
+          "modifiers": [
+            { "source": "SKILL", "id": "socialSkill", "levels": { "2": 0.2 } },
+            { "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } }
+          ]
+        },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 4 }] },
+        "onFailure": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -6 },
+            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "officeStigma", "from": 1, "to": 2 }
+          ]
+        }
+      },
+      {
+        "id": "accept",
+        "label": "일단 참고 넘어간다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "mental", "amount": -6 },
+          { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "favor", "amount": 3 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_clear_reputation",
+    "version": 1,
+    "status": "published",
+    "special": true,
+    "title": "누명을 벗을 기회",
+    "description": "그날의 일을 기억하는 사람이 생각보다 많다. 지금이라면 바로잡을 수 있을지도 모른다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 4,
+    "conditions": { "employment": "EMPLOYED", "negativeTraitLevels": { "officeStigma": { "min": 1 } } },
+    "choices": [
+      {
+        "id": "present_evidence",
+        "label": "증거를 모아 진상 규명을 요청한다",
+        "visibleIf": { "negativeTraitLevels": { "officeStigma": { "min": 2, "max": 2 } } },
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [{ "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } }]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 },
+            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "officeStigma", "from": 2, "to": 1 }
+          ]
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -4 }] }
+      },
+      {
+        "id": "official_restoration",
+        "label": "공식 석상에서 명예를 회복한다",
+        "visibleIf": { "negativeTraitLevels": { "officeStigma": { "min": 1, "max": 1 } } },
+        "outcome": {
+          "baseChance": 0.45,
+          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.15 } }]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 },
+            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "officeStigma", "from": 1, "to": 0 }
+          ]
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -4 }] }
+      },
+      {
+        "id": "wait",
+        "label": "시간이 해결해 주길 기다린다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -2 }]
+      }
+    ]
+  },
+  {
+    "id": "evt_boss_code_review",
+    "version": 1,
+    "status": "published",
+    "title": "상사의 1:1 리뷰",
+    "description": "상사가 당신의 결과물을 한 줄 한 줄 직접 검토해 주겠다고 한다.",
+    "category": "work",
+    "rarity": "common",
+    "weight": 12,
+    "conditions": {
+      "employment": "EMPLOYED",
+      "npc": { "role": "BOSS", "personalityAny": ["MENTOR", "SUPPORTIVE", "FAIR"] }
+    },
+    "npcWeightModifiers": [{ "role": "BOSS", "personalityAny": ["MENTOR"], "add": 10 }],
+    "choices": [
+      {
+        "id": "accept_feedback",
+        "label": "피드백을 받아들이고 고친다",
+        "outcome": {
+          "baseChance": 0.7,
+          "modifiers": [{ "source": "NPC", "personalityAny": ["MENTOR"], "bonus": 0.1 }]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "focus", "amount": 5 },
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 3 },
+            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "trust", "amount": 5 }
+          ]
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -3 }] }
+      },
+      {
+        "id": "politely_decline",
+        "label": "바쁘다며 정중히 사양한다",
+        "guaranteedEffects": [
+          { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "favor", "amount": -3 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_peer_help_request",
+    "version": 1,
+    "status": "published",
+    "title": "동료의 부탁",
+    "description": "동료가 마감 직전 업무를 도와달라고 부탁한다.",
+    "category": "social",
+    "rarity": "common",
+    "weight": 14,
+    "conditions": { "employment": "EMPLOYED", "npc": { "role": "PEER" } },
+    "choices": [
+      {
+        "id": "help",
+        "label": "내 일을 미루고 돕는다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -3 }],
+        "outcome": {
+          "baseChance": 0.7,
+          "modifiers": [
+            { "source": "NPC", "personalityAny": ["FREE_RIDER"], "bonus": -0.2, "label": "무임승차" }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "trust", "amount": 8 },
+            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "favor", "amount": 5 },
+            { "type": "FLAG_SET", "key": "helped_peer", "scope": "NPC" }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "favor", "amount": 2 },
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -3 }
+          ]
+        }
+      },
+      {
+        "id": "swap_tasks",
+        "label": "서로의 업무를 맞바꿔 함께 끝낸다",
+        "enabledIf": { "npc": { "role": "PEER", "relation": { "trust": { "min": 70 } } } },
+        "requirementHint": "신뢰가 두터운 동료일 때 가능",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "focus", "amount": 3 },
+          { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "trust", "amount": 3 }
+        ]
+      },
+      {
+        "id": "refuse",
+        "label": "미안하지만 거절한다",
+        "guaranteedEffects": [
+          { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "favor", "amount": -5 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_peer_blame_shift",
+    "version": 1,
+    "status": "published",
+    "title": "떠넘겨진 책임",
+    "description": "동료가 회의에서 일정 지연의 책임을 당신에게 떠넘겼다.",
+    "category": "social",
+    "rarity": "uncommon",
+    "weight": 10,
+    "conditions": {
+      "employment": "EMPLOYED",
+      "npc": { "role": "PEER", "personalityAny": ["COMPETITIVE", "FREE_RIDER", "GOSSIPER"] }
+    },
+    "npcWeightModifiers": [{ "role": "PEER", "personalityAny": ["COMPETITIVE"], "add": 6 }],
+    "choices": [
+      {
+        "id": "defend",
+        "label": "경위를 차분히 설명한다",
+        "outcome": {
+          "baseChance": 0.45,
+          "modifiers": [
+            { "source": "SKILL", "id": "crisis", "levels": { "1": 0.1, "2": 0.12 } },
+            { "source": "NPC", "relation": { "rivalry": { "min": 70 } }, "bonus": -0.1, "label": "강한 견제" }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 4 },
+            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "rivalry", "amount": 5 }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -4 },
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -10 }
+          ]
+        },
+        "conditionalEffects": [
+          {
+            "on": "FAILURE",
+            "when": { "skillLevels": { "crisis": { "min": 1 } } },
+            "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": 5 }]
+          }
+        ]
+      },
+      {
+        "id": "let_it_go",
+        "label": "말다툼하지 않고 넘어간다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "mental", "amount": -4 },
+          { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "rivalry", "amount": -5 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_weekend_recharge",
+    "version": 1,
+    "status": "published",
+    "title": "오랜만의 빈 주말",
+    "description": "이번 주말에는 약속도, 업무 연락도 없다. 무엇을 할까?",
+    "category": "life",
+    "rarity": "common",
+    "weight": 10,
+    "tags": ["recovery"],
+    "conditions": { "employment": "EMPLOYED" },
+    "choices": [
+      {
+        "id": "sleep",
+        "label": "이틀 내내 푹 잔다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "health", "amount": 8 },
+          { "type": "RESOURCE_DELTA", "key": "mental", "amount": 3 }
+        ]
+      },
+      {
+        "id": "meet_friends",
+        "label": "오랜 친구들을 만난다",
+        "guaranteedEffects": [
+          { "type": "CASH_DELTA", "amount": -100000 },
+          { "type": "RESOURCE_DELTA", "key": "mental", "amount": 8 }
+        ]
+      },
+      {
+        "id": "study",
+        "label": "업무 공부를 해 둔다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "focus", "amount": 6 },
+          { "type": "RESOURCE_DELTA", "key": "mental", "amount": -2 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_focus_slipping",
+    "version": 1,
+    "status": "published",
+    "title": "자꾸 새는 집중력",
+    "description": "같은 메일을 세 번 읽어도 내용이 머리에 들어오지 않는다. 이러다 큰 실수를 할 것 같다.",
+    "category": "work",
+    "rarity": "common",
+    "weight": 15,
+    "tags": ["recovery"],
+    "cooldownMonths": 2,
+    "conditions": { "employment": "EMPLOYED", "resources": { "focus": { "max": 30 } } },
+    "choices": [
+      {
+        "id": "take_leave",
+        "label": "연차를 내고 머리를 식힌다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "focus", "amount": 12 },
+          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -1 }
+        ]
+      },
+      {
+        "id": "checklist",
+        "label": "체크리스트를 만들어 하나씩 확인한다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": 6 }]
+      },
+      {
+        "id": "coffee",
+        "label": "커피 세 잔으로 버틴다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "focus", "amount": 3 },
+          { "type": "RESOURCE_DELTA", "key": "health", "amount": -3 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_reputation_repair",
+    "version": 1,
+    "status": "published",
+    "title": "식어 가는 시선",
+    "description": "요즘 회의에서 내 의견이 자주 묻힌다. 분위기를 바꿀 계기가 필요하다.",
+    "category": "social",
+    "rarity": "common",
+    "weight": 12,
+    "tags": ["recovery"],
+    "cooldownMonths": 2,
+    "conditions": { "employment": "EMPLOYED", "resources": { "reputation": { "max": 30 } } },
+    "choices": [
+      {
+        "id": "volunteer",
+        "label": "아무도 맡지 않으려는 일을 자원한다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -4 }],
+        "outcome": { "baseChance": 0.65 },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 10 }] },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 3 }] }
+      },
+      {
+        "id": "small_talk",
+        "label": "점심을 돌리며 관계를 다진다",
+        "guaranteedEffects": [
+          { "type": "CASH_DELTA", "amount": -150000 },
+          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_restructuring_rumor",
+    "version": 1,
+    "status": "published",
+    "title": "구조조정 소문",
+    "description": "탕비실에서 '올해 안에 인원 정리가 있다'는 이야기가 돈다. 모두가 평소보다 일찍 출근하기 시작했다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 6,
+    "cooldownMonths": 12,
+    "conditions": {
+      "employment": "EMPLOYED",
+      "flagsNone": [{ "key": "layoff_rumor", "scope": "COMPANY" }]
+    },
+    "choices": [
+      {
+        "id": "prepare",
+        "label": "성과 자료를 미리 정리해 둔다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -3 },
+          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 3 },
+          { "type": "FLAG_SET", "key": "layoff_rumor", "scope": "COMPANY", "expiresInMonths": 6 }
+        ]
+      },
+      {
+        "id": "ignore",
+        "label": "소문일 뿐이라며 넘긴다",
+        "guaranteedEffects": [
+          { "type": "FLAG_SET", "key": "layoff_rumor", "scope": "COMPANY", "expiresInMonths": 6 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_restructuring_list",
+    "version": 1,
+    "status": "published",
+    "title": "구조조정 명단",
+    "description": "소문이 사실이 되었다. 인사팀이 한 명씩 면담실로 부르기 시작했고, 이제 당신 차례다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 30,
+    "highRisk": true,
+    "maxOccurrencesPerRun": 3,
+    "conditions": {
+      "employment": "EMPLOYED",
+      "flagsAll": [{ "key": "layoff_rumor", "scope": "COMPANY" }]
+    },
+    "choices": [
+      {
+        "id": "prove_value",
+        "label": "핵심 성과를 들고 면담에 들어간다",
+        "outcome": {
+          "baseChance": 0.55,
+          "modifiers": [
+            { "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.15 } },
+            { "source": "RESOURCE", "key": "reputation", "range": { "min": 60 }, "bonus": 0.15 }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 },
+            { "type": "FLAG_CLEAR", "key": "layoff_rumor", "scope": "COMPANY" }
+          ],
+          "resultText": "면담관이 고개를 끄덕였다. 이번 명단에서는 빠졌다."
+        },
+        "onFailure": {
+          "effects": [{ "type": "EMPLOYMENT_CHANGE", "status": "UNEMPLOYED", "reason": "RESTRUCTURING" }],
+          "resultText": "면담은 10분 만에 끝났다."
+        }
+      },
+      {
+        "id": "accept_transfer",
+        "label": "한직 발령을 받아들이고 버틴다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -8 },
+          { "type": "RESOURCE_DELTA", "key": "mental", "amount": -6 },
+          { "type": "FLAG_CLEAR", "key": "layoff_rumor", "scope": "COMPANY" }
+        ],
+        "resultText": "창가 끝자리로 옮겼다. 그래도 아직 회사원이다."
+      }
+    ]
+  }
+]
