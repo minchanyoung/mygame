@@ -1,4 +1,5 @@
 import { RESOURCE_KEYS, turnInfo, type GameRunState, type ScheduledEvent } from '@company-life/shared';
+import { processAnnualReview, processSalaryAdjustment } from './annual';
 import type { ContentIndex } from './content-index';
 import { buildEnding, finalizeEnding, withPendingEnding } from './ending';
 import { EngineError } from './errors';
@@ -110,16 +111,26 @@ export function startMonth(
   assertCommand(state.phase, 'startMonth');
   assertTransition(state.phase, 'startMonth', 'EVENT_PENDING');
   const start = { resources: { ...state.resources }, cash: state.cash, debt: state.debt };
-  const settled = applyMonthlySettlement(state, content);
-  const rng = new SeededRng(settled.state.rngState);
+  // §20.1 순서: 1월 연봉 조정(급여 정산 전) → 정산 → 12월 인사평가 → 사건 선정
+  const adjusted = processSalaryAdjustment(state, content);
+  const settled = applyMonthlySettlement(adjusted.state, content);
+  const reviewed = processAnnualReview(settled.state, content);
+  const rng = new SeededRng(reviewed.state.rngState);
   // forced는 플레이테스트 도구 전용 (추첨을 건너뛰고 지정 사건을 연다)
   const { selection, scheduledEvents } = forced
-    ? { selection: forced, scheduledEvents: settled.state.scheduledEvents }
-    : pickMonthlyEvent(settled.state, rng, content);
-  const opened = openEvent({ ...settled.state, scheduledEvents, rngState: rng.state }, selection, content);
+    ? { selection: forced, scheduledEvents: reviewed.state.scheduledEvents }
+    : pickMonthlyEvent(reviewed.state, rng, content);
+  const opened = openEvent({ ...reviewed.state, scheduledEvents, rngState: rng.state }, selection, content);
   return {
     ...opened,
-    currentMonth: { turnIndex: state.turnIndex, start, settlement: settled.settlement, eventResult: null },
+    currentMonth: {
+      turnIndex: state.turnIndex,
+      start,
+      settlement: settled.settlement,
+      annualReview: reviewed.review,
+      salaryAdjustment: adjusted.adjustment,
+      eventResult: null,
+    },
   };
 }
 

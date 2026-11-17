@@ -191,6 +191,10 @@ function toMonthSummary(state: GameRunState, content: ContentIndex): PublicMonth
     netSalary: m.settlement.netSalary,
     livingCost: m.settlement.livingCost,
     interest: m.settlement.interest,
+    annualReview: m.annualReview
+      ? { grade: m.annualReview.grade, reputationDelta: m.annualReview.reputationDelta }
+      : null,
+    salaryAdjustment: m.salaryAdjustment,
     resourceDelta,
     cashDelta: state.cash - m.start.cash,
     debtDelta: state.debt - m.start.debt,
@@ -304,6 +308,7 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
       rank: job?.rank ?? null,
       rankLabel: job ? RANK_LABELS[job.rank] : null,
       annualSalary: job?.annualSalary ?? null,
+      lastReviewGrade: state.annualReviews.at(-1)?.grade ?? null,
     },
     resources: { ...state.resources },
     cash: state.cash,

@@ -902,5 +902,499 @@
         "resultText": "창가 끝자리로 옮겼다. 그래도 아직 회사원이다."
       }
     ]
+  },
+  {
+    "id": "evt_dev_hotfix",
+    "version": 1,
+    "status": "published",
+    "title": "배포 직후의 장애 제보",
+    "description": "방금 배포한 기능이 깨졌다는 제보가 쏟아진다. 고객센터 전화가 울리기 시작했다.",
+    "category": "work",
+    "rarity": "common",
+    "weight": 14,
+    "cooldownMonths": 6,
+    "tags": ["job"],
+    "conditions": { "employment": "EMPLOYED", "jobs": ["DEV"] },
+    "choices": [
+      {
+        "id": "proper_fix",
+        "label": "원인을 끝까지 찾아 제대로 고친다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -8 },
+          { "type": "RESOURCE_DELTA", "key": "health", "amount": -3 }
+        ],
+        "outcome": {
+          "baseChance": 0.6,
+          "modifiers": [
+            { "source": "SKILL", "id": "crisis", "levels": { "1": 0.1, "2": 0.15 } },
+            { "source": "SKILL", "id": "observation", "levels": { "1": 0.05, "2": 0.1 } }
+          ]
+        },
+        "onSuccess": {
+          "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 }],
+          "resultText": "근본 원인을 찾아 고쳤다. 다시는 같은 문제로 깨지지 않을 것이다."
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -4 }] }
+      },
+      {
+        "id": "quick_patch",
+        "label": "임시 패치로 일단 막는다",
+        "description": "당장은 조용해지겠지만…",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -2 },
+          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 2 },
+          { "type": "SCHEDULE_EVENT", "eventId": "evt_tech_debt_return", "delayMonths": 4 }
+        ],
+        "resultText": "급한 불은 껐다. 주석에 'TODO: 나중에 고치기'를 남겼다."
+      },
+      {
+        "id": "rollback",
+        "label": "이전 버전으로 롤백한다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }]
+      }
+    ]
+  },
+  {
+    "id": "evt_tech_debt_return",
+    "version": 1,
+    "status": "published",
+    "scheduledOnly": true,
+    "title": "돌아온 임시 패치",
+    "description": "넉 달 전 임시로 막아 둔 코드가 결국 터졌다. 'TODO: 나중에 고치기'의 '나중'이 오늘이다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "highRisk": true,
+    "conditions": { "employment": "EMPLOYED" },
+    "choices": [
+      {
+        "id": "all_night",
+        "label": "밤을 새워 제대로 갈아엎는다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "health", "amount": -8 },
+          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -10 }
+        ],
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [{ "source": "SKILL", "id": "crisis", "levels": { "1": 0.1, "2": 0.2 } }]
+        },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 4 }] },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -8 }] }
+      },
+      {
+        "id": "confess",
+        "label": "임시 패치였다고 솔직히 보고한다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -6 },
+          { "type": "NPC_RELATION_DELTA", "target": "BOSS", "stat": "trust", "amount": 3 }
+        ],
+        "resultText": "한숨 소리가 들렸지만, 팀장은 솔직하게 말해 줘서 고맙다고 했다."
+      }
+    ]
+  },
+  {
+    "id": "evt_hr_interviewer",
+    "version": 1,
+    "status": "published",
+    "title": "하루 종일 면접관",
+    "description": "채용 시즌이다. 오늘은 아침부터 저녁까지 면접실에 앉아 있어야 한다.",
+    "category": "work",
+    "rarity": "common",
+    "weight": 14,
+    "cooldownMonths": 6,
+    "tags": ["job"],
+    "conditions": { "employment": "EMPLOYED", "jobs": ["HR"] },
+    "choices": [
+      {
+        "id": "thorough",
+        "label": "지원자 한 명 한 명 꼼꼼히 평가한다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": -7 }],
+        "outcome": {
+          "baseChance": 0.65,
+          "modifiers": [
+            { "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } },
+            { "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.05, "2": 0.1 } }
+          ]
+        },
+        "onSuccess": {
+          "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 }],
+          "resultText": "당신이 뽑은 신입이 첫 달부터 일을 잘한다는 소문이 돈다."
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }] }
+      },
+      {
+        "id": "skim",
+        "label": "첫인상과 분위기로 빠르게 판단한다",
+        "outcome": { "baseChance": 0.4 },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 1 }] },
+        "onFailure": {
+          "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -8 }],
+          "resultText": "당신이 강력 추천한 신입이 사흘 만에 퇴사했다."
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_sales_big_deal",
+    "version": 1,
+    "status": "published",
+    "title": "분기를 건 대형 계약",
+    "description": "이번 분기 실적을 좌우할 대형 거래처 미팅이 잡혔다. 팀 전체가 당신만 바라본다.",
+    "category": "work",
+    "rarity": "common",
+    "weight": 14,
+    "cooldownMonths": 6,
+    "highRisk": true,
+    "tags": ["job"],
+    "conditions": { "employment": "EMPLOYED", "jobs": ["SALES"] },
+    "choices": [
+      {
+        "id": "entertain",
+        "label": "접대 자리를 마련한다",
+        "guaranteedEffects": [
+          { "type": "CASH_DELTA", "amount": -400000 },
+          { "type": "RESOURCE_DELTA", "key": "health", "amount": -5 }
+        ],
+        "outcome": {
+          "baseChance": 0.6,
+          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.15 } }]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 },
+            { "type": "CASH_DELTA", "amount": 600000 }
+          ],
+          "resultText": "3차 노래방에서 계약서에 사인을 받았다. 성과급이 나왔다."
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -5 }] }
+      },
+      {
+        "id": "honest_pitch",
+        "label": "정직한 숫자로 정면 승부한다",
+        "outcome": {
+          "baseChance": 0.45,
+          "modifiers": [{ "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } }]
+        },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 10 }] },
+        "onFailure": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -6 },
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -4 }
+          ]
+        }
+      },
+      {
+        "id": "pass",
+        "label": "선배에게 넘긴다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }]
+      }
+    ]
+  },
+  {
+    "id": "evt_finance_closing_error",
+    "version": 1,
+    "status": "published",
+    "title": "맞지 않는 결산",
+    "description": "결산 마감 하루 전, 숫자 하나가 끝까지 맞지 않는다.",
+    "category": "work",
+    "rarity": "common",
+    "weight": 14,
+    "cooldownMonths": 6,
+    "tags": ["job"],
+    "conditions": { "employment": "EMPLOYED", "jobs": ["FINANCE"] },
+    "choices": [
+      {
+        "id": "recheck_all",
+        "label": "전표를 처음부터 다시 맞춰 본다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": -10 }],
+        "outcome": {
+          "baseChance": 0.7,
+          "modifiers": [{ "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } }]
+        },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 }] },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -4 }] }
+      },
+      {
+        "id": "adjust_quietly",
+        "label": "차액을 조용히 맞춰 넣는다",
+        "outcome": { "baseChance": 0.5 },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 1 }] },
+        "onFailure": {
+          "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -10 }],
+          "resultText": "감사팀이 그 한 줄을 찾아냈다."
+        }
+      },
+      {
+        "id": "report",
+        "label": "팀장에게 바로 보고한다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -2 },
+          { "type": "NPC_RELATION_DELTA", "target": "BOSS", "stat": "trust", "amount": 3 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_planning_pitch",
+    "version": 1,
+    "status": "published",
+    "title": "신사업 제안 발표",
+    "description": "다음 주 임원 앞에서 신사업 제안을 발표하게 됐다. 자료가 아직 반밖에 없다.",
+    "category": "work",
+    "rarity": "common",
+    "weight": 14,
+    "cooldownMonths": 6,
+    "tags": ["job"],
+    "conditions": { "employment": "EMPLOYED", "jobs": ["PLANNING"] },
+    "choices": [
+      {
+        "id": "solid_data",
+        "label": "밤새 근거 자료를 탄탄히 채운다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": -6 }],
+        "outcome": {
+          "baseChance": 0.55,
+          "modifiers": [{ "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } }]
+        },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 }] },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }] }
+      },
+      {
+        "id": "inflate",
+        "label": "숫자를 조금 부풀려 화려하게 발표한다",
+        "description": "박수는 확실하다. 그 다음은…",
+        "outcome": { "baseChance": 0.7 },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 10 },
+            { "type": "SCHEDULE_EVENT", "eventId": "evt_numbers_audit", "delayMonths": 3 }
+          ],
+          "resultText": "임원들이 박수를 쳤다. 숫자를 다시 보는 사람은 없었다. 아직은."
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -5 }] }
+      },
+      {
+        "id": "modest",
+        "label": "있는 자료로 무난하게 발표한다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 1 },
+          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -2 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_numbers_audit",
+    "version": 1,
+    "status": "published",
+    "scheduledOnly": true,
+    "title": "다시 꺼내 든 발표 자료",
+    "description": "석 달 전 발표한 수치를 감사팀이 다시 들여다보고 있다. 당신의 이름이 적힌 슬라이드가 회의실 화면에 떠 있다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 1,
+    "highRisk": true,
+    "conditions": { "employment": "EMPLOYED" },
+    "choices": [
+      {
+        "id": "own_up",
+        "label": "과장이 있었다고 먼저 인정한다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -8 }]
+      },
+      {
+        "id": "defend",
+        "label": "해석의 차이라고 끝까지 방어한다",
+        "outcome": {
+          "baseChance": 0.4,
+          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.2 } }]
+        },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 2 }] },
+        "onFailure": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -15 },
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -6 }
+          ],
+          "resultText": "감사 보고서 첫 장에 당신의 슬라이드가 실렸다."
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_meeting_marathon",
+    "version": 1,
+    "status": "published",
+    "title": "회의, 회의, 회의",
+    "description": "오늘 캘린더가 회의로 꽉 찼다. 정작 내 일은 하나도 손대지 못했다.",
+    "category": "daily",
+    "rarity": "common",
+    "weight": 12,
+    "conditions": { "employment": "EMPLOYED" },
+    "choices": [
+      {
+        "id": "endure",
+        "label": "끝까지 다 들어간다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -6 },
+          { "type": "RESOURCE_DELTA", "key": "mental", "amount": -2 }
+        ]
+      },
+      {
+        "id": "skip_one",
+        "label": "하나쯤은 빠지고 내 일을 한다",
+        "outcome": { "baseChance": 0.6 },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": 3 }] },
+        "onFailure": {
+          "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -5 }],
+          "resultText": "하필 그 회의에서 내 업무가 다른 사람에게 넘어갔다."
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_office_gossip",
+    "version": 1,
+    "status": "published",
+    "title": "나에 대한 소문",
+    "description": "탕비실에서 내 이야기가 나오다 내가 들어가자 대화가 뚝 끊겼다.",
+    "category": "social",
+    "rarity": "common",
+    "weight": 10,
+    "conditions": { "employment": "EMPLOYED" },
+    "choices": [
+      {
+        "id": "confront",
+        "label": "누가 그런 말을 했는지 직접 묻는다",
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.15 } }]
+        },
+        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 3 }] },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -6 }] }
+      },
+      {
+        "id": "ignore",
+        "label": "못 들은 척한다",
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 },
+          { "type": "RESOURCE_DELTA", "key": "mental", "amount": -2 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_hobby_found",
+    "version": 1,
+    "status": "published",
+    "special": true,
+    "title": "뜻밖의 취미",
+    "description": "퇴근길에 우연히 들른 동네 클래스가 생각보다 즐거웠다. 오랜만에 시간 가는 줄 몰랐다.",
+    "category": "life",
+    "rarity": "uncommon",
+    "weight": 10,
+    "cooldownMonths": 6,
+    "tags": ["recovery"],
+    "conditions": { "negativeTraitLevels": { "burnout": { "min": 1 } } },
+    "choices": [
+      {
+        "id": "commit_hobby",
+        "label": "주말마다 꾸준히 다녀 본다",
+        "visibleIf": { "negativeTraitLevels": { "burnout": { "min": 1, "max": 1 } } },
+        "guaranteedEffects": [{ "type": "CASH_DELTA", "amount": -200000 }],
+        "outcome": {
+          "baseChance": 0.55,
+          "modifiers": [{ "source": "RESOURCE", "key": "mental", "range": { "min": 40 }, "bonus": 0.1 }]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": 6 },
+            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "burnout", "from": 1, "to": 0 }
+          ],
+          "resultText": "일 말고도 내가 잘하는 게 있다는 걸 알았다. 월요일이 조금 덜 무섭다."
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": 2 }] }
+      },
+      {
+        "id": "retreat",
+        "label": "2박 3일 템플스테이를 다녀온다",
+        "visibleIf": { "negativeTraitLevels": { "burnout": { "min": 2, "max": 2 } } },
+        "guaranteedEffects": [{ "type": "CASH_DELTA", "amount": -500000 }],
+        "outcome": { "baseChance": 0.5 },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "mental", "amount": 6 },
+            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "burnout", "from": 2, "to": 1 }
+          ]
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": 2 }] }
+      },
+      {
+        "id": "no_time",
+        "label": "그럴 여유가 없다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -2 }]
+      }
+    ]
+  },
+  {
+    "id": "evt_prove_yourself",
+    "version": 1,
+    "status": "published",
+    "special": true,
+    "title": "아무도 원하지 않는 프로젝트",
+    "description": "모두가 피한 프로젝트가 당신에게 떨어졌다. 그런데 어쩌면, 소문을 잠재울 기회일지도 모른다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 10,
+    "cooldownMonths": 6,
+    "conditions": { "employment": "EMPLOYED", "negativeTraitLevels": { "officeStigma": { "min": 1 } } },
+    "choices": [
+      {
+        "id": "deliver",
+        "label": "실력으로 끝까지 해낸다",
+        "visibleIf": { "negativeTraitLevels": { "officeStigma": { "min": 1, "max": 1 } } },
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "health", "amount": -5 },
+          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -4 }
+        ],
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [{ "source": "SKILL", "id": "crisis", "levels": { "1": 0.1, "2": 0.15 } }]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 },
+            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "officeStigma", "from": 1, "to": 0 }
+          ],
+          "resultText": "결과물이 말해 줬다. 더는 아무도 그 일을 입에 올리지 않는다."
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }] }
+      },
+      {
+        "id": "big_win",
+        "label": "모두가 놀랄 성과를 노린다",
+        "visibleIf": { "negativeTraitLevels": { "officeStigma": { "min": 2, "max": 2 } } },
+        "guaranteedEffects": [
+          { "type": "RESOURCE_DELTA", "key": "health", "amount": -6 },
+          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -6 }
+        ],
+        "outcome": {
+          "baseChance": 0.4,
+          "modifiers": [
+            { "source": "SKILL", "id": "crisis", "levels": { "1": 0.1, "2": 0.15 } },
+            { "source": "SKILL", "id": "observation", "levels": { "1": 0.05, "2": 0.1 } }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 },
+            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "officeStigma", "from": 2, "to": 1 }
+          ]
+        },
+        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -4 }] }
+      },
+      {
+        "id": "decline",
+        "label": "정중히 거절한다",
+        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -2 }]
+      }
+    ]
   }
 ]

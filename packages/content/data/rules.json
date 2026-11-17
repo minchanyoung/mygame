@@ -31,6 +31,13 @@
     "debtWarningPermille": 700,
     "recoveryWeightBonus": 25
   },
+  "annualReview": {
+    "weights": { "reputation": 4, "bossTrust": 3, "bossFavor": 1, "successRate": 2 },
+    "gradeThresholds": { "S": 75, "A": 62, "B": 48, "C": 35 },
+    "raisePermilleByGrade": { "S": 80, "A": 50, "B": 30, "C": 10, "D": 0 },
+    "reputationDeltaByGrade": { "S": 5, "A": 3, "B": 0, "C": 0, "D": -2 },
+    "traitAdjustments": { "officeStigma": { "1": -5, "2": -15 }, "socialSkill": { "2": 3 } }
+  },
   "monthly": {
     "taxPermille": 150,
     "livingCost": 1300000,

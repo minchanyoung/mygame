@@ -23,7 +23,13 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
           {e.jobLabel && <span className="chip">{e.jobLabel}</span>}
           {e.rankLabel && <span className="chip">{e.rankLabel}</span>}
         </div>
-        {e.annualSalary !== null && <p className="small">연봉 {formatKrw(e.annualSalary)}</p>}
+        {e.annualSalary !== null && (
+          <p className="small">
+            연봉 {formatKrw(e.annualSalary)}
+            {e.lastReviewGrade && ` · 최근 평가 ${e.lastReviewGrade}등급`}
+            {view.turn.monthOfYear === 12 && ' · 이번 달 연말 평가'}
+          </p>
+        )}
       </div>
 
       <Warnings view={view} />

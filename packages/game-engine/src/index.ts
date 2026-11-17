@@ -12,6 +12,7 @@ export * from './chance';
 export * from './effects';
 export * from './events';
 export * from './ending';
+export * from './annual';
 export * from './month';
 export * from './simulation';
 export * from './playtest';

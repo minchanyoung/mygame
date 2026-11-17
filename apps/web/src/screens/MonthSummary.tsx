@@ -54,6 +54,28 @@ export function MonthSummary({ view, busy, onNext }: Props) {
         </div>
       )}
 
+      {m?.annualReview && (
+        <div className="card review">
+          <strong>📋 연말 인사평가</strong>
+          <p>
+            올해 평가 등급은{' '}
+            <span className={`grade grade-${m.annualReview.grade}`}>{m.annualReview.grade}</span>
+            {m.annualReview.reputationDelta !== 0 && ` (평판 ${signed(m.annualReview.reputationDelta)})`}.
+            다음 1월 연봉에 반영됩니다.
+          </p>
+        </div>
+      )}
+
+      {m?.salaryAdjustment && (
+        <div className="card review">
+          <strong>💰 연봉 조정</strong>
+          <p>
+            {m.salaryAdjustment.grade && `지난해 ${m.salaryAdjustment.grade}등급 반영 — `}
+            {formatKrw(m.salaryAdjustment.from)} → <strong>{formatKrw(m.salaryAdjustment.to)}</strong>
+          </p>
+        </div>
+      )}
+
       {m && (
         <div className="card">
           <dl className="kv kv-wide">

@@ -94,7 +94,7 @@ export function getEligibleEvents(state: GameRunState, content: ContentIndex): E
   const candidates: EventCandidate[] = [];
 
   for (const event of content.pack.events) {
-    if (event.status !== 'published' || event.id === fallbackEventId) continue;
+    if (event.status !== 'published' || event.id === fallbackEventId || event.scheduledOnly) continue;
     if (highRiskBlocked && event.highRisk) continue;
 
     const count = stats.count.get(event.id) ?? 0;

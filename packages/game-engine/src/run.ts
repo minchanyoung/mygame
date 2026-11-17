@@ -56,6 +56,7 @@ export function createRun(input: CreateRunInput, content: ContentIndex): GameRun
     npcs: [],
     npcAssignments: [],
     eventHistory: [{ turnIndex: 0, kind: 'RUN_CREATED', summary: '새 인생 시작' }],
+    annualReviews: [],
     annualReviewProcessedYear: null,
     salaryAdjustedYear: null,
     statistics: {

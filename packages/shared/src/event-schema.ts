@@ -258,6 +258,8 @@ const EventObjectSchema = z
     exclusiveGroup: ContentIdSchema.optional(),
     /** 큰 체력·정신·재정 손실 가능 사건 (§21.3 연속 고위험 방지). */
     highRisk: z.boolean().optional(),
+    /** 예약(SCHEDULE_EVENT)으로만 발생하는 후속 사건. 무작위 추첨 후보에서 제외된다 (§7.4). */
+    scheduledOnly: z.boolean().optional(),
     npcWeightModifiers: z.array(NpcWeightModifierSchema).max(6).optional(),
     conditions: ConditionsSchema.optional(),
     choices: z.array(ChoiceSchema).min(1).max(4),

@@ -109,9 +109,21 @@ describe('content pack', () => {
     expect(issues(p).length).toBeGreaterThan(0);
   });
 
+  it('rejects scheduledOnly events that nothing schedules (orphan follow-ups)', () => {
+    const p = raw();
+    for (const e of p.events) {
+      for (const c of e.choices) {
+        const g = c['guaranteedEffects'] as Array<{ type: string; eventId?: string }> | undefined;
+        if (g) c['guaranteedEffects'] = g.filter((x) => x.eventId !== 'evt_tech_debt_return');
+      }
+    }
+    expect(issues(p).join('\n')).toMatch(/evt_tech_debt_return: scheduledOnly 사건을 예약하는 사건이 없음/);
+  });
+
   it('requires every active trait to have all level transition paths', () => {
     const p = raw();
-    p.events = p.events.filter((e) => e.id !== 'evt_burnout_recovery');
+    // 극복 루트가 2개(멈춰 선 주말, 뜻밖의 취미)이므로 둘 다 지워야 경로가 사라진다
+    p.events = p.events.filter((e) => e.id !== 'evt_burnout_recovery' && e.id !== 'evt_hobby_found');
     const out = issues(p).join('\n');
     expect(out).toMatch(/burnout: 활성 특성의 레벨 전이 2→1/);
     expect(out).toMatch(/burnout: 활성 특성의 레벨 전이 1→0/);

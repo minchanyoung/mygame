@@ -240,6 +240,16 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
     }
   }
 
+  // 예약 전용 사건은 반드시 어떤 사건이 SCHEDULE_EVENT로 예약해야 한다 (고아 콘텐츠 방지)
+  const scheduledTargets = new Set([...scheduleEdges.values()].flat());
+  for (const event of pack.events.filter((e) => e.scheduledOnly)) {
+    if (!scheduledTargets.has(event.id))
+      add(`events.${event.id}`, 'scheduledOnly 사건을 예약하는 사건이 없음');
+  }
+  for (const id of Object.keys(pack.rules.annualReview.traitAdjustments)) {
+    if (!traits.has(id)) add('rules.annualReview.traitAdjustments', `알 수 없는 특성: ${id}`);
+  }
+
   // 엔딩 문구 변형의 조건 참조
   for (const [cause, def] of Object.entries(pack.endings.causes)) {
     def.variants?.forEach((v, i) => checkConditions(`endings.causes.${cause}.variants[${i}]`, v.when));

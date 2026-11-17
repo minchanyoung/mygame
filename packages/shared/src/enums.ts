@@ -123,6 +123,11 @@ export const ContentIdSchema = z.string().regex(/^[a-zA-Z][A-Za-z0-9_]{1,63}$/, 
 export const EventIdSchema = z.string().regex(/^evt_[a-z0-9_]{2,63}$/, 'evt_ 접두사 소문자 ID');
 export const CompanyIdSchema = z.string().regex(/^company_[a-z0-9_]{2,63}$/, 'company_ 접두사 소문자 ID');
 
+/** §20.1 연말 인사평가 등급 */
+export const REVIEW_GRADES = ['S', 'A', 'B', 'C', 'D'] as const;
+export const ReviewGradeSchema = z.enum(REVIEW_GRADES);
+export type ReviewGrade = z.infer<typeof ReviewGradeSchema>;
+
 /** §26.5 이벤트로 인한 비자발적 실직 사유. 자발적 퇴사 사유는 존재하지 않는다 (§26.1). */
 export const JOB_LOSS_REASONS = ['LAYOFF', 'RESTRUCTURING', 'FORCED_RESIGNATION', 'COMPANY_CLOSURE'] as const;
 export const JobLossReasonSchema = z.enum(JOB_LOSS_REASONS);

@@ -12,6 +12,7 @@ import {
   NpcRoleSchema,
   RESOURCE_KEYS,
   ResourceKeySchema,
+  ReviewGradeSchema,
 } from './enums';
 import { ConditionsSchema, EventDefinitionSchema } from './event-schema';
 
@@ -162,6 +163,35 @@ export const GameRulesSchema = z
         /** 부채가 한계선의 이 비율(‰) 이상이면 경고 */
         debtWarningPermille: z.number().int().min(0).max(1000),
         recoveryWeightBonus: z.number().int().min(0).max(1000),
+      })
+      .strict(),
+    /**
+     * §20.1 연말 인사평가 (12월) → 다음 1월 연봉 조정.
+     * 점수 = 가중 평균(평판, 상사 신뢰, 상사 호감, 올해 사건 성공률%) + 특성 보정 → 0~100.
+     */
+    annualReview: z
+      .object({
+        weights: z
+          .object({
+            reputation: z.number().int().min(0),
+            bossTrust: z.number().int().min(0),
+            bossFavor: z.number().int().min(0),
+            successRate: z.number().int().min(0),
+          })
+          .strict(),
+        /** 등급 하한 점수 (S ≥ A ≥ B ≥ C, 그 아래는 D) */
+        gradeThresholds: z
+          .object({ S: z.number().int(), A: z.number().int(), B: z.number().int(), C: z.number().int() })
+          .strict(),
+        /** 등급별 연봉 인상률(‰) */
+        raisePermilleByGrade: z.record(ReviewGradeSchema, z.number().int().min(-200).max(500)),
+        /** 등급별 평판 변화 */
+        reputationDeltaByGrade: z.record(ReviewGradeSchema, z.number().int().min(-30).max(30)),
+        /** 특성별 점수 보정 (레벨 치환형): 예) officeStigma { "1": -5, "2": -15 } */
+        traitAdjustments: z.record(
+          ContentIdSchema,
+          z.object({ '1': z.number().int().optional(), '2': z.number().int().optional() }).strict(),
+        ),
       })
       .strict(),
     /** 월간 정산 (간략 게임 모델 — 실제 세법/금융 아님) */

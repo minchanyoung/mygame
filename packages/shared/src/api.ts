@@ -8,6 +8,7 @@ import type {
   NpcRank,
   NpcRole,
   PlayerRank,
+  ReviewGrade,
   RiskLevel,
   RunPhase,
 } from './enums';
@@ -171,6 +172,10 @@ export interface PublicMonthSummary {
   netSalary: number;
   livingCost: number;
   interest: number;
+  /** 12월 인사평가 결과 */
+  annualReview: { grade: ReviewGrade; reputationDelta: number } | null;
+  /** 1월 연봉 조정 */
+  salaryAdjustment: { grade: ReviewGrade | null; from: number; to: number } | null;
   resourceDelta: Resources;
   cashDelta: number;
   debtDelta: number;
@@ -214,6 +219,8 @@ export interface PublicRunView {
     rank: PlayerRank | null;
     rankLabel: string | null;
     annualSalary: number | null;
+    /** 가장 최근 인사평가 등급 */
+    lastReviewGrade: ReviewGrade | null;
   };
   resources: Resources;
   cash: number;

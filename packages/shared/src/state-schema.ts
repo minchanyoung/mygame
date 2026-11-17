@@ -16,6 +16,7 @@ import {
   NpcRoleSchema,
   OwnedTraitLevelSchema,
   PlayerRankSchema,
+  ReviewGradeSchema,
   RunPhaseSchema,
   TraitLevelSchema,
 } from './enums';
@@ -130,6 +131,18 @@ export type Ending = z.infer<typeof EndingSchema>;
 
 const MoneySnapshot = z.object({ resources: ResourcesSchema, cash: Krw, debt: Krw }).strict();
 
+/** §20.1 연말 인사평가 기록 (승진 심사 등에서 참조) */
+export const AnnualReviewSchema = z
+  .object({
+    yearIndex: z.number().int().min(0),
+    turnIndex: z.number().int().min(0),
+    companyId: CompanyIdSchema,
+    grade: ReviewGradeSchema,
+    score: z.number().int().min(0).max(100),
+  })
+  .strict();
+export type AnnualReview = z.infer<typeof AnnualReviewSchema>;
+
 /** 이번 달 기록 (월말 요약 표시용) */
 export const MonthLogSchema = z
   .object({
@@ -142,6 +155,16 @@ export const MonthLogSchema = z
         interest: Krw.nonnegative(),
       })
       .strict(),
+    /** 12월이면 이번 달 처리된 인사평가 */
+    annualReview: z
+      .object({ grade: ReviewGradeSchema, score: z.number().int(), reputationDelta: z.number().int() })
+      .strict()
+      .nullable(),
+    /** 1월이면 이번 달 적용된 연봉 조정 */
+    salaryAdjustment: z
+      .object({ grade: ReviewGradeSchema.nullable(), from: Krw.positive(), to: Krw.positive() })
+      .strict()
+      .nullable(),
     eventResult: z
       .object({
         eventId: EventIdSchema,
@@ -330,6 +353,7 @@ export const GameRunStateSchema = z
     npcs: z.array(NpcSchema),
     npcAssignments: z.array(NpcAssignmentSchema),
     eventHistory: z.array(HistoryEntrySchema),
+    annualReviews: z.array(AnnualReviewSchema),
     annualReviewProcessedYear: z.number().int().nullable(),
     salaryAdjustedYear: z.number().int().nullable(),
     statistics: z

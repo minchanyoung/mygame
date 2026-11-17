@@ -29,15 +29,16 @@
 | 1.8 | 모바일 웹: 시작 → 이름/성별 → 카드 선택 → 지원 → 팀 화면 | apps/web | 수동 스모크(HTTP) | 🟡 브라우저 육안 검증 전 |
 | 1.9 | 월간 진행 엔진 + API (`start-month`/`choose`/`next-month`/`current-event`/`result`) | engine/month.ts, api | ending/app 테스트 | ✅ (이벤트 화면은 1.16) |
 | 1.10 | 월간 정산: 세후 급여(간략), 생활비, 부채 이자 0.5%, 현금 부족분 → 부채, 자연 회복 | engine, content/rules | 정산 테스트 | ✅ |
-| 1.11 | 12월 평가 / 1월 연봉 조정 (체크포인트로 1회 보장) | engine | §20.3 수용 테스트 1·2 | ⬜ |
-| 1.12 | 예약 이벤트 처리(dueTurn·priority·maxDelayMonths=3), 플래그 만료 | engine | 예약/만료 테스트 | 🟡 엔진 처리만, 예약 콘텐츠 없음 |
+| 1.11 | 12월 평가 / 1월 연봉 조정 (체크포인트로 1회 보장, 사내 낙인 감점) | engine/annual.ts, content/rules | annual 테스트 | ✅ S2 |
+| 1.12 | 예약 이벤트: `scheduledOnly` 후속 사건 2개(임시 패치→돌아온 임시 패치, 부풀린 발표→감사) | engine, content | annual 테스트 | ✅ S2 |
+| 1.14 | 상사 교체 규칙 `reassignBossIfNeeded` (§21.2) — 승진(S3)에서 호출 | engine/npcs | annual 테스트 | ✅ S2 (호출처는 S3) |
 | ~~1.13~~ | ~~실업 월 진행~~ — §26으로 대체 | — | — | 삭제 |
 | 1.17 | §26 실직 게임오버·엔딩(자원 0·부채 한계·이벤트 실직·조기 은퇴·정년), 경고, 첫 구직 보장 | engine/ending·jobs·view, content | §26.7 테스트 | ✅ 검수 ② 대기 |
 | 1.18 | 자동 플레이 시뮬레이터 (`npm run simulate -w @company-life/game-engine -- 1000`) | engine/simulation | 진행 불능 0건 테스트 | ✅ |
 | 1.19 | 밸런스 조정 S1: 구조조정 소문 재직 12개월+·쿨다운 24, 명단 가중치 10·최대 2회, 면담 70% (`tenureMonths` 조건 추가) | content/events, shared, engine | `npm run simulate` 목표 표시 | 🟡 실패율 목표 근접, 엔딩 다양성 미달 → S2 콘텐츠로 해결 |
 | 1.21 | git 저장소 + GitHub 원격 (minchanyoung/mygame) | 루트 | — | 🟡 로컬 커밋 완료, push는 사용자 로그인 필요 |
 | 1.14 | 상사 교체 규칙(플레이어 ≥ 상사 직급 시 FORMER_BOSS + 별도 스트림 생성) | engine/npcs | NPC 교체 테스트 | ⬜ |
-| 1.15 | 이벤트 팩 18개 이상, 직무 특화 3개, 부정 특성 2번째 극복 루트 | content | 콘텐츠 검증 | 🟡 19개 (직무 특화 0) |
+| 1.15 | 이벤트 팩: 30개 (직무 특화 5, 예약 후속 2, 집중력·평판 압박 2, 부정 특성 두 번째 극복 루트 2) | content | 콘텐츠 검증 | ✅ S2 |
 | 1.16 | 화면: 이벤트·월말 요약·경고 배너·엔딩 (검수 ③) | web | 사용자 플레이테스트 (`docs/PLAYTEST.md`) | 🟡 구현 완료, 사용자 검수 대기 |
 | 1.20 | 플레이테스트 도구 (`npm run playtest`): 상태 조정·사건 강제·정확한 확률/숨김 정보, 조작 run 표시 | api/engine/web | playtest 테스트 | ✅ |
 

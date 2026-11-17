@@ -1,7 +1,7 @@
-import type { EndingType, GameRunState } from '@company-life/shared';
+import type { Effect, EndingType, GameRunState } from '@company-life/shared';
 import type { ContentIndex } from './content-index';
 import { EngineError } from './errors';
-import { evaluateChoices } from './events';
+import { evaluateChoices, type ChoiceEvaluation } from './events';
 import { applyForJob } from './jobs';
 import { chooseInMonth, nextMonth, startMonth } from './month';
 import { SeededRng } from './rng';
@@ -11,7 +11,8 @@ import { toPublicActiveEvent } from './view';
 /**
  * §13.3 자동 플레이 봇. 정책 선택용 난수는 게임 판정 RNG와 분리된 스트림을 쓴다.
  * - random: 고를 수 있는 선택지 중 무작위
- * - cautious: 확정 비용으로 실직하는 선택지를 피하고, 그중 확정 자원 변화 합이 가장 큰 선택지
+ * - cautious: 확정 비용으로 실직하는 선택지를 피하고, 자원 변화 기댓값(성공·실패 확률 반영,
+ *   위험 구간 자원 손실 가중)이 가장 큰 선택지. 사람보다 정보가 많다(정확한 확률을 안다)는 점에 유의.
  */
 export type AutoPlayPolicy = 'random' | 'cautious';
 
@@ -46,13 +47,31 @@ function pickChoice(
   const fatal = new Set(view?.choices.filter((c) => c.fatalWarning).map((c) => c.id));
   const safe = selectable.filter((c) => !fatal.has(c.choice.id));
   const pool = safe.length > 0 ? safe : selectable;
-  const score = (id: string) =>
-    (pool.find((c) => c.choice.id === id)?.choice.guaranteedEffects ?? []).reduce(
-      (sum, e) => sum + (e.type === 'RESOURCE_DELTA' ? e.amount : 0),
+
+  // 자원 변화의 기댓값. 위험 구간(30 이하) 자원의 손실은 3배로 무겁게 본다.
+  const weight = (key: keyof GameRunState['resources'], amount: number) =>
+    amount < 0 && state.resources[key] <= 30 ? amount * 3 : amount;
+  // 실직은 게임오버이므로 어떤 자원 손실보다 무겁게 본다
+  const JOB_LOSS_PENALTY = -200;
+  const sum = (effects: readonly Effect[] | undefined) =>
+    (effects ?? []).reduce(
+      (s, e) =>
+        s +
+        (e.type === 'RESOURCE_DELTA'
+          ? weight(e.key, e.amount)
+          : e.type === 'EMPLOYMENT_CHANGE'
+            ? JOB_LOSS_PENALTY
+            : 0),
       0,
-    ) +
-    (pool.find((c) => c.choice.id === id)?.chance?.chance ?? 0.5) * 5;
-  return [...pool].sort((a, b) => score(b.choice.id) - score(a.choice.id))[0]!.choice.id;
+    );
+  const expected = (c: ChoiceEvaluation) => {
+    const p = c.chance?.chance ?? 1;
+    const outcome = c.chance
+      ? p * sum(c.choice.onSuccess?.effects) + (1 - p) * sum(c.choice.onFailure?.effects)
+      : 0;
+    return sum(c.choice.guaranteedEffects) + outcome;
+  };
+  return [...pool].sort((a, b) => expected(b) - expected(a))[0]!.choice.id;
 }
 
 export function autoPlay(seed: string, policy: AutoPlayPolicy, content: ContentIndex): AutoPlayResult {

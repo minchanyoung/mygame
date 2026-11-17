@@ -167,6 +167,58 @@ export function currentTeamNpcs(state: GameRunState): Array<{ npc: Npc; role: Np
 }
 
 /**
+ * §21.2 직속 상사의 직급은 항상 플레이어보다 높아야 한다. 플레이어가 상사와 같거나 높아지면
+ * 기존 상사는 FORMER_BOSS로 남기고(ID·관계·기억 보존, 삭제하지 않음) 별도 시드 스트림으로 새 상사를 생성한다.
+ * 이미 조건을 만족하면 아무것도 바꾸지 않는다 (재호출해도 다시 굴리지 않음).
+ */
+export function reassignBossIfNeeded(
+  state: GameRunState,
+  content: ContentIndex,
+): { state: GameRunState; replaced: boolean } {
+  const job = state.employment.current;
+  if (!job) return { state, replaced: false };
+  const bossEntry = currentTeamNpcs(state).find((t) => t.role === 'BOSS');
+  const playerIdx = NPC_RANKS.indexOf(job.rank);
+  if (bossEntry && NPC_RANKS.indexOf(bossEntry.npc.rank) > playerIdx) return { state, replaced: false };
+
+  const bossesSoFar = new Set(
+    state.npcs
+      .filter((n) => n.companyId === job.companyId && n.teamId === job.teamId && n.role === 'BOSS')
+      .map((n) => n.npcId),
+  ).size;
+  const [newBoss] = generateCompanyNpcs(
+    {
+      seed: state.seed,
+      companyId: job.companyId,
+      teamId: job.teamId,
+      turnIndex: state.turnIndex,
+      playerRank: job.rank,
+      stream: bossesSoFar,
+    },
+    content,
+  );
+  if (!newBoss) return { state, replaced: false };
+
+  const npcAssignments = state.npcAssignments.flatMap((a): NpcAssignment[] =>
+    bossEntry && a.npcId === bossEntry.npc.npcId && a.role === 'BOSS' && a.toTurn === null
+      ? [
+          { ...a, toTurn: state.turnIndex },
+          { ...a, role: 'FORMER_BOSS', fromTurn: state.turnIndex, toTurn: null },
+        ]
+      : [a],
+  );
+  npcAssignments.push({
+    npcId: newBoss.npcId,
+    companyId: job.companyId,
+    teamId: job.teamId,
+    role: 'BOSS',
+    fromTurn: state.turnIndex,
+    toTurn: null,
+  });
+  return { state: { ...state, npcs: [...state.npcs, newBoss], npcAssignments }, replaced: true };
+}
+
+/**
  * 입사한 회사·팀의 NPC 구성을 보장한다. 같은 run에서 이미 생성된 활성 팀이 있으면 재사용하고
  * (§8.1, 새로고침/재입사 시 다시 굴리지 않음), 없으면 새로 생성한다. 입력 상태는 변경하지 않는다.
  */
