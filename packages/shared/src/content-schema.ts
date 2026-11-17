@@ -10,6 +10,7 @@ import {
   JobIdSchema,
   NpcRelationStatSchema,
   NpcRoleSchema,
+  PlayerRankSchema,
   RESOURCE_KEYS,
   ResourceKeySchema,
   ReviewGradeSchema,
@@ -228,6 +229,8 @@ export const GameRulesSchema = z
             misc: z.number().int().min(0),
           })
           .strict(),
+        /** 물가 상승: 생활비가 해마다 이 비율(‰)만큼 복리로 오른다 */
+        livingCostGrowthPermille: z.number().int().min(0).max(200),
         debtInterestPermille: z.number().int().min(0).max(100),
         /** 빚이 있으면 매달 갚는 원금 상한 (원) */
         debtRepayment: z.number().int().min(0),
@@ -243,6 +246,80 @@ export const GameRulesSchema = z
         /** 직무 계수(‰). 1000 = 1.0배. 정수 연산으로 부동소수점 금액 계산을 피한다. */
         jobCoefficientPermille: jobRecord(z.number().int().min(500).max(2000)),
         roundingUnit: z.number().int().positive(),
+      })
+      .strict(),
+    /**
+     * S5 승진 심사 (1월, 연봉 조정 직전). 자동 승진 없음: 근속 + 포인트를 채우면 심사가 열리고 확률 판정 (§5.4).
+     */
+    promotion: z
+      .object({
+        /** 사다리: 사원→대리→과장→차장→부장 순서, 연속이어야 한다 (검증기) */
+        ladder: z
+          .array(
+            z
+              .object({
+                from: PlayerRankSchema,
+                to: PlayerRankSchema,
+                minYears: z.number().int().min(0).max(20),
+                points: z.number().int().min(1).max(50),
+                raisePermille: z.number().int().min(0).max(1000),
+                /** 이 단계의 심사 확률 보정 (위로 갈수록 자리가 적다) */
+                chanceAdjust: z.number().min(-0.5).max(0.5),
+              })
+              .strict(),
+          )
+          .min(1),
+        /** 12월 평가 등급별 승진 포인트 */
+        pointsByGrade: z.record(ReviewGradeSchema, z.number().int().min(0).max(20)),
+        baseChance: ChanceSchema,
+        /** 필요 포인트 초과 1점당 */
+        perExtraPoint: z.number().min(0).max(0.5),
+        maxExtraBonus: z.number().min(0).max(0.5),
+        policy: z
+          .object({
+            /** SENIORITY: 최소 근속 초과 1년당 */
+            seniorityPerYear: z.number().min(0).max(0.5),
+            /** PERFORMANCE: 직전 평가 등급별 */
+            performanceByGrade: z.record(ReviewGradeSchema, z.number().min(-0.5).max(0.5)),
+            /** POLITICS: 상사 호감 기준 */
+            politicsFavorHigh: z.number().int().min(0).max(100),
+            politicsFavorLow: z.number().int().min(0).max(100),
+            politicsBonus: z.number().min(0).max(0.5),
+          })
+          .strict(),
+        bossTrustMin: z.number().int().min(0).max(100),
+        bossTrustBonus: z.number().min(0).max(0.5),
+        /** 특성 보정 (레벨 치환형), 예: officeStigma { "1": -0.05, "2": -0.15 } */
+        traitAdjustments: z.record(
+          ContentIdSchema,
+          z.object({ '1': z.number().optional(), '2': z.number().optional() }).strict(),
+        ),
+        /** 이 플래그(COMPANY)가 있으면 심사 자체가 열리지 않음 (PIP 경고) */
+        blockedByFlag: ContentIdSchema,
+        /** 누락 1회당 다음 심사 보정 */
+        missBonus: z.number().min(0).max(0.5),
+        missPenalty: z
+          .object({
+            mental: z.number().int().min(0).max(50),
+            reputation: z.number().int().min(0).max(50),
+            bossFavor: z.number().int().min(0).max(50),
+          })
+          .strict(),
+        /** 연속 누락이 이 횟수에 도달하면 예약하는 사건 */
+        consecutiveMissEvent: z.object({ misses: z.number().int().min(1), eventId: EventIdSchema }).strict(),
+        /** 직급별 매달 자연 변화 추가 보정 (부담) */
+        rankBurden: z.partialRecord(
+          PlayerRankSchema,
+          z.partialRecord(ResourceKeySchema, z.number().int().min(-10).max(10)),
+        ),
+      })
+      .strict(),
+    /** 인생 목표 진행 축하 구간(%)과 보상 */
+    lifeGoal: z
+      .object({
+        offerCount: z.number().int().min(1).max(6),
+        milestones: z.array(z.number().int().min(1).max(99)),
+        milestoneMental: z.number().int().min(0).max(20),
       })
       .strict(),
   })
@@ -280,6 +357,59 @@ export const EndingsSchema = z
   .strict();
 export type Endings = z.infer<typeof EndingsSchema>;
 
+/**
+ * S5 인생 목표 카드. 판정은 엔딩 시점, 정상 엔딩(조기 은퇴·정년)에서만 (실패 엔딩은 자동 미달성).
+ * - NET_WORTH: 현금 − 빚 ≥ amount
+ * - RANK: 최종 직급 ≥ rank
+ * - FULL_TENURE: 정년 은퇴 엔딩
+ * - DEBT_FREE: 빚 0 그리고 현금 ≥ amount
+ * - WELLBEING: 체력·정신력 모두 ≥ stat
+ * - ACE: 연말 평가 S ≥ count회
+ */
+export const LifeGoalKindSchema = z.enum([
+  'NET_WORTH',
+  'RANK',
+  'FULL_TENURE',
+  'DEBT_FREE',
+  'WELLBEING',
+  'ACE',
+]);
+export type LifeGoalKind = z.infer<typeof LifeGoalKindSchema>;
+
+export const LifeGoalDefinitionSchema = z
+  .object({
+    id: ContentIdSchema,
+    kind: LifeGoalKindSchema,
+    title: z.string().min(1).max(20),
+    emoji: z.string().min(1).max(4),
+    description: z.string().min(1).max(120),
+    amount: z.number().int().positive().optional(),
+    rank: PlayerRankSchema.optional(),
+    stat: z.number().int().min(1).max(100).optional(),
+    count: z.number().int().min(1).max(40).optional(),
+    /** 이 배경 특성 중 하나가 있으면 '어울리는 목표'로 우선 제시 */
+    affinity: z.array(ContentIdSchema).optional(),
+    achievedText: z.string().min(1).max(200),
+    failedText: z.string().min(1).max(200),
+  })
+  .strict()
+  .refine((g) => {
+    switch (g.kind) {
+      case 'NET_WORTH':
+      case 'DEBT_FREE':
+        return g.amount !== undefined;
+      case 'RANK':
+        return g.rank !== undefined;
+      case 'WELLBEING':
+        return g.stat !== undefined;
+      case 'ACE':
+        return g.count !== undefined;
+      default:
+        return true;
+    }
+  }, '목표 종류에 필요한 수치(amount/rank/stat/count)가 없음');
+export type LifeGoalDefinition = z.infer<typeof LifeGoalDefinitionSchema>;
+
 export const ContentPackSchema = z
   .object({
     contentVersion: z.string().min(1),
@@ -296,6 +426,7 @@ export const ContentPackSchema = z
     workFallbackEventId: EventIdSchema,
     events: z.array(EventDefinitionSchema),
     endings: EndingsSchema,
+    lifeGoals: z.array(LifeGoalDefinitionSchema).min(3),
   })
   .strict();
 export type ContentPack = z.infer<typeof ContentPackSchema>;

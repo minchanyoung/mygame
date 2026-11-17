@@ -3,6 +3,7 @@
  * 밸런스 판단용 개발 도구이며 서버에서 쓰지 않는다.
  */
 import { loadContentPack } from '@company-life/content';
+import { RANK_LABELS } from '@company-life/shared';
 import { indexContent } from './content-index';
 import { autoPlay, type AutoPlayPolicy } from './simulation';
 
@@ -58,5 +59,52 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
   console.log(`엔딩 나이 분위수: p10=${q(0.1)} p25=${q(0.25)} p50=${q(0.5)} p75=${q(0.75)} p90=${q(0.9)}`);
   for (const [type, n] of [...byType.entries()].sort((a, b) => b[1] - a[1])) {
     console.log(`  ${type.padEnd(20)} ${String(n).padStart(5)}  ${pct(n)}`);
+  }
+
+  // S5 승진: 정상 엔딩(50세 이상까지 근무)한 판의 최종 직급 분포, 첫 승진 나이
+  const normal = results.filter((r) => r.category === 'NORMAL');
+  const share = (n: number) => `${normal.length ? ((n / normal.length) * 100).toFixed(1) : '0'}%`;
+  const rankCount = new Map<string, number>();
+  for (const r of normal) rankCount.set(r.highestRank ?? '-', (rankCount.get(r.highestRank ?? '-') ?? 0) + 1);
+  const head = rankCount.get('DEPARTMENT_HEAD') ?? 0;
+  console.log(
+    `${mark(head / Math.max(1, normal.length) >= 0.25 && head / Math.max(1, normal.length) <= 0.4)} 정상 엔딩 중 부장 도달: ${share(head)} (목표 25~40%, 신중 봇 기준)`,
+  );
+  console.log(
+    `  최종 직급: ${['STAFF', 'ASSISTANT_MANAGER', 'MANAGER', 'DEPUTY_HEAD', 'DEPARTMENT_HEAD']
+      .map((k) => `${RANK_LABELS[k as keyof typeof RANK_LABELS]} ${share(rankCount.get(k) ?? 0)}`)
+      .join(' · ')}`,
+  );
+  const promoAges = results
+    .filter((r) => r.firstPromotionAge !== null)
+    .map((r) => r.firstPromotionAge as number)
+    .sort((a, b) => a - b);
+  const median = promoAges[Math.floor(promoAges.length / 2)] ?? '-';
+  console.log(`  첫 승진 나이 중앙값: ${median}세 (목표 27~28세), 승진 경험 ${pct(promoAges.length)}`);
+
+  // S5 인생 목표 달성률 (목표별, 전체 판 기준. 목표 20~45%)
+  const byGoal = new Map<string, { n: number; ok: number }>();
+  for (const r of results) {
+    if (!r.goalId) continue;
+    const g = byGoal.get(r.goalId) ?? { n: 0, ok: 0 };
+    g.n++;
+    if (r.goalAchieved) g.ok++;
+    byGoal.set(r.goalId, g);
+  }
+  const dist = (xs: number[]) => {
+    const s = [...xs].sort((a, b) => a - b);
+    const at = (p: number) => s[Math.min(s.length - 1, Math.floor(p * s.length))] ?? 0;
+    return `p25=${at(0.25)} p50=${at(0.5)} p75=${at(0.75)}`;
+  };
+  const eok = (n: number) => Math.round(n / 10_000_000) / 10;
+  console.log(
+    `  정상 엔딩 순자산(억): ${dist(normal.map((r) => eok(r.finalCash - r.finalDebt)))} · 체력·정신력 최소: ${dist(normal.map((r) => r.finalWellbeing))} · S등급 횟수: ${dist(normal.map((r) => r.sGrades))}`,
+  );
+  console.log('  인생 목표 달성률 (목표 20~45%):');
+  for (const [id, g] of [...byGoal.entries()].sort()) {
+    const rate = g.ok / g.n;
+    console.log(
+      `    ${mark(rate >= 0.2 && rate <= 0.45)} ${id.padEnd(24)} ${(rate * 100).toFixed(1)}% (${g.ok}/${g.n})`,
+    );
   }
 }

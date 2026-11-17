@@ -8,7 +8,7 @@ import { openEvent } from './events';
 import { chooseInMonth, nextMonth, startMonth } from './month';
 import { toPublicActiveEvent } from './view';
 import { applyForJob } from './jobs';
-import { chooseCharacter, createRun } from './run';
+import { chooseCharacter, chooseGoal, createRun } from './run';
 import { SeededRng } from './rng';
 
 export const content: ContentIndex = indexContent(loadContentPack());
@@ -22,9 +22,15 @@ export function newRun(seed = 'test-seed', profile: PlayerProfile = PROFILE): Ga
   );
 }
 
+/** 캐릭터 선택 → 인생 목표(첫 후보 또는 지정) 선택까지 진행해 JOB_OFFERS 상태로 */
+export function pickCard(run: GameRunState, cardId: string, goalId?: string): GameRunState {
+  const chosen = chooseCharacter(run, cardId, content);
+  return chooseGoal(chosen, goalId ?? chosen.lifeGoalOffers[0]!, content);
+}
+
 /** 확정 합격(픽스처)으로 입사까지 진행한 상태 */
 export function employedRun(seed = 'test-seed', offerIndex = 2): GameRunState {
-  const chosen = chooseCharacter(newRun(seed), 'card_1', content);
+  const chosen = pickCard(newRun(seed), 'card_1');
   const offer = chosen.jobOffers[offerIndex]!;
   const forced: GameRunState = {
     ...chosen,

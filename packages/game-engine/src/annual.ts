@@ -139,11 +139,17 @@ export function processAnnualReview(
         },
       ]
     : state.flags;
+  // 평가 등급만큼 승진 포인트 적립 (S5)
+  const points = content.pack.rules.promotion.pointsByGrade[review.grade] ?? 0;
   return {
     review,
     state: {
       ...state,
       flags,
+      employment: {
+        ...state.employment,
+        current: { ...job, promotionPoints: job.promotionPoints + points },
+      },
       cash: state.cash + review.bonus,
       annualReviewProcessedYear: info.yearIndex,
       annualReviews: [

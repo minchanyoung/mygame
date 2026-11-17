@@ -1,5 +1,6 @@
 import {
   COMPANY_GRADES,
+  PLAYER_RANKS,
   eventSlot,
   ContentPackSchema,
   type Conditions,
@@ -216,6 +217,8 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
   // 연말 평가가 낮은 등급에 세우는 경고 플래그도 사전 징후로 인정한다
   const reviewFlag = pack.rules.annualReview.warningFlag.key;
   flagSetters.set(`COMPANY:${reviewFlag}`, new Set(['(annual_review)']));
+  // 승진 심사가 세우는 플래그 (엔진 promotion.ts JUST_PROMOTED_FLAG)
+  flagSetters.set('RUN:just_promoted', new Set(['(promotion)']));
   for (const event of pack.events) {
     for (const choice of event.choices) {
       const all = [
@@ -263,8 +266,40 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
     }
   }
 
-  // 예약 전용 사건은 반드시 어떤 사건이 SCHEDULE_EVENT로 예약해야 한다 (고아 콘텐츠 방지)
+  // S5 승진 규칙: 사다리는 사원부터 한 칸씩 연속, 마지막은 최고 직급
+  const promo = pack.rules.promotion;
+  promo.ladder.forEach((step, i) => {
+    const fromIdx = PLAYER_RANKS.indexOf(step.from);
+    if (fromIdx !== i)
+      add(`rules.promotion.ladder[${i}]`, `${i}번째 단계의 시작 직급이 ${PLAYER_RANKS[i]}가 아님`);
+    if (PLAYER_RANKS.indexOf(step.to) !== fromIdx + 1)
+      add(`rules.promotion.ladder[${i}]`, `${step.from} 다음 직급은 ${PLAYER_RANKS[fromIdx + 1]}이어야 함`);
+  });
+  if (promo.ladder.length !== PLAYER_RANKS.length - 1)
+    add('rules.promotion.ladder', `사다리는 ${PLAYER_RANKS.length - 1}단계여야 함`);
+  for (const id of Object.keys(promo.traitAdjustments)) {
+    if (!traits.has(id)) add('rules.promotion.traitAdjustments', `알 수 없는 특성: ${id}`);
+  }
+  const missEvent = pack.events.find((e) => e.id === promo.consecutiveMissEvent.eventId);
+  if (!missEvent)
+    add('rules.promotion.consecutiveMissEvent', `알 수 없는 사건: ${promo.consecutiveMissEvent.eventId}`);
+
+  // S5 인생 목표
+  checkUnique(
+    pack.lifeGoals.map((g) => g.id),
+    'lifeGoals',
+  );
+  if (pack.lifeGoals.length < pack.rules.lifeGoal.offerCount)
+    add('lifeGoals', `목표가 제시 장수(${pack.rules.lifeGoal.offerCount})보다 적음`);
+  for (const g of pack.lifeGoals) {
+    g.affinity?.forEach(
+      (id) => backgrounds.has(id) || add(`lifeGoals.${g.id}`, `알 수 없는 배경 특성: ${id}`),
+    );
+  }
+
+  // 예약 전용 사건은 반드시 어떤 사건(또는 승진 누락 규칙)이 예약해야 한다 (고아 콘텐츠 방지)
   const scheduledTargets = new Set([...scheduleEdges.values()].flat());
+  scheduledTargets.add(promo.consecutiveMissEvent.eventId);
   for (const event of pack.events.filter((e) => e.scheduledOnly)) {
     if (!scheduledTargets.has(event.id))
       add(`events.${event.id}`, 'scheduledOnly 사건을 예약하는 사건이 없음');

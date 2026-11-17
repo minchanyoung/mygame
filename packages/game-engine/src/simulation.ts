@@ -1,11 +1,17 @@
-import type { Effect, EndingType, GameRunState } from '@company-life/shared';
+import {
+  turnInfo,
+  type Effect,
+  type EndingType,
+  type GameRunState,
+  type PlayerRank,
+} from '@company-life/shared';
 import type { ContentIndex } from './content-index';
 import { EngineError } from './errors';
 import { evaluateChoices, type ChoiceEvaluation } from './events';
 import { applyForJob } from './jobs';
 import { chooseInMonth, nextMonth, startMonth } from './month';
 import { SeededRng } from './rng';
-import { chooseCharacter, createRun } from './run';
+import { chooseCharacter, chooseGoal, createRun } from './run';
 import { toPublicActiveEvent } from './view';
 
 /**
@@ -24,6 +30,16 @@ export interface AutoPlayResult {
   months: number;
   /** 진행 불능(고를 선택지가 없음 등) 발생 시 사유 */
   stuck: string | null;
+  /** S5: 최고 직급, 첫 승진 나이, 인생 목표와 달성 여부 */
+  highestRank: PlayerRank | null;
+  firstPromotionAge: number | null;
+  goalId: string | null;
+  goalAchieved: boolean | null;
+  /** 종료 시점 자산·컨디션·S등급 횟수 (목표 수치 조정용) */
+  finalCash: number;
+  finalDebt: number;
+  finalWellbeing: number;
+  sGrades: number;
 }
 
 function pickChoice(
@@ -74,6 +90,23 @@ function pickChoice(
   return [...pool].sort((a, b) => expected(b) - expected(a))[0]!.choice.id;
 }
 
+function careerStats(
+  state: GameRunState,
+  content: ContentIndex,
+): Omit<AutoPlayResult, 'seed' | 'endingType' | 'category' | 'age' | 'months' | 'stuck'> {
+  const first = state.eventHistory.find((h) => h.kind === 'PROMOTION');
+  return {
+    highestRank: state.statistics.highestRank,
+    firstPromotionAge: first ? turnInfo(first.turnIndex, content.pack.rules.startAge).age : null,
+    goalId: state.lifeGoal?.goalId ?? null,
+    goalAchieved: state.ending?.goal?.achieved ?? null,
+    finalCash: state.cash,
+    finalDebt: state.debt,
+    finalWellbeing: Math.min(state.resources.health, state.resources.mental),
+    sGrades: state.annualReviews.filter((r) => r.grade === 'S').length,
+  };
+}
+
 export function autoPlay(seed: string, policy: AutoPlayPolicy, content: ContentIndex): AutoPlayResult {
   const policyRng = SeededRng.derive(seed, 'policy');
   const now = '2026-11-17T00:00:00.000Z';
@@ -88,6 +121,7 @@ export function autoPlay(seed: string, policy: AutoPlayPolicy, content: ContentI
     content,
   );
   state = chooseCharacter(state, policyRng.pick(state.characterCards).cardId, content);
+  state = chooseGoal(state, policyRng.pick(state.lifeGoalOffers), content);
   state = applyForJob(state, policyRng.pick(state.jobOffers).offerId, content).state;
 
   const maxMonths = (content.pack.rules.retireAge - content.pack.rules.startAge) * 12 + 1;
@@ -100,6 +134,7 @@ export function autoPlay(seed: string, policy: AutoPlayPolicy, content: ContentI
         const choiceId = pickChoice(state, policy, policyRng, content);
         if (!choiceId) {
           return {
+            ...careerStats(state, content),
             seed,
             endingType: null,
             category: null,
@@ -113,11 +148,20 @@ export function autoPlay(seed: string, policy: AutoPlayPolicy, content: ContentI
       state = nextMonth(state, content, now);
     } catch (err) {
       const msg = err instanceof EngineError ? `${err.code}: ${err.message}` : String(err);
-      return { seed, endingType: null, category: null, age: null, months: i, stuck: msg };
+      return {
+        ...careerStats(state, content),
+        seed,
+        endingType: null,
+        category: null,
+        age: null,
+        months: i,
+        stuck: msg,
+      };
     }
   }
   const e = state.ending;
   return {
+    ...careerStats(state, content),
     seed,
     endingType: e?.type ?? null,
     category: e?.category ?? null,

@@ -5,6 +5,7 @@ import {
   PlaytestForceEventRequestSchema,
   PlaytestPatchRequestSchema,
   ChooseCharacterRequestSchema,
+  ChooseGoalRequestSchema,
   ChooseRequestSchema,
   CommandRequestSchema,
   GameRunStateSchema,
@@ -19,6 +20,7 @@ import {
 import {
   applyForJob,
   chooseCharacter,
+  chooseGoal,
   chooseInMonth,
   createRun,
   EngineError,
@@ -73,6 +75,7 @@ function engineErrorStatus(err: EngineError): number {
     case 'LEVEL_MISMATCH':
       return 409;
     case 'CARD_NOT_FOUND':
+    case 'GOAL_NOT_OFFERED':
     case 'OFFER_NOT_FOUND':
     case 'CHOICE_NOT_AVAILABLE':
       return 400;
@@ -257,6 +260,14 @@ export function buildApp(options: AppOptions): FastifyInstance {
     const body = parseBody(ChooseCharacterRequestSchema, req.body);
     const out = await runCommand(req, 'chooseCharacter', body, (state, content) => ({
       state: chooseCharacter(state, body.cardId, content),
+    }));
+    return reply.status(out.statusCode).send(out.body);
+  });
+
+  app.post<{ Params: { id: string } }>('/api/runs/:id/goal', async (req, reply) => {
+    const body = parseBody(ChooseGoalRequestSchema, req.body);
+    const out = await runCommand(req, 'chooseGoal', body, (state, content) => ({
+      state: chooseGoal(state, body.goalId, content),
     }));
     return reply.status(out.statusCode).send(out.body);
   });

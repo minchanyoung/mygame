@@ -1,7 +1,12 @@
 import {
   GENDER_LABELS,
   JOB_LABELS,
+  PLAYER_RANKS,
   RANK_LABELS,
+  type LifeGoalDefinition,
+  type PublicLifeGoal,
+  type PublicLifeGoalProgress,
+  type PublicPromotionStatus,
   RESOURCE_ENDING_CAUSE,
   RESOURCE_KEYS,
   RESOURCE_LABELS,
@@ -38,6 +43,8 @@ import {
   type TraitLevels,
 } from '@company-life/shared';
 import { backgroundEffects, recommendedJob } from './background-effects';
+import { goalDef, lifeGoalProgress } from './goals';
+import { promotionStatus } from './promotion';
 import { matchesConditions } from './conditions';
 import { requireFrom, type ContentIndex } from './content-index';
 import { applyEffects } from './effects';
@@ -187,16 +194,89 @@ export function computeWarnings(state: GameRunState, content: ContentIndex): Pub
   return out;
 }
 
-function toPublicEnding(ending: Ending | null): PublicEnding | null {
-  return ending
-    ? {
-        type: ending.type,
-        category: ending.category,
-        title: ending.title,
-        text: ending.text,
-        age: ending.age,
-      }
-    : null;
+function toPublicEnding(
+  ending: Ending | null,
+  state: GameRunState,
+  content: ContentIndex,
+): PublicEnding | null {
+  if (!ending) return null;
+  const best = state.statistics.highestRank;
+  const def = ending.goal ? content.pack.lifeGoals.find((g) => g.id === ending.goal!.goalId) : undefined;
+  return {
+    type: ending.type,
+    category: ending.category,
+    title: ending.title,
+    text: ending.text,
+    age: ending.age,
+    highestRankLabel: best ? RANK_LABELS[best] : null,
+    goal:
+      ending.goal && def
+        ? { title: def.title, emoji: def.emoji, achieved: ending.goal.achieved, text: ending.goal.text }
+        : null,
+  };
+}
+
+/** 금액 짧게: 4,200만 · 3억 · 3억 2,000만 · −500만 */
+export function krwShort(n: number): string {
+  const sign = n < 0 ? '−' : '';
+  const abs = Math.abs(n);
+  const eok = Math.floor(abs / 100_000_000);
+  const man = Math.floor((abs % 100_000_000) / 10_000);
+  if (eok > 0) return `${sign}${eok}억${man > 0 ? ` ${man.toLocaleString('ko-KR')}만` : ''}`;
+  if (man > 0) return `${sign}${man.toLocaleString('ko-KR')}만`;
+  return `${sign}${abs.toLocaleString('ko-KR')}원`;
+}
+
+function toPublicGoal(def: LifeGoalDefinition, state: GameRunState): PublicLifeGoal {
+  return {
+    id: def.id,
+    title: def.title,
+    emoji: def.emoji,
+    description: def.description,
+    fitting: def.affinity?.some((id) => state.backgroundTraits.includes(id)) ?? false,
+  };
+}
+
+function toPublicGoalProgress(state: GameRunState, content: ContentIndex): PublicLifeGoalProgress | null {
+  if (!state.lifeGoal) return null;
+  const def = goalDef(content, state.lifeGoal.goalId);
+  const p = lifeGoalProgress(state, content)!;
+  let progressLabel: string;
+  switch (def.kind) {
+    case 'NET_WORTH':
+      progressLabel = `순자산 ${krwShort(p.current)} / ${krwShort(p.target)}`;
+      break;
+    case 'DEBT_FREE':
+      progressLabel = `빚 ${krwShort(state.debt)} · 현금 ${krwShort(state.cash)} / ${krwShort(p.target)}`;
+      break;
+    case 'RANK':
+      progressLabel = `현재 ${RANK_LABELS[PLAYER_RANKS[p.current]!]} / 목표 ${RANK_LABELS[def.rank!]}`;
+      break;
+    case 'FULL_TENURE':
+      progressLabel = `${p.current}세 / ${p.target}세 정년`;
+      break;
+    case 'WELLBEING':
+      progressLabel = `체력·정신력 중 낮은 쪽 ${p.current} (기준 ${p.target}) · 50세 이후까지`;
+      break;
+    case 'ACE':
+      progressLabel = `연말 평가 S ${p.current}회 / ${p.target}회`;
+      break;
+  }
+  return { ...toPublicGoal(def, state), percent: p.percent, progressLabel };
+}
+
+function toPublicPromotionStatus(state: GameRunState, content: ContentIndex): PublicPromotionStatus | null {
+  const s = promotionStatus(state, content);
+  if (!s) return null;
+  return {
+    nextRankLabel: s.to ? RANK_LABELS[s.to] : null,
+    yearsInRank: s.yearsInRank,
+    minYears: s.minYears,
+    points: s.points,
+    requiredPoints: s.requiredPoints,
+    blocked: s.blocked,
+    eligible: s.eligible,
+  };
 }
 
 function toMonthSummary(state: GameRunState, content: ContentIndex): PublicMonthSummary | null {
@@ -221,6 +301,18 @@ function toMonthSummary(state: GameRunState, content: ContentIndex): PublicMonth
     debtRepayment: m.settlement.debtRepayment,
     annualReview: m.annualReview ? toPublicReview(m.annualReview) : null,
     salaryAdjustment: m.salaryAdjustment,
+    promotion: m.promotion
+      ? {
+          success: m.promotion.success,
+          fromLabel: RANK_LABELS[m.promotion.from],
+          toLabel: RANK_LABELS[m.promotion.to],
+          salaryFrom: m.promotion.salaryFrom,
+          salaryTo: m.promotion.salaryTo,
+          newBossName: m.promotion.newBossName,
+          misses: m.promotion.misses,
+        }
+      : null,
+    goalMilestone: m.goalMilestone,
     resourceDelta,
     cashDelta: state.cash - m.start.cash,
     debtDelta: state.debt - m.start.debt,
@@ -541,7 +633,13 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
       lastReviewGrade: state.annualReviews.at(-1)?.grade ?? null,
       startedAge: job ? turnInfo(job.startedTurn, content.pack.rules.startAge).age : null,
       startedMonth: job ? turnInfo(job.startedTurn, content.pack.rules.startAge).monthOfYear : null,
+      promotion: toPublicPromotionStatus(state, content),
     },
+    lifeGoalOffers:
+      state.phase === 'GOAL_SELECTION'
+        ? state.lifeGoalOffers.map((id) => toPublicGoal(goalDef(content, id), state))
+        : [],
+    lifeGoal: toPublicGoalProgress(state, content),
     resources: { ...state.resources },
     cash: state.cash,
     debt: state.debt,
@@ -552,8 +650,8 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
     activeEvent: toPublicActiveEvent(state, content),
     warnings: computeWarnings(state, content),
     monthSummary: toMonthSummary(state, content),
-    pendingEnding: toPublicEnding(state.pendingEnding),
-    ending: toPublicEnding(state.ending),
+    pendingEnding: toPublicEnding(state.pendingEnding, state, content),
+    ending: toPublicEnding(state.ending, state, content),
     playtestModified: state.playtestModified,
     calendar: toCalendar(state, content),
     history: toHistory(state, content),

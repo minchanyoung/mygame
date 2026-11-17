@@ -69,6 +69,13 @@ export const api = {
       body: JSON.stringify({ cardId, expectedRevision, idempotencyKey }),
     }),
 
+  chooseGoal: (s: Session, goalId: string, expectedRevision: number, idempotencyKey: string) =>
+    request<{ view: PublicRunView }>(`/api/runs/${s.runId}/goal`, {
+      method: 'POST',
+      token: s.guestToken,
+      body: JSON.stringify({ goalId, expectedRevision, idempotencyKey }),
+    }),
+
   applyJob: (s: Session, offerId: string, expectedRevision: number, idempotencyKey: string) =>
     request<{
       view: PublicRunView;

@@ -102,6 +102,12 @@ export const EmploymentSchema = z
         rank: PlayerRankSchema,
         annualSalary: Krw.positive(),
         startedTurn: z.number().int().min(0),
+        /** 현 직급이 된 턴 (승진 최소 근속 계산) */
+        rankSinceTurn: z.number().int().min(0),
+        /** 현 직급에서 쌓은 승진 포인트 (승진 시 0, 회사 내부 값) */
+        promotionPoints: z.number().int().min(0),
+        /** 현 직급에서 연속 승진 누락 횟수 */
+        promotionMisses: z.number().int().min(0),
       })
       .strict()
       .nullable(),
@@ -125,9 +131,35 @@ export const EndingSchema = z
     sourceEventId: EventIdSchema.nullable(),
     title: z.string(),
     text: z.string(),
+    /** 인생 목표 판정. 실패 엔딩은 자동 미달성 (S5 Q3) */
+    goal: z.object({ goalId: ContentIdSchema, achieved: z.boolean(), text: z.string() }).strict().nullable(),
   })
   .strict();
 export type Ending = z.infer<typeof EndingSchema>;
+
+/** 1월 승진 심사 결과 */
+export const PromotionResultSchema = z
+  .object({
+    from: PlayerRankSchema,
+    to: PlayerRankSchema,
+    success: z.boolean(),
+    /** 승진 시 연봉 인상분이 반영된 금액 (누락 시 null) */
+    salaryFrom: Krw.positive().nullable(),
+    salaryTo: Krw.positive().nullable(),
+    newBossName: z.string().nullable(),
+    misses: z.number().int().min(0),
+  })
+  .strict();
+export type PromotionResult = z.infer<typeof PromotionResultSchema>;
+
+export const LifeGoalStateSchema = z
+  .object({
+    goalId: ContentIdSchema,
+    /** 이미 축하한 진행도 구간 (25, 50, 75) */
+    milestones: z.array(z.number().int().min(1).max(100)),
+  })
+  .strict();
+export type LifeGoalState = z.infer<typeof LifeGoalStateSchema>;
 
 const MoneySnapshot = z.object({ resources: ResourcesSchema, cash: Krw, debt: Krw }).strict();
 
@@ -241,6 +273,10 @@ export const MonthLogSchema = z
       .object({ grade: ReviewGradeSchema.nullable(), from: Krw.positive(), to: Krw.positive() })
       .strict()
       .nullable(),
+    /** 1월이면 이번 달 승진 심사 결과 (자격이 없으면 null) */
+    promotion: PromotionResultSchema.nullable(),
+    /** 이번 달 새로 넘은 인생 목표 진행 구간 (25/50/75) */
+    goalMilestone: z.number().int().nullable(),
     /** 이번 달 사건 결과 (업무 → 일상 순) */
     eventResults: z.array(EventResultSchema),
   })
@@ -370,7 +406,9 @@ export const HistoryEntrySchema = z
     kind: z.enum([
       'RUN_CREATED',
       'CHARACTER_SELECTED',
+      'GOAL_SELECTED',
       'JOB_APPLICATION',
+      'PROMOTION',
       'NPC_TEAM_CREATED',
       'EVENT_RESOLVED',
       'ENDING',
@@ -399,6 +437,9 @@ export const GameRunStateSchema = z
     profile: PlayerProfileSchema,
     characterCards: z.array(CharacterCardSchema),
     selectedCharacter: CharacterCardSchema.nullable(),
+    /** 인생 목표 후보 3장 (GOAL_SELECTION에서 고정) */
+    lifeGoalOffers: z.array(ContentIdSchema),
+    lifeGoal: LifeGoalStateSchema.nullable(),
     jobOffers: z.array(JobOfferSchema),
     jobSearch: JobSearchSchema,
     employment: EmploymentSchema,

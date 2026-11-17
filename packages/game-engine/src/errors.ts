@@ -2,6 +2,7 @@ export type EngineErrorCode =
   | 'INVALID_PHASE'
   | 'INVALID_TRANSITION'
   | 'CARD_NOT_FOUND'
+  | 'GOAL_NOT_OFFERED'
   | 'OFFER_NOT_FOUND'
   | 'EVENT_NOT_FOUND'
   | 'CHOICE_NOT_AVAILABLE'

@@ -11,6 +11,8 @@ import { processAnnualReview, processSalaryAdjustment } from './annual';
 import type { ContentIndex } from './content-index';
 import { buildEnding, finalizeEnding, withPendingEnding } from './ending';
 import { EngineError } from './errors';
+import { updateLifeGoalMilestone } from './goals';
+import { processPromotion } from './promotion';
 import {
   evaluateChoices,
   getEligibleEvents,
@@ -57,7 +59,16 @@ export function applyMonthlySettlement(
   const gross = Math.floor(job.annualSalary / 12);
   const tax = Math.floor((gross * monthly.taxPermille) / 1000);
   const netSalary = gross - tax;
-  const livingBreakdown = { ...monthly.livingCosts };
+  // 물가 상승: 해마다 복리로 오른 생활비 (천 원 단위 내림)
+  const years = Math.floor(state.turnIndex / 12);
+  const inflation = Math.pow(1 + monthly.livingCostGrowthPermille / 1000, years);
+  const grow = (n: number) => Math.floor((n * inflation) / 1000) * 1000;
+  const livingBreakdown = {
+    housing: grow(monthly.livingCosts.housing),
+    food: grow(monthly.livingCosts.food),
+    transport: grow(monthly.livingCosts.transport),
+    misc: grow(monthly.livingCosts.misc),
+  };
   const livingCost =
     livingBreakdown.housing + livingBreakdown.food + livingBreakdown.transport + livingBreakdown.misc;
   const interest = Math.floor((state.debt * monthly.debtInterestPermille) / 1000);
@@ -72,9 +83,11 @@ export function applyMonthlySettlement(
     debt += -cash;
     cash = 0;
   }
+  // 자연 변화 + 직급 부담 (과장 이상은 회복이 줄어든다)
+  const burden = content.pack.rules.promotion.rankBurden[job.rank] ?? {};
   const resources = { ...state.resources };
   for (const key of RESOURCE_KEYS) {
-    resources[key] = clampStat(resources[key] + (monthly.naturalChange[key] ?? 0));
+    resources[key] = clampStat(resources[key] + (monthly.naturalChange[key] ?? 0) + (burden[key] ?? 0));
   }
   return {
     state: {
@@ -146,9 +159,10 @@ export function startMonth(
   assertCommand(state.phase, 'startMonth');
   assertTransition(state.phase, 'startMonth', 'EVENT_PENDING');
   const start = { resources: { ...state.resources }, cash: state.cash, debt: state.debt };
-  // §20.1 순서: 1월 연봉 조정(급여 정산 전) → 정산 → 12월 인사평가 → 사건 선정
+  // §20.1 순서: 1월 연봉 조정 → 1월 승진 심사(직급·상사 재배치) → 정산 → 12월 인사평가 → 사건 선정
   const adjusted = processSalaryAdjustment(state, content);
-  const settled = applyMonthlySettlement(adjusted.state, content);
+  const promoted = processPromotion(adjusted.state, content);
+  const settled = applyMonthlySettlement(promoted.state, content);
   const reviewed = processAnnualReview(settled.state, content);
   const rng = new SeededRng(reviewed.state.rngState);
   // forced는 플레이테스트 도구 전용 (추첨을 건너뛰고 지정 사건 1개만 연다)
@@ -170,6 +184,8 @@ export function startMonth(
       settlement: settled.settlement,
       annualReview: reviewed.review,
       salaryAdjustment: adjusted.adjustment,
+      promotion: promoted.result,
+      goalMilestone: null,
       eventResults: [],
     },
   };
@@ -245,12 +261,20 @@ export function chooseInMonth(
   const thisMonthHighRisk = logged.eventOccurrences.some(
     (o) => o.turnIndex === state.turnIndex && o.highRisk,
   );
+  // 인생 목표 축하 구간 (실직이 예고된 달은 생략)
+  const goal = logged.pendingEnding
+    ? { state: logged, milestone: null }
+    : updateLifeGoalMilestone(logged, content);
+  const closed = {
+    ...goal.state,
+    currentMonth: goal.state.currentMonth && { ...goal.state.currentMonth, goalMilestone: goal.milestone },
+  };
   return {
     state: {
-      ...logged,
+      ...closed,
       pendingEvents: [],
       statistics: {
-        ...logged.statistics,
+        ...closed.statistics,
         consecutiveHighRiskMonths: thisMonthHighRisk ? state.statistics.consecutiveHighRiskMonths + 1 : 0,
       },
     },

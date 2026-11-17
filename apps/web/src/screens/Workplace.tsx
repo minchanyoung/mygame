@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import type { PublicRunView } from '@company-life/shared';
 import { Icon, IconBadge, type IconName } from '../components/Icons';
-import { EmployeeBadge, Gauges, MoneyRow, Warnings, YearCalendar } from '../components/StatusPanel';
+import {
+  CareerCard,
+  EmployeeBadge,
+  Gauges,
+  MoneyRow,
+  Warnings,
+  YearCalendar,
+} from '../components/StatusPanel';
 
 interface Props {
   view: PublicRunView;
@@ -32,6 +39,7 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
           <Warnings view={view} />
           <Gauges view={view} />
           <MoneyRow view={view} />
+          <CareerCard view={view} />
           {lastStory && (
             <button type="button" className="card last-story" onClick={() => setTab('record')}>
               <IconBadge name="story" color="var(--navy)" size={32} />
@@ -84,6 +92,7 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
           <h2>나</h2>
           <Gauges view={view} />
           <MoneyRow view={view} />
+          <CareerCard view={view} />
           <div className="card">
             <strong>발견한 특성</strong>
             {view.skills.length + view.negativeTraits.length === 0 ? (

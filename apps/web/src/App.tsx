@@ -13,6 +13,7 @@ import { PlaytestPanel } from './components/PlaytestPanel';
 import { CharacterSelect } from './screens/CharacterSelect';
 import { EndingScreen } from './screens/EndingScreen';
 import { EventScreen } from './screens/EventScreen';
+import { GoalSelect } from './screens/GoalSelect';
 import { MonthSummary } from './screens/MonthSummary';
 import { JobOffers } from './screens/JobOffers';
 import { ProfileForm } from './screens/ProfileForm';
@@ -183,6 +184,20 @@ export function App() {
                 command(
                   `character:${cardId}`,
                   async (s, v, key) => (await api.chooseCharacter(s, cardId, v.revision, key)).view,
+                )
+              }
+            />
+          );
+          break;
+        case 'GOAL_SELECTION':
+          body = (
+            <GoalSelect
+              view={view}
+              busy={busy}
+              onConfirm={(goalId) =>
+                command(
+                  `goal:${goalId}`,
+                  async (s, v, key) => (await api.chooseGoal(s, goalId, v.revision, key)).view,
                 )
               }
             />

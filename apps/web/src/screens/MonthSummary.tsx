@@ -144,6 +144,69 @@ export function MonthSummary({ view, busy, onNext }: Props) {
 
       {m?.annualReview && <ReviewSheet review={m.annualReview} age={view.turn.age} />}
 
+      {m?.promotion && (
+        <div className={`sheet appointment ${m.promotion.success ? '' : 'appointment-held'}`}>
+          <div className="sheet-title">
+            <strong>{m.promotion.success ? '인 사 발 령' : '승진 심사 결과'}</strong>
+            <span className="tiny muted">{view.turn.age}세 1월</span>
+          </div>
+          {m.promotion.success ? (
+            <>
+              <p className="appointment-line">
+                <strong>{view.profile.displayName}</strong> — {m.promotion.fromLabel}
+                {' → '}
+                <strong className="display">{m.promotion.toLabel}</strong>에 임함
+              </p>
+              <div className="sheet-rows">
+                {m.promotion.salaryFrom !== null && m.promotion.salaryTo !== null && (
+                  <div className="sheet-row">
+                    <span>승진 연봉</span>
+                    <strong className="num pos">
+                      {formatKrw(m.promotion.salaryFrom)} → {formatKrw(m.promotion.salaryTo)}
+                    </strong>
+                  </div>
+                )}
+                {m.promotion.newBossName && (
+                  <span className="tiny muted">
+                    직급 조정으로 {m.promotion.newBossName}이(가) 새 직속 상사가 되었습니다.
+                  </span>
+                )}
+              </div>
+              <span className="stamp stamp-mid sheet-stamp stamp-slam" aria-hidden="true">
+                발령
+              </span>
+            </>
+          ) : (
+            <>
+              <p className="appointment-line">
+                {m.promotion.toLabel} 승진 심사에서 <strong>누락</strong>되었습니다.
+                {m.promotion.misses >= 2 ? ` (${m.promotion.misses}년 연속)` : ''}
+              </p>
+              <p className="tiny muted">
+                정신력·평판·상사 호감이 떨어졌어요. 포인트는 유지되고, 다음 심사에서는 조금 유리해집니다.
+              </p>
+              <span className="stamp stamp-mid stamp-navy sheet-stamp" aria-hidden="true">
+                보류
+              </span>
+            </>
+          )}
+        </div>
+      )}
+
+      {m?.goalMilestone && view.lifeGoal && (
+        <div className="card goal-milestone flip-in" role="status">
+          <span className="goal-emoji" aria-hidden="true">
+            {view.lifeGoal.emoji}
+          </span>
+          <div>
+            <strong>
+              인생 목표 {m.goalMilestone}% 돌파 · {view.lifeGoal.title}
+            </strong>
+            <p className="tiny muted">{view.lifeGoal.progressLabel} · 정신력 +3</p>
+          </div>
+        </div>
+      )}
+
       {m?.salaryAdjustment && (
         <div className="sheet">
           <div className="sheet-title">

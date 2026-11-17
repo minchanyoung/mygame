@@ -9,6 +9,7 @@ import {
 } from '@company-life/shared';
 import { matchesConditions } from './conditions';
 import type { ContentIndex } from './content-index';
+import { judgeLifeGoal } from './goals';
 import { currentTeamNpcs } from './npcs';
 
 /** 부채 한계선 = 연봉 × 배수 (§26.1). 재직 정보가 없으면 null. */
@@ -61,21 +62,29 @@ export function buildEnding(
   const causeDef = endings.causes[cause];
   const causeText = pickText(causeDef, state, content);
   const base = { cause, age, turnIndex: state.turnIndex, sourceEventId };
+  // 인생 목표 판정은 엔딩 종류가 정해진 뒤에 붙인다 (실패 엔딩은 자동 미달성)
+  const withGoal = (e: Omit<Ending, 'goal'>): Ending => ({ ...e, goal: judgeLifeGoal(state, e, content) });
 
   if (cause === 'RETIREMENT') {
-    return { ...base, type: 'RETIREMENT', category: 'NORMAL', title: causeDef.title, text: causeText };
+    return withGoal({
+      ...base,
+      type: 'RETIREMENT',
+      category: 'NORMAL',
+      title: causeDef.title,
+      text: causeText,
+    });
   }
   if (age < rules.gameOver.failureBeforeAge) {
-    return { ...base, type: cause, category: 'FAILURE', title: causeDef.title, text: causeText };
+    return withGoal({ ...base, type: cause, category: 'FAILURE', title: causeDef.title, text: causeText });
   }
   const early = endings.earlyRetirement;
-  return {
+  return withGoal({
     ...base,
     type: 'EARLY_RETIREMENT',
     category: 'NORMAL',
     title: `${early.title} — ${causeDef.title}`,
     text: `${causeText} ${pickText(early, state, content)}`,
-  };
+  });
 }
 
 /** MONTH_SUMMARY 진입 시 호출: 원인이 있으면 pendingEnding을 기록한다. */

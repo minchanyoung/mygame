@@ -107,7 +107,8 @@ describe('POST /api/runs/:id/character — idempotency and revision (§23.3)', (
     const first = await app.inject({ method: 'POST', url, headers, payload });
     expect(first.statusCode).toBe(200);
     const view = first.json().view as PublicRunView;
-    expect(view.phase).toBe('JOB_OFFERS');
+    expect(view.phase).toBe('GOAL_SELECTION');
+    expect(view.lifeGoalOffers).toHaveLength(3);
     expect(view.revision).toBe(1);
     expect(view.selectedCardId).toBe('card_2');
     expect(view.jobOffers).toHaveLength(3);
@@ -135,6 +136,43 @@ describe('POST /api/runs/:id/character — idempotency and revision (§23.3)', (
     });
     expect(stale.statusCode).toBe(409);
     expect(stale.json().code).toBe('REVISION_CONFLICT');
+  });
+
+  it('S5 goal: only an offered goal is accepted (400), and job offers come after the goal', async () => {
+    const app = makeApp();
+    const { body } = await createRun(app);
+    const headers = auth(body.guestToken);
+    const chosen = (
+      await app.inject({
+        method: 'POST',
+        url: `/api/runs/${body.runId}/character`,
+        headers,
+        payload: { cardId: 'card_1', idempotencyKey: 'key-goal-c1', expectedRevision: 0 },
+      })
+    ).json().view as PublicRunView;
+    const skip = await app.inject({
+      method: 'POST',
+      url: `/api/runs/${body.runId}/apply-job`,
+      headers,
+      payload: { offerId: chosen.jobOffers[0]!.offerId, idempotencyKey: 'key-goal-a1', expectedRevision: 1 },
+    });
+    expect(skip.statusCode).toBe(409);
+    const offered = new Set(chosen.lifeGoalOffers.map((g) => g.id));
+    const other = [
+      'goal_own_home',
+      'goal_department_head',
+      'goal_full_tenure',
+      'goal_debt_free',
+      'goal_ace',
+    ].find((id) => !offered.has(id))!;
+    const bad = await app.inject({
+      method: 'POST',
+      url: `/api/runs/${body.runId}/goal`,
+      headers,
+      payload: { goalId: other, idempotencyKey: 'key-goal-b1', expectedRevision: 1 },
+    });
+    expect(bad.statusCode).toBe(400);
+    expect(bad.json().code).toBe('GOAL_NOT_OFFERED');
   });
 
   it('cannot skip phases (apply-job during CHARACTER_SELECTION → 409)', async () => {
@@ -171,6 +209,15 @@ describe('job application → NPC team, persisted across reconnect', () => {
         payload: { cardId: 'card_1', idempotencyKey: 'key-char-0001', expectedRevision: 0 },
       })
     ).json().view as PublicRunView;
+    view = (
+      await app.inject({
+        method: 'POST',
+        url: `/api/runs/${body.runId}/goal`,
+        headers,
+        payload: { goalId: view.lifeGoalOffers[0]!.id, idempotencyKey: 'key-goal-0001', expectedRevision: 1 },
+      })
+    ).json().view as PublicRunView;
+    expect(view.phase).toBe('JOB_OFFERS');
 
     // 가장 합격률이 높은 카드에 반복 지원 — 연속 불합격 시 추천 카드가 나오므로 반드시 종료된다
     for (let attempt = 0; view.phase === 'JOB_OFFERS' && attempt < 30; attempt++) {
@@ -245,14 +292,16 @@ describe('monthly loop and game over over HTTP (§26)', () => {
       return { status: res.statusCode, json: res.json() as { view: PublicRunView; code?: string } };
     };
     const chosen = await post('character', { cardId: 'card_1' }, 0);
-    const hired = await post('apply-job', { offerId: chosen.json.view.jobOffers[0]!.offerId }, 1);
+    const goal = await post('goal', { goalId: chosen.json.view.lifeGoalOffers[0]!.id }, 1);
+    expect(goal.status).toBe(200);
+    const hired = await post('apply-job', { offerId: goal.json.view.jobOffers[0]!.offerId }, 2);
     expect(hired.json.view.phase).toBe('MONTH_START');
     return { app, runId: body.runId, headers, post };
   }
 
   it('start-month → choose → next-month advances one month; stale occurrenceId → 409', async () => {
     const { app, runId, headers, post } = await employed(new MemoryRunStore());
-    const started = await post('start-month', {}, 2);
+    const started = await post('start-month', {}, 3);
     expect(started.status).toBe(200);
     const view = started.json.view;
     expect(view.phase).toBe('EVENT_PENDING');
@@ -261,13 +310,13 @@ describe('monthly loop and game over over HTTP (§26)', () => {
     expect(JSON.stringify(event)).not.toMatch(/"chance"|baseChance/);
 
     const choice = view.activeEvent!.choices.find((c) => c.enabled)!;
-    const stale = await post('choose', { occurrenceId: 'occ_wrong', choiceId: choice.id }, 3);
+    const stale = await post('choose', { occurrenceId: 'occ_wrong', choiceId: choice.id }, 4);
     expect(stale.status).toBe(409);
     expect(stale.json.code).toBe('STALE_EVENT');
 
     // 업무 사건 → 일상 사건 순으로 두 번 고른다
-    let chosen = await post('choose', { occurrenceId: event.occurrenceId, choiceId: choice.id }, 3);
-    let revision = 4;
+    let chosen = await post('choose', { occurrenceId: event.occurrenceId, choiceId: choice.id }, 4);
+    let revision = 5;
     expect(chosen.json.view.lastStory?.slot).toBe('work');
     while (chosen.json.view.phase === 'EVENT_PENDING' && !chosen.json.view.pendingEnding) {
       const ev = chosen.json.view.activeEvent!;
@@ -296,7 +345,7 @@ describe('monthly loop and game over over HTTP (§26)', () => {
       record: { ...record, state: { ...record.state, resources: { ...record.state.resources, health: 1 } } },
       value: null,
     }));
-    let revision = 2;
+    let revision = 3;
     let view: PublicRunView | undefined;
     // 체력 1 상태에서 체력이 깎이는 선택이 나올 때까지 진행 (자연 회복 +1이 있으므로 확정 경고 선택지를 고른다)
     for (let month = 0; month < 40; month++) {
@@ -365,17 +414,20 @@ describe('playtest tools over HTTP', () => {
       idempotencyKey: 'key-pt-c1',
       expectedRevision: 0,
     });
+    const goalId = ((await app.inject({ url: `/api/runs/${body.runId}`, headers })).json() as PublicRunView)
+      .lifeGoalOffers[0]!.id;
+    await post(`runs/${body.runId}/goal`, { goalId, idempotencyKey: 'key-pt-g1', expectedRevision: 1 });
     const offers = (await app.inject({ url: `/api/runs/${body.runId}/job-offers`, headers })).json()
       .jobOffers;
     await post(`runs/${body.runId}/apply-job`, {
       offerId: offers[2].offerId,
       idempotencyKey: 'key-pt-a1',
-      expectedRevision: 1,
+      expectedRevision: 2,
     });
 
     const forbidden = await post(
       `playtest/runs/${body.runId}/patch`,
-      { resources: { health: 3 }, idempotencyKey: 'key-pt-x1', expectedRevision: 2 },
+      { resources: { health: 3 }, idempotencyKey: 'key-pt-x1', expectedRevision: 3 },
       auth('wrong-token'),
     );
     expect(forbidden.statusCode).toBe(403);
@@ -383,7 +435,7 @@ describe('playtest tools over HTTP', () => {
     const patched = await post(`playtest/runs/${body.runId}/patch`, {
       resources: { health: 3 },
       idempotencyKey: 'key-pt-p1',
-      expectedRevision: 2,
+      expectedRevision: 3,
     });
     expect(patched.statusCode).toBe(200);
     const view = patched.json().view as PublicRunView;
@@ -394,7 +446,7 @@ describe('playtest tools over HTTP', () => {
     const forced = await post(`playtest/runs/${body.runId}/force-event`, {
       eventId: 'evt_server_outage',
       idempotencyKey: 'key-pt-f1',
-      expectedRevision: 3,
+      expectedRevision: 4,
     });
     const fv = forced.json().view as PublicRunView;
     expect(fv.phase).toBe('EVENT_PENDING');

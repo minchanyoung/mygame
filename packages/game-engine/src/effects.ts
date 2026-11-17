@@ -79,6 +79,16 @@ export function applyEffects(
         draft.debt = Math.max(0, draft.debt + effect.amount);
         break;
 
+      case 'PROMOTION_POINT_DELTA':
+        // 재직 중일 때만 의미가 있다. 실직 상태면 무시.
+        if (draft.employment.current) {
+          draft.employment.current.promotionPoints = Math.max(
+            0,
+            draft.employment.current.promotionPoints + effect.amount,
+          );
+        }
+        break;
+
       case 'SKILL_SET_LEVEL': {
         const current = draft.skills[effect.id] ?? 0;
         if (current !== effect.from) {

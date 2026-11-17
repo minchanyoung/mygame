@@ -7,7 +7,8 @@ import { EngineError } from './errors';
  */
 export const TRANSITIONS: Readonly<Record<RunPhase, Partial<Record<RunCommand, readonly RunPhase[]>>>> = {
   PROFILE_INPUT: { createCards: ['CHARACTER_SELECTION'] },
-  CHARACTER_SELECTION: { chooseCharacter: ['JOB_OFFERS'] },
+  CHARACTER_SELECTION: { chooseCharacter: ['GOAL_SELECTION'] },
+  GOAL_SELECTION: { chooseGoal: ['JOB_OFFERS'] },
   JOB_OFFERS: { apply: ['MONTH_START', 'JOB_OFFERS'] },
   MONTH_START: { startMonth: ['EVENT_PENDING', 'MONTH_SUMMARY'] },
   EVENT_PENDING: { choose: ['MONTH_SUMMARY', 'EVENT_PENDING'] },

@@ -1,0 +1,67 @@
+[
+  {
+    "id": "goal_own_home",
+    "kind": "NET_WORTH",
+    "title": "내 집 마련",
+    "emoji": "🏠",
+    "description": "은퇴할 때 순자산(현금 − 빚) 10억 원. 서울에 내 아파트 한 채, 월세 탈출이 인생의 목표다.",
+    "amount": 1000000000,
+    "affinity": ["fam_student_loan", "fam_self_made", "fam_single_parent"],
+    "achievedText": "은퇴 기념으로 등기권리증을 액자에 넣었다. 대출은 아직 조금 남았지만, 이건 내 집이다.",
+    "failedText": "집주인의 문자는 은퇴 후에도 계속 왔다. '계약 갱신 관련해서요~'"
+  },
+  {
+    "id": "goal_department_head",
+    "kind": "RANK",
+    "title": "부장 달기",
+    "emoji": "👔",
+    "description": "언젠가 명함에 '부장' 두 글자를 새긴다. 사원증 사진도 그때 바꿀 것이다.",
+    "rank": "DEPARTMENT_HEAD",
+    "affinity": ["uni_top", "str_eloquence", "str_charm"],
+    "achievedText": "부장 명함 한 통을 다 쓰기 전에 은퇴했다. 남은 명함은 서랍에 고이 넣어두었다.",
+    "failedText": "끝내 부장 명함은 받지 못했다. 송별회에서 후배 부장이 건배사를 했다."
+  },
+  {
+    "id": "goal_full_tenure",
+    "kind": "FULL_TENURE",
+    "title": "정년 완주",
+    "emoji": "🎖",
+    "description": "가늘고 길게. 60세 정년 퇴임식 꽃다발을 받는 날까지 버틴다.",
+    "affinity": ["str_stamina", "fam_middle", "wk_shy"],
+    "achievedText": "36년 만의 퇴임식. 꽃다발이 생각보다 무거웠다. 버틴 세월만큼.",
+    "failedText": "정년 퇴임식 꽃다발은 다른 사람의 것이 되었다."
+  },
+  {
+    "id": "goal_debt_free",
+    "kind": "DEBT_FREE",
+    "title": "빚 없는 인생",
+    "emoji": "💸",
+    "description": "빚 0원, 통장에 현금 5억 원. 누구에게도 이자를 내지 않는 노후.",
+    "amount": 500000000,
+    "affinity": ["fam_student_loan", "wk_spender", "str_detail"],
+    "achievedText": "마지막 대출 상환 문자를 캡처해 두었다. 이제 은행은 나에게 이자를 준다.",
+    "failedText": "은퇴 축하 문자보다 대출 상환 안내 문자가 먼저 왔다."
+  },
+  {
+    "id": "goal_work_life_balance",
+    "kind": "WELLBEING",
+    "title": "워라밸 수호자",
+    "emoji": "🌿",
+    "description": "회사에 영혼까지 팔지는 않는다. 체력·정신력 모두 90 이상으로 은퇴한다.",
+    "stat": 90,
+    "affinity": ["wk_frail", "wk_pressure", "str_empathy"],
+    "achievedText": "은퇴 다음 날 등산을 갔다. 숨이 차지 않았다. 마음도 가벼웠다.",
+    "failedText": "은퇴하고 나서야 알았다. 몸과 마음이 먼저 퇴사했었다는 걸."
+  },
+  {
+    "id": "goal_ace",
+    "kind": "ACE",
+    "title": "에이스",
+    "emoji": "🏆",
+    "description": "'그 사람 없으면 안 돼'라는 말을 듣는다. 연말 평가 S등급 6회.",
+    "count": 6,
+    "affinity": ["str_prodigy", "str_logic", "str_creative"],
+    "achievedText": "사내 명예의 전당에 사진이 걸렸다. 퇴사 후에도 3년간 내려가지 않았다.",
+    "failedText": "열심히 했다. 다만 '에이스'라는 말은 늘 옆자리에서 들렸다."
+  }
+]

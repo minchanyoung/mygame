@@ -7,7 +7,7 @@ interface Props {
   onHome: () => void;
 }
 
-const MILESTONE_KINDS = new Set(['JOB_APPLICATION', 'ENDING']);
+const MILESTONE_KINDS = new Set(['JOB_APPLICATION', 'GOAL_SELECTED', 'PROMOTION', 'ENDING']);
 
 /** GAME_OVER — 퇴직 통지서(실패) / 퇴직 증명서(정상) + 인생 연대기 (정식 성적표는 Phase 2) */
 export function EndingScreen({ view, onNewGame, onHome }: Props) {
@@ -37,8 +37,27 @@ export function EndingScreen({ view, onNewGame, onHome }: Props) {
         </span>
       </div>
 
+      {e.goal && (
+        <div className={`card goal-verdict ${e.goal.achieved ? 'goal-ok' : 'goal-miss'}`}>
+          <div className="career-head">
+            <strong>
+              <span aria-hidden="true">{e.goal.emoji}</span> 인생 목표 · {e.goal.title}
+            </strong>
+            <span className={`stamp stamp-small ${e.goal.achieved ? 'stamp-navy' : ''}`} aria-hidden="true">
+              {e.goal.achieved ? '달성' : '미달'}
+            </span>
+          </div>
+          <p className="small" style={{ lineHeight: 1.7 }}>
+            {e.goal.text}
+          </p>
+          {fail && <span className="tiny muted">50세 전에 회사를 떠나 목표 판정 대상이 아니었습니다.</span>}
+        </div>
+      )}
+
       <div className="card">
         <dl className="kv kv-wide">
+          <dt>최종 직급</dt>
+          <dd>{e.highestRankLabel ?? '-'}</dd>
           <dt>순자산</dt>
           <dd className={view.netWorth < 0 ? 'neg' : ''}>
             {view.netWorth < 0 ? `−${formatKrw(-view.netWorth)}` : formatKrw(view.netWorth)}

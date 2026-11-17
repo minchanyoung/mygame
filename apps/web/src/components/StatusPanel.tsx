@@ -58,6 +58,71 @@ export function EmployeeBadge({ view }: { view: PublicRunView }) {
   );
 }
 
+/** S5 커리어: 다음 승진까지(근속·포인트) + 인생 목표 진행 */
+export function CareerCard({ view }: { view: PublicRunView }) {
+  const p = view.employment.promotion;
+  const g = view.lifeGoal;
+  if (!p && !g) return null;
+  const pct = (cur: number, max: number) => (max > 0 ? Math.min(100, Math.round((cur / max) * 100)) : 100);
+  return (
+    <div className="card career" style={{ gap: 10 }}>
+      {p && (
+        <div className="career-row">
+          <div className="career-head">
+            <strong className="small">
+              {p.nextRankLabel ? `다음 승진 · ${p.nextRankLabel}` : '최고 직급 달성'}
+            </strong>
+            {p.nextRankLabel && (
+              <span className={`chip ${p.blocked ? 'chip-danger' : p.eligible ? 'chip-trait' : ''}`}>
+                {p.blocked ? '성과 개선 중 · 심사 보류' : p.eligible ? '1월 심사 대상' : '준비 중'}
+              </span>
+            )}
+          </div>
+          {p.nextRankLabel && (
+            <div className="career-bars">
+              <div>
+                <span className="tiny muted">
+                  근속 {p.yearsInRank}/{p.minYears}년
+                </span>
+                <div className="mini-bar" aria-hidden="true">
+                  <span style={{ width: `${pct(p.yearsInRank, p.minYears)}%` }} />
+                </div>
+              </div>
+              <div>
+                <span className="tiny muted">
+                  승진 포인트 {p.points}/{p.requiredPoints}
+                </span>
+                <div className="mini-bar" aria-hidden="true">
+                  <span style={{ width: `${pct(p.points, p.requiredPoints)}%` }} />
+                </div>
+              </div>
+            </div>
+          )}
+          {p.nextRankLabel && (
+            <span className="tiny muted">
+              연말 평가 등급과 큰 성과로 포인트가 쌓여요. 조건을 채우면 1월에 심사.
+            </span>
+          )}
+        </div>
+      )}
+      {g && (
+        <div className="career-row">
+          <div className="career-head">
+            <strong className="small">
+              <span aria-hidden="true">{g.emoji}</span> 인생 목표 · {g.title}
+            </strong>
+            <span className="tiny muted">{g.percent}%</span>
+          </div>
+          <div className="mini-bar mini-bar-goal" aria-hidden="true">
+            <span style={{ width: `${g.percent}%` }} />
+          </div>
+          <span className="tiny muted">{g.progressLabel}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /** 자원 4개. 20 이하는 색과 함께 '위험' 글자로도 표시 (§10.2) */
 export function Gauges({ view }: { view: PublicRunView }) {
   return (

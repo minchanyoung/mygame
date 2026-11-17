@@ -3,9 +3,9 @@ import { GameRunStateSchema, type JobOffer } from '@company-life/shared';
 import { generateCharacterCards } from './characters';
 import { EngineError } from './errors';
 import { applyForJob, calculateHireChance, generateJobOffers } from './jobs';
-import { chooseCharacter } from './run';
+import { chooseCharacter, chooseGoal } from './run';
 import { allowedCommands, assertCommand, assertTransition } from './state-machine';
-import { content, employedRun, newRun, PROFILE } from './test-fixtures';
+import { content, employedRun, newRun, pickCard, PROFILE } from './test-fixtures';
 import { toPublicView } from './view';
 
 const expectEngineError = (fn: () => unknown, code: string) => {
@@ -89,12 +89,42 @@ describe('createRun / chooseCharacter', () => {
     const run = newRun();
     expectEngineError(() => chooseCharacter(run, 'card_999', content), 'CARD_NOT_FOUND');
     const chosen = chooseCharacter(run, 'card_2', content);
-    expect(chosen.phase).toBe('JOB_OFFERS');
+    expect(chosen.phase).toBe('GOAL_SELECTION');
     expect(chosen.selectedCharacter).toEqual(run.characterCards[1]);
     expect(chosen.resources).toEqual(run.characterCards[1]!.resources);
     expect(chosen.skills).toEqual({});
     expect(chosen.negativeTraits).toEqual({});
     expectEngineError(() => chooseCharacter(chosen, 'card_1', content), 'INVALID_PHASE');
+  });
+
+  it('S5 인생 목표: 서로 다른 3장을 시드 고정으로 제시하고, 제시된 것만 고를 수 있다', () => {
+    const chosen = chooseCharacter(newRun('goal-seed'), 'card_1', content);
+    expect(chosen.lifeGoalOffers).toHaveLength(3);
+    expect(new Set(chosen.lifeGoalOffers).size).toBe(3);
+    expect(chooseCharacter(newRun('goal-seed'), 'card_1', content).lifeGoalOffers).toEqual(
+      chosen.lifeGoalOffers,
+    );
+    const notOffered = content.pack.lifeGoals.find((g) => !chosen.lifeGoalOffers.includes(g.id))!.id;
+    expectEngineError(() => chooseGoal(chosen, notOffered, content), 'GOAL_NOT_OFFERED');
+    expectEngineError(() => applyForJob(chosen, chosen.jobOffers[0]!.offerId, content), 'INVALID_PHASE');
+    const picked = chooseGoal(chosen, chosen.lifeGoalOffers[1]!, content);
+    expect(picked.phase).toBe('JOB_OFFERS');
+    expect(picked.lifeGoal).toEqual({ goalId: chosen.lifeGoalOffers[1], milestones: [] });
+    const view = toPublicView(chosen, content);
+    expect(view.lifeGoalOffers.map((g) => g.id)).toEqual(chosen.lifeGoalOffers);
+    expect(GameRunStateSchema.safeParse(picked).success).toBe(true);
+  });
+
+  it('S5 인생 목표: 배경과 어울리는 목표가 있으면 후보에 반드시 1장 포함된다', () => {
+    for (let i = 0; i < 30; i++) {
+      const s = chooseCharacter(newRun(`fit-${i}`), 'card_1', content);
+      const fitting = content.pack.lifeGoals.filter((g) =>
+        g.affinity?.some((id) => s.backgroundTraits.includes(id)),
+      );
+      if (fitting.length > 0) {
+        expect(s.lifeGoalOffers.some((id) => fitting.some((g) => g.id === id))).toBe(true);
+      }
+    }
   });
 
   it('does not expose the seed or RNG state in the public view', () => {
@@ -107,7 +137,7 @@ describe('createRun / chooseCharacter', () => {
 describe('job offers and hiring (§3.2, §26.4)', () => {
   it('first search: 3 distinct companies; the third is always F-grade and guaranteed (100%)', () => {
     for (let i = 0; i < 30; i++) {
-      const s = chooseCharacter(newRun(`offers-${i}`), 'card_1', content);
+      const s = pickCard(newRun(`offers-${i}`), 'card_1');
       expect(s.jobOffers).toHaveLength(3);
       expect(new Set(s.jobOffers.map((o) => o.companyId)).size).toBe(3);
       const [a, b, sure] = s.jobOffers as [JobOffer, JobOffer, JobOffer];
@@ -125,7 +155,7 @@ describe('job offers and hiring (§3.2, §26.4)', () => {
   });
 
   it('hire chance is identical regardless of the player name/gender', () => {
-    const s = chooseCharacter(newRun(), 'card_1', content);
+    const s = pickCard(newRun(), 'card_1');
     const input = {
       character: s.selectedCharacter!,
       resources: s.resources,
@@ -151,7 +181,7 @@ describe('job offers and hiring (§3.2, §26.4)', () => {
   });
 
   it('first search rejection: costs mental and auto-joins the shown guaranteed F card (§26.4)', () => {
-    const s = chooseCharacter(newRun('reject'), 'card_1', content);
+    const s = pickCard(newRun('reject'), 'card_1');
     const applied = s.jobOffers[0]!;
     const sure = s.jobOffers[2]!;
     const forced = { ...s, jobOffers: s.jobOffers.map((o, j) => (j === 0 ? { ...o, hireChance: 0 } : o)) };
@@ -170,7 +200,7 @@ describe('job offers and hiring (§3.2, §26.4)', () => {
 
   it('every first-search choice ends employed, across many seeds', () => {
     for (let i = 0; i < 40; i++) {
-      const s = chooseCharacter(newRun(`always-${i}`), 'card_2', content);
+      const s = pickCard(newRun(`always-${i}`), 'card_2');
       for (const offer of s.jobOffers) {
         const out = applyForJob(s, offer.offerId, content);
         expect(out.state.phase).toBe('MONTH_START');
@@ -180,7 +210,7 @@ describe('job offers and hiring (§3.2, §26.4)', () => {
   });
 
   it('job offers are reproducible for the same state', () => {
-    const s = chooseCharacter(newRun(), 'card_3', content);
+    const s = pickCard(newRun(), 'card_3');
     expect(generateJobOffers(s, content)).toEqual(s.jobOffers);
   });
 });

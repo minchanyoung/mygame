@@ -26,6 +26,7 @@ export const GENDER_LABELS: Record<Gender, string> = {
 export const RUN_PHASES = [
   'PROFILE_INPUT',
   'CHARACTER_SELECTION',
+  'GOAL_SELECTION',
   'JOB_OFFERS',
   'MONTH_START',
   'EVENT_PENDING',
@@ -38,6 +39,7 @@ export type RunPhase = z.infer<typeof RunPhaseSchema>;
 export const RUN_COMMANDS = [
   'createCards',
   'chooseCharacter',
+  'chooseGoal',
   'apply',
   'startMonth',
   'choose',
@@ -61,7 +63,13 @@ export const JOB_LABELS: Record<JobId, string> = {
   PLANNING: '기획',
 };
 
-export const PLAYER_RANKS = ['STAFF', 'ASSISTANT_MANAGER', 'MANAGER', 'DEPARTMENT_HEAD'] as const;
+export const PLAYER_RANKS = [
+  'STAFF',
+  'ASSISTANT_MANAGER',
+  'MANAGER',
+  'DEPUTY_HEAD',
+  'DEPARTMENT_HEAD',
+] as const;
 export const PlayerRankSchema = z.enum(PLAYER_RANKS);
 export type PlayerRank = z.infer<typeof PlayerRankSchema>;
 /** NPC 계층 전용 확장 직급 EXECUTIVE (§21.2). 플레이어 직급이 아니다. */
@@ -72,6 +80,7 @@ export const RANK_LABELS: Record<NpcRank, string> = {
   STAFF: '사원',
   ASSISTANT_MANAGER: '대리',
   MANAGER: '과장',
+  DEPUTY_HEAD: '차장',
   DEPARTMENT_HEAD: '부장',
   EXECUTIVE: '임원',
 };

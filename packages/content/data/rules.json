@@ -69,6 +69,7 @@
   "monthly": {
     "taxPermille": 150,
     "livingCosts": { "housing": 550000, "food": 450000, "transport": 150000, "misc": 150000 },
+    "livingCostGrowthPermille": 40,
     "debtInterestPermille": 5,
     "debtRepayment": 200000,
     "naturalChange": { "health": 2, "mental": 3, "focus": 2, "reputation": 1 }
@@ -92,5 +93,65 @@
     },
     "jobCoefficientPermille": { "DEV": 1080, "HR": 980, "SALES": 1000, "FINANCE": 1040, "PLANNING": 1000 },
     "roundingUnit": 100000
+  },
+  "promotion": {
+    "ladder": [
+      {
+        "from": "STAFF",
+        "to": "ASSISTANT_MANAGER",
+        "minYears": 2,
+        "points": 4,
+        "raisePermille": 100,
+        "chanceAdjust": 0
+      },
+      {
+        "from": "ASSISTANT_MANAGER",
+        "to": "MANAGER",
+        "minYears": 4,
+        "points": 8,
+        "raisePermille": 120,
+        "chanceAdjust": -0.05
+      },
+      {
+        "from": "MANAGER",
+        "to": "DEPUTY_HEAD",
+        "minYears": 5,
+        "points": 14,
+        "raisePermille": 120,
+        "chanceAdjust": -0.2
+      },
+      {
+        "from": "DEPUTY_HEAD",
+        "to": "DEPARTMENT_HEAD",
+        "minYears": 6,
+        "points": 22,
+        "raisePermille": 150,
+        "chanceAdjust": -0.35
+      }
+    ],
+    "pointsByGrade": { "S": 3, "A": 2, "B": 1, "C": 0, "D": 0 },
+    "baseChance": 0.55,
+    "perExtraPoint": 0.08,
+    "maxExtraBonus": 0.24,
+    "policy": {
+      "seniorityPerYear": 0.05,
+      "performanceByGrade": { "S": 0.15, "A": 0.08, "B": 0, "C": -0.1, "D": -0.1 },
+      "politicsFavorHigh": 70,
+      "politicsFavorLow": 40,
+      "politicsBonus": 0.12
+    },
+    "bossTrustMin": 70,
+    "bossTrustBonus": 0.05,
+    "traitAdjustments": { "officeStigma": { "1": -0.05, "2": -0.15 } },
+    "blockedByFlag": "performance_warning",
+    "missBonus": 0.1,
+    "missPenalty": { "mental": 8, "reputation": 5, "bossFavor": 8 },
+    "consecutiveMissEvent": { "misses": 2, "eventId": "evt_promotion_passed_over" },
+    "rankBurden": {}
+  },
+  "lifeGoal": {
+    "offerCount": 3,
+    "milestones": [25, 50, 75],
+    "milestoneMental": 3
   }
 }

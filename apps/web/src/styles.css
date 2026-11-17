@@ -1730,3 +1730,91 @@ details summary {
   flex-direction: column;
   gap: 2px;
 }
+
+/* ── S5 인생 목표 · 승진 ── */
+.goal-grid {
+  display: grid;
+  gap: 12px;
+}
+.goal-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  text-align: left;
+  border: 2px solid var(--line);
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.goal-card-on {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px var(--navy-soft);
+}
+.goal-emoji {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.goal-title {
+  font-family: var(--display);
+  font-size: 1.25rem;
+}
+.career-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.career-row + .career-row {
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+.career-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.career-bars {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.mini-bar {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--line-2);
+  overflow: hidden;
+  margin-top: 3px;
+}
+.mini-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--navy);
+}
+.mini-bar-goal span {
+  background: #2f9e5b;
+}
+.appointment-line {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.appointment-held {
+  opacity: 0.92;
+}
+.goal-milestone {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  border-left: 6px solid #2f9e5b;
+}
+.goal-verdict {
+  gap: 8px;
+}
+.goal-ok {
+  border-left: 6px solid #2f9e5b;
+}
+.goal-miss {
+  border-left: 6px solid var(--muted);
+}

@@ -123,6 +123,8 @@ export const EffectSchema = z.discriminatedUnion('type', [
     .strict(),
   z.object({ type: z.literal('CASH_DELTA'), amount: z.number().int() }).strict(),
   z.object({ type: z.literal('DEBT_DELTA'), amount: z.number().int() }).strict(),
+  /** S5 승진 포인트 증감 (현 직급, 0 미만으로 내려가지 않음) */
+  z.object({ type: z.literal('PROMOTION_POINT_DELTA'), amount: z.number().int().min(-5).max(5) }).strict(),
   z
     .object({
       type: z.literal('SKILL_SET_LEVEL'),

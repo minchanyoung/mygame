@@ -2,6 +2,7 @@ import { ENGINE_VERSION, type GameRunState, type PlayerProfile } from '@company-
 import { generateCharacterCards } from './characters';
 import type { ContentIndex } from './content-index';
 import { EngineError } from './errors';
+import { goalDef, offerLifeGoals } from './goals';
 import { generateJobOffers } from './jobs';
 import { deriveSeed } from './rng';
 import { assertCommand, assertTransition } from './state-machine';
@@ -38,6 +39,8 @@ export function createRun(input: CreateRunInput, content: ContentIndex): GameRun
     profile: { ...input.profile },
     characterCards: cards,
     selectedCharacter: null,
+    lifeGoalOffers: [],
+    lifeGoal: null,
     jobOffers: [],
     jobSearch: { round: 0, consecutiveRejections: 0, lastResult: null },
     employment: { status: 'UNEMPLOYED', current: null, jobLoss: null },
@@ -77,18 +80,19 @@ export function createRun(input: CreateRunInput, content: ContentIndex): GameRun
 }
 
 /**
- * CHARACTER_SELECTION --chooseCharacter(cardId)--> JOB_OFFERS.
+ * CHARACTER_SELECTION --chooseCharacter(cardId)--> GOAL_SELECTION.
  * 서버가 발급해 상태에 고정한 cardId만 허용한다 (클라이언트가 보낸 인물 데이터는 받지 않는다).
+ * 인생 목표 후보 3장과 첫 구직 카드도 이때 고정한다.
  */
 export function chooseCharacter(state: GameRunState, cardId: string, content: ContentIndex): GameRunState {
   assertCommand(state.phase, 'chooseCharacter');
   const card = state.characterCards.find((c) => c.cardId === cardId);
   if (!card) throw new EngineError('CARD_NOT_FOUND', `unknown cardId: ${cardId}`, { cardId });
-  assertTransition(state.phase, 'chooseCharacter', 'JOB_OFFERS');
+  assertTransition(state.phase, 'chooseCharacter', 'GOAL_SELECTION');
 
   const selected: GameRunState = {
     ...state,
-    phase: 'JOB_OFFERS',
+    phase: 'GOAL_SELECTION',
     selectedCharacter: card,
     resources: { ...card.resources },
     cash: card.cash,
@@ -102,5 +106,33 @@ export function chooseCharacter(state: GameRunState, cardId: string, content: Co
       { turnIndex: state.turnIndex, kind: 'CHARACTER_SELECTED', summary: '캐릭터 확정', data: { cardId } },
     ],
   };
-  return { ...selected, jobOffers: generateJobOffers(selected, content) };
+  return {
+    ...selected,
+    lifeGoalOffers: offerLifeGoals(selected, content),
+    jobOffers: generateJobOffers(selected, content),
+  };
+}
+
+/** GOAL_SELECTION --chooseGoal(goalId)--> JOB_OFFERS. 제시된 3장 중에서만 고를 수 있다. */
+export function chooseGoal(state: GameRunState, goalId: string, content: ContentIndex): GameRunState {
+  assertCommand(state.phase, 'chooseGoal');
+  if (!state.lifeGoalOffers.includes(goalId)) {
+    throw new EngineError('GOAL_NOT_OFFERED', `goal not offered: ${goalId}`, { goalId });
+  }
+  assertTransition(state.phase, 'chooseGoal', 'JOB_OFFERS');
+  const def = goalDef(content, goalId);
+  return {
+    ...state,
+    phase: 'JOB_OFFERS',
+    lifeGoal: { goalId, milestones: [] },
+    eventHistory: [
+      ...state.eventHistory,
+      {
+        turnIndex: state.turnIndex,
+        kind: 'GOAL_SELECTED',
+        summary: `인생 목표: ${def.title}`,
+        data: { goalId },
+      },
+    ],
+  };
 }

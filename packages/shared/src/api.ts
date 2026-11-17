@@ -30,6 +30,15 @@ export const ChooseCharacterRequestSchema = z
   .strict();
 export type ChooseCharacterRequest = z.infer<typeof ChooseCharacterRequestSchema>;
 
+export const ChooseGoalRequestSchema = z
+  .object({
+    goalId: z.string().min(1).max(64),
+    idempotencyKey: IdempotencyKeySchema,
+    expectedRevision: RevisionSchema,
+  })
+  .strict();
+export type ChooseGoalRequest = z.infer<typeof ChooseGoalRequestSchema>;
+
 export const ApplyJobRequestSchema = z
   .object({
     offerId: z.string().min(1).max(100),
@@ -179,6 +188,50 @@ export interface PublicEnding {
   title: string;
   text: string;
   age: number;
+  /** 커리어 최고 직급 */
+  highestRankLabel: string | null;
+  /** 인생 목표 판정 (목표가 없으면 null). 실패 엔딩은 자동 미달성. */
+  goal: { title: string; emoji: string; achieved: boolean; text: string } | null;
+}
+
+/** S5 인생 목표 카드 */
+export interface PublicLifeGoal {
+  id: string;
+  title: string;
+  emoji: string;
+  description: string;
+  /** 배경 특성과 어울리는 목표 */
+  fitting: boolean;
+}
+
+export interface PublicLifeGoalProgress extends PublicLifeGoal {
+  percent: number;
+  /** 예: "순자산 4,200만 / 3억" */
+  progressLabel: string;
+}
+
+/** 메인 화면 승진 진행 (확률은 비공개, 근속·포인트만) */
+export interface PublicPromotionStatus {
+  nextRankLabel: string | null;
+  yearsInRank: number;
+  minYears: number;
+  points: number;
+  requiredPoints: number;
+  /** PIP 경고 등으로 심사가 막힘 */
+  blocked: boolean;
+  /** 다음 1월 심사 대상 */
+  eligible: boolean;
+}
+
+/** 1월 인사발령 */
+export interface PublicPromotionResult {
+  success: boolean;
+  fromLabel: string;
+  toLabel: string;
+  salaryFrom: number | null;
+  salaryTo: number | null;
+  newBossName: string | null;
+  misses: number;
 }
 
 export interface PublicMonthSummary {
@@ -195,6 +248,10 @@ export interface PublicMonthSummary {
   annualReview: PublicReview | null;
   /** 1월 연봉 조정 */
   salaryAdjustment: { grade: ReviewGrade | null; from: number; to: number } | null;
+  /** 1월 승진 심사 (대상이 아니면 null) */
+  promotion: PublicPromotionResult | null;
+  /** 이번 달 새로 넘은 인생 목표 진행 구간 */
+  goalMilestone: number | null;
   resourceDelta: Resources;
   cashDelta: number;
   debtDelta: number;
@@ -317,7 +374,11 @@ export interface PublicRunView {
     /** 현재 회사 입사 시점 */
     startedAge: number | null;
     startedMonth: number | null;
+    promotion: PublicPromotionStatus | null;
   };
+  /** GOAL_SELECTION에서 고를 인생 목표 후보 */
+  lifeGoalOffers: PublicLifeGoal[];
+  lifeGoal: PublicLifeGoalProgress | null;
   resources: Resources;
   cash: number;
   debt: number;
