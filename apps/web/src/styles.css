@@ -651,7 +651,7 @@ button.card {
 
 .bg-tiles {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -1817,4 +1817,67 @@ details summary {
 }
 .goal-miss {
   border-left: 6px solid var(--muted);
+}
+
+/* ── 스펙 카드 3장 가로 정렬 ──
+   휴대폰: 옆으로 넘기는 가로 줄(스냅) / 넓은 화면: 세 장을 한 줄에 펼침 */
+.spec-pager {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.spec-pager-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-family: var(--display);
+  cursor: pointer;
+}
+.spec-pager-dot.on {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--on-navy);
+}
+.spec-swipe-hint {
+  margin-left: auto;
+}
+.spec-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 86%;
+  gap: 12px;
+  align-items: start;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  margin: 0 -16px;
+  padding: 4px 16px 12px;
+  scroll-padding: 0 16px;
+}
+.spec-row > .spec {
+  scroll-snap-align: center;
+  min-width: 0;
+}
+@media (min-width: 900px) {
+  .app-wide {
+    max-width: 1120px;
+  }
+  .spec-row {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow: visible;
+    margin: 0;
+    padding: 4px 0 12px;
+  }
+  .spec-pager {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spec-row {
+    scroll-behavior: auto;
+  }
 }

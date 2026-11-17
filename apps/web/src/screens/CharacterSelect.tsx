@@ -71,11 +71,11 @@ function SpecCard({
   const backgrounds = [
     { icon: 'school' as const, label: '학력', trait: card.university },
     { icon: 'book' as const, label: '전공', trait: card.major },
-    { icon: 'home' as const, label: '가정', trait: card.family },
   ];
   const rare = card.strength.rare || card.weakness.rare;
   return (
     <article
+      id={`spec-${card.cardId}`}
       className={`card spec flip-in ${on ? 'card-on' : ''} ${rare ? 'spec-rare' : ''}`}
       style={{ animationDelay: `${index * 160}ms` }}
       aria-label={`스펙 ${LETTERS[index]}`}
@@ -127,7 +127,7 @@ function SpecCard({
       </div>
 
       <details className="spec-more">
-        <summary className="small">학력·전공·가정 효과 자세히</summary>
+        <summary className="small">학력·전공 효과 자세히</summary>
         {backgrounds.map((b) => (
           <div key={b.label} style={{ marginTop: 8 }}>
             <strong className="small">
@@ -163,7 +163,27 @@ export function CharacterSelect({ view, busy, onConfirm }: Props) {
         게임 규칙에서 계산된 값이에요. 영구 능력은 아직 아무도 없습니다.
       </p>
 
-      <div className="card-list">
+      <div className="spec-pager" role="tablist" aria-label="스펙 바로가기">
+        {view.characterCards.map((card, i) => (
+          <button
+            key={card.cardId}
+            type="button"
+            role="tab"
+            aria-selected={selected === card.cardId}
+            className={`spec-pager-dot ${selected === card.cardId ? 'on' : ''}`}
+            onClick={() =>
+              document
+                .getElementById(`spec-${card.cardId}`)
+                ?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+            }
+          >
+            {LETTERS[i]}
+          </button>
+        ))}
+        <span className="tiny muted spec-swipe-hint">옆으로 넘겨 비교해 보세요</span>
+      </div>
+
+      <div className="spec-row">
         {view.characterCards.map((card, i) => (
           <SpecCard
             key={card.cardId}

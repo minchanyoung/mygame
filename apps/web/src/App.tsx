@@ -294,7 +294,9 @@ export function App() {
     ) : null;
 
   return (
-    <div className="app">
+    <div
+      className={`app ${screen.kind === 'run' && screen.view.phase === 'CHARACTER_SELECTION' ? 'app-wide' : ''}`}
+    >
       <header className="app-header">
         <span className="logo">오늘도 출근</span>
         {screen.kind === 'run' && (
