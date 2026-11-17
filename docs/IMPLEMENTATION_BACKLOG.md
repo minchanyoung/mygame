@@ -34,7 +34,8 @@
 | ~~1.13~~ | ~~실업 월 진행~~ — §26으로 대체 | — | — | 삭제 |
 | 1.17 | §26 실직 게임오버·엔딩(자원 0·부채 한계·이벤트 실직·조기 은퇴·정년), 경고, 첫 구직 보장 | engine/ending·jobs·view, content | §26.7 테스트 | ✅ 검수 ② 대기 |
 | 1.18 | 자동 플레이 시뮬레이터 (`npm run simulate -w @company-life/game-engine -- 1000`) | engine/simulation | 진행 불능 0건 테스트 | ✅ |
-| 1.19 | 밸런스 조정 (구조조정 편중, 이른 실패) | content/rules·events | 시뮬레이션 | ⬜ 검수 결정 후 |
+| 1.19 | 밸런스 조정 S1: 구조조정 소문 재직 12개월+·쿨다운 24, 명단 가중치 10·최대 2회, 면담 70% (`tenureMonths` 조건 추가) | content/events, shared, engine | `npm run simulate` 목표 표시 | 🟡 실패율 목표 근접, 엔딩 다양성 미달 → S2 콘텐츠로 해결 |
+| 1.21 | git 저장소 + GitHub 원격 (minchanyoung/mygame) | 루트 | — | 🟡 로컬 커밋 완료, push는 사용자 로그인 필요 |
 | 1.14 | 상사 교체 규칙(플레이어 ≥ 상사 직급 시 FORMER_BOSS + 별도 스트림 생성) | engine/npcs | NPC 교체 테스트 | ⬜ |
 | 1.15 | 이벤트 팩 18개 이상, 직무 특화 3개, 부정 특성 2번째 극복 루트 | content | 콘텐츠 검증 | 🟡 19개 (직무 특화 0) |
 | 1.16 | 화면: 이벤트·월말 요약·경고 배너·엔딩 (검수 ③) | web | 사용자 플레이테스트 (`docs/PLAYTEST.md`) | 🟡 구현 완료, 사용자 검수 대기 |

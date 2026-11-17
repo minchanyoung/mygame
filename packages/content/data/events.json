@@ -828,9 +828,10 @@
     "category": "company",
     "rarity": "uncommon",
     "weight": 6,
-    "cooldownMonths": 12,
+    "cooldownMonths": 24,
     "conditions": {
       "employment": "EMPLOYED",
+      "tenureMonths": { "min": 12 },
       "flagsNone": [{ "key": "layoff_rumor", "scope": "COMPANY" }]
     },
     "choices": [
@@ -860,9 +861,9 @@
     "description": "소문이 사실이 되었다. 인사팀이 한 명씩 면담실로 부르기 시작했고, 이제 당신 차례다.",
     "category": "company",
     "rarity": "uncommon",
-    "weight": 30,
+    "weight": 10,
     "highRisk": true,
-    "maxOccurrencesPerRun": 3,
+    "maxOccurrencesPerRun": 2,
     "conditions": {
       "employment": "EMPLOYED",
       "flagsAll": [{ "key": "layoff_rumor", "scope": "COMPANY" }]
@@ -872,7 +873,7 @@
         "id": "prove_value",
         "label": "핵심 성과를 들고 면담에 들어간다",
         "outcome": {
-          "baseChance": 0.55,
+          "baseChance": 0.7,
           "modifiers": [
             { "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.15 } },
             { "source": "RESOURCE", "key": "reputation", "range": { "min": 60 }, "bonus": 0.15 }

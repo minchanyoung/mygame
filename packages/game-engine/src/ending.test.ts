@@ -106,6 +106,12 @@ describe('§26 job-loss endings', () => {
 });
 
 describe('§26.5 event job loss requires warning signs', () => {
+  it('구조조정 소문은 재직 12개월 이후에만 후보가 된다 (tenureMonths)', () => {
+    const started = base.employment.current!.startedTurn;
+    expect(eligibleIds({ ...base, turnIndex: started + 11 })).not.toContain('evt_restructuring_rumor');
+    expect(eligibleIds({ ...base, turnIndex: started + 12 })).toContain('evt_restructuring_rumor');
+  });
+
   it('구조조정 명단은 소문 플래그 없이는 후보가 아니고, 소문 이후에만 등장한다', () => {
     expect(eligibleIds(base)).not.toContain('evt_restructuring_list');
     const rumor = chooseInMonth(

@@ -55,6 +55,8 @@ export const ConditionsSchema = z
   .object({
     employment: z.union([EmploymentStatusSchema, z.array(EmploymentStatusSchema).min(1)]).optional(),
     age: IntRangeSchema.optional(),
+    /** 현재 회사 재직 개월 수 (입사 턴 기준) */
+    tenureMonths: IntRangeSchema.optional(),
     companyGrades: z.array(CompanyGradeSchema).min(1).optional(),
     jobs: z.array(JobIdSchema).min(1).optional(),
     ranks: z.array(PlayerRankSchema).min(1).optional(),
