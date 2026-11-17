@@ -10,6 +10,7 @@ import {
 import { processAnnualReview, processSalaryAdjustment } from './annual';
 import type { ContentIndex } from './content-index';
 import { buildEnding, finalizeEnding, withPendingEnding } from './ending';
+import { inflate, priceIndex } from './economy';
 import { EngineError } from './errors';
 import { updateLifeGoalMilestone } from './goals';
 import { processPromotion } from './promotion';
@@ -59,10 +60,9 @@ export function applyMonthlySettlement(
   const gross = Math.floor(job.annualSalary / 12);
   const tax = Math.floor((gross * monthly.taxPermille) / 1000);
   const netSalary = gross - tax;
-  // 물가 상승: 해마다 복리로 오른 생활비 (천 원 단위 내림)
-  const years = Math.floor(state.turnIndex / 12);
-  const inflation = Math.pow(1 + monthly.livingCostGrowthPermille / 1000, years);
-  const grow = (n: number) => Math.floor((n * inflation) / 1000) * 1000;
+  // 물가 상승: 해마다 복리로 오른 생활비 (천 원 단위)
+  const index = priceIndex(state, content);
+  const grow = (n: number) => inflate(n, index);
   const livingBreakdown = {
     housing: grow(monthly.livingCosts.housing),
     food: grow(monthly.livingCosts.food),
@@ -276,6 +276,11 @@ export function chooseInMonth(
       statistics: {
         ...closed.statistics,
         consecutiveHighRiskMonths: thisMonthHighRisk ? state.statistics.consecutiveHighRiskMonths + 1 : 0,
+        lowestWellbeing: Math.min(
+          closed.statistics.lowestWellbeing,
+          closed.resources.health,
+          closed.resources.mental,
+        ),
       },
     },
     result: r,

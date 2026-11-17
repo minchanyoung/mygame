@@ -70,6 +70,9 @@ export function lifeGoalProgress(state: GameRunState, content: ContentIndex): Go
       const cur = Math.min(state.resources.health, state.resources.mental);
       // 진행 = 50세까지 버틴 정도. 현재 상태가 기준 미만이면 절반만 인정
       const tenure = pct(age - rules.startAge, rules.gameOver.failureBeforeAge - rules.startAge);
+      // 한 번이라도 최저선 아래로 무너졌다면 이미 달성 불가 → 0%
+      if (state.statistics.lowestWellbeing < (def.floor ?? 0))
+        return { percent: 0, current: cur, target: def.stat! };
       return { percent: cur >= def.stat! ? tenure : Math.floor(tenure / 2), current: cur, target: def.stat! };
     }
     case 'ACE': {
@@ -105,7 +108,11 @@ export function judgeLifeGoal(
         achieved = ending.type === 'RETIREMENT';
         break;
       case 'WELLBEING':
-        achieved = state.resources.health >= def.stat! && state.resources.mental >= def.stat!;
+        // 은퇴 시 컨디션 + 커리어 내내 무너진 적 없음 (월말 체력·정신력이 floor 미만으로 떨어진 적 없음)
+        achieved =
+          state.resources.health >= def.stat! &&
+          state.resources.mental >= def.stat! &&
+          state.statistics.lowestWellbeing >= (def.floor ?? 0);
         break;
       case 'ACE':
         achieved = state.annualReviews.filter((r) => r.grade === 'S').length >= def.count!;

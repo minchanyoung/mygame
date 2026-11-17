@@ -53,7 +53,7 @@ export function computeAnnualReview(state: GameRunState, content: ContentIndex):
       note:
         workJudged.length > 0
           ? `올해 업무 ${workJudged.length}건 중 ${workWins}건 성공`
-          : '판정할 업무가 없었음',
+          : '결과가 갈리는 업무에 도전하지 않아 기본 50점 (확정 선택만 함)',
     },
     {
       key: 'boss' as const,

@@ -68,7 +68,6 @@ export function backgroundEffects(def: BackgroundTraitDefinition, content: Conte
         tone: toneOf(d),
       });
   }
-  if (def.cash !== undefined) effects.push({ text: `시작 현금 ${manwon(def.cash)}`, tone: 'neutral' });
   if (def.cashDelta) {
     effects.push({
       text: `시작 현금 ${def.cashDelta > 0 ? '+' : '−'}${manwon(Math.abs(def.cashDelta))}`,

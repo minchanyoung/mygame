@@ -38,12 +38,11 @@ export type TraitDefinition = z.infer<typeof TraitDefinitionSchema>;
 export const BackgroundTraitDefinitionSchema = z
   .object({
     id: ContentIdSchema,
-    kind: z.enum(['UNIVERSITY', 'MAJOR', 'FAMILY', 'STRENGTH', 'WEAKNESS']),
+    kind: z.enum(['UNIVERSITY', 'MAJOR', 'STRENGTH', 'WEAKNESS']),
     name: z.string().min(1).max(24),
     description: z.string().max(200),
     rarity: z.enum(['common', 'rare']).optional(),
     resourceDeltas: z.partialRecord(ResourceKeySchema, z.number().int().min(-50).max(50)).optional(),
-    cash: z.number().int().min(0).optional(),
     cashDelta: z.number().int().optional(),
     debtDelta: z.number().int().min(0).optional(),
     hireBonus: z
@@ -386,6 +385,8 @@ export const LifeGoalDefinitionSchema = z
     amount: z.number().int().positive().optional(),
     rank: PlayerRankSchema.optional(),
     stat: z.number().int().min(1).max(100).optional(),
+    /** WELLBEING: 커리어 내내 월말 체력·정신력이 이 값 아래로 떨어진 적이 없어야 함 */
+    floor: z.number().int().min(0).max(100).optional(),
     count: z.number().int().min(1).max(40).optional(),
     /** 이 배경 특성 중 하나가 있으면 '어울리는 목표'로 우선 제시 */
     affinity: z.array(ContentIdSchema).optional(),

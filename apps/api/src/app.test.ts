@@ -175,6 +175,27 @@ describe('POST /api/runs/:id/character — idempotency and revision (§23.3)', (
     expect(bad.json().code).toBe('GOAL_NOT_OFFERED');
   });
 
+  it('a save pinned to a content version no longer on the server is moved to the latest content', async () => {
+    const store = new MemoryRunStore();
+    const app = makeApp(store);
+    const { body } = await createRun(app);
+    await store.update(body.runId, async (record) => ({
+      record: { ...record, state: { ...record.state, contentVersion: '2000.01.01-old' } },
+      value: null,
+    }));
+    const headers = auth(body.guestToken);
+    const view = (await app.inject({ url: `/api/runs/${body.runId}`, headers })).json() as PublicRunView;
+    expect(view.contentVersion).toBe(contents[0]!.contentVersion);
+    const chosen = await app.inject({
+      method: 'POST',
+      url: `/api/runs/${body.runId}/character`,
+      headers,
+      payload: { cardId: 'card_1', idempotencyKey: 'key-rebind-01', expectedRevision: 0 },
+    });
+    expect(chosen.statusCode).toBe(200);
+    expect((chosen.json().view as PublicRunView).contentVersion).toBe(contents[0]!.contentVersion);
+  });
+
   it('cannot skip phases (apply-job during CHARACTER_SELECTION → 409)', async () => {
     const app = makeApp();
     const { body } = await createRun(app);

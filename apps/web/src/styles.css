@@ -2087,3 +2087,13 @@ details summary {
   flex-direction: column;
   gap: 4px;
 }
+
+/* 정상 엔딩으로 이어지는 선택지 안내 (실패 경고와 구분되는 중립 표시) */
+.ending-notice {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--navy);
+  background: var(--navy-soft);
+  border-radius: 8px;
+  padding: 4px 8px;
+}

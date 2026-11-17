@@ -9012,8 +9012,8 @@
         "reply": "…생각해봤는데요. 받겠습니다. 그동안 감사했습니다.",
         "guaranteedEffects": [
           {
-            "type": "CASH_DELTA",
-            "amount": 80000000
+            "type": "SALARY_MONTHS",
+            "months": 24
           },
           {
             "type": "RESOURCE_DELTA",

@@ -58,10 +58,10 @@ describe('character cards (§3.1)', () => {
     expect(strip(a)).toEqual(strip(b));
   });
 
-  it('guarantees diversity: no two cards share university/major/family/strength/weakness', () => {
+  it('guarantees diversity: no two cards share university/major/strength/weakness', () => {
     for (let i = 0; i < 50; i++) {
       const cards = generateCharacterCards(PROFILE, `div-${i}`, content);
-      for (const key of ['universityId', 'majorId', 'familyId', 'strengthId', 'weaknessId'] as const) {
+      for (const key of ['universityId', 'majorId', 'strengthId', 'weaknessId'] as const) {
         expect(new Set(cards.map((c) => c[key])).size).toBe(3);
       }
       for (const c of cards) {

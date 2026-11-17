@@ -10,7 +10,7 @@
   "character": {
     "baseResources": { "health": 70, "mental": 60, "focus": 60, "reputation": 50 },
     "resourceJitter": 5,
-    "baseCash": 3000000
+    "baseCash": 5000000
   },
   "hiring": {
     "baseChanceByGrade": { "S": 0.15, "A": 0.25, "B": 0.4, "C": 0.55, "D": 0.7, "F": 0.85 },

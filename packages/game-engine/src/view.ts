@@ -1,6 +1,7 @@
 import {
   GENDER_LABELS,
   JOB_LABELS,
+  JOB_LOSS_REASONS,
   PLAYER_RANKS,
   RANK_LABELS,
   type LifeGoalDefinition,
@@ -43,6 +44,7 @@ import {
   type TraitLevels,
 } from '@company-life/shared';
 import { backgroundEffects, recommendedJob } from './background-effects';
+import { inflate, priceIndex } from './economy';
 import { goalDef, lifeGoalProgress } from './goals';
 import { promotionStatus } from './promotion';
 import { matchesConditions } from './conditions';
@@ -76,7 +78,6 @@ export function toPublicCard(card: CharacterCard, content: ContentIndex): Public
     startAge: card.startAge,
     university: bg(card.universityId, content),
     major: bg(card.majorId, content),
-    family: bg(card.familyId, content),
     strength: bg(card.strengthId, content),
     weakness: bg(card.weaknessId, content),
     resources: { ...card.resources },
@@ -115,11 +116,11 @@ function toPublicNpc(npc: Npc, content: ContentIndex): PublicNpc {
 }
 
 /** §22.1 확정 비용만 표시 (확률은 비공개) */
-function costLabels(effects: readonly Effect[]): string[] {
+function costLabels(effects: readonly Effect[], index: number): string[] {
   const out: string[] = [];
   for (const e of effects) {
     if (e.type === 'RESOURCE_DELTA' && e.amount < 0) out.push(`${RESOURCE_LABELS[e.key]} ${e.amount}`);
-    if (e.type === 'CASH_DELTA' && e.amount < 0) out.push(`현금 -${krw(-e.amount)}`);
+    if (e.type === 'CASH_DELTA' && e.amount < 0) out.push(`현금 -${krw(-inflate(e.amount, index))}`);
   }
   return out;
 }
@@ -141,14 +142,14 @@ function lockedHint(
  * §26.3 확정 비용(guaranteedEffects + 일치하는 ALWAYS 조건부 효과)만으로 실직 엔딩에 닿는지 미리 계산한다.
  * 확률이 걸린 결과는 여기서 다루지 않는다 (위험 등급만 표시, §22.1).
  */
-function fatalWarning(
+function guaranteedEnding(
   state: GameRunState,
   choice: Choice,
   participant: Npc | null,
   occurrenceId: string,
   eventId: string,
   content: ContentIndex,
-): string | null {
+): Ending | null {
   const always = (choice.conditionalEffects ?? [])
     .filter((ce) => ce.on === 'ALWAYS' && matchesConditions(state, ce.when, { participant }, content))
     .flatMap((ce) => ce.effects);
@@ -156,12 +157,35 @@ function fatalWarning(
   if (effects.length === 0) return null;
   const draft = cloneForEffects(state);
   try {
-    applyEffects(draft, effects, { eventId, occurrenceId, participantNpcId: participant?.npcId ?? null });
+    applyEffects(draft, effects, {
+      eventId,
+      occurrenceId,
+      participantNpcId: participant?.npcId ?? null,
+      priceIndex: priceIndex(state, content),
+    });
   } catch {
     return null;
   }
   const found = detectJobLossCause(draft, content);
-  return found ? `⚠ 선택 시 ${buildEnding(draft, found.cause, found.sourceEventId, content).title}` : null;
+  return found ? buildEnding(draft, found.cause, found.sourceEventId, content) : null;
+}
+
+/**
+ * 확정 비용만으로 엔딩에 닿는 선택지 표시.
+ * 실패 엔딩이면 빨간 경고(두 번 눌러 확정), 정상 엔딩(50세 이후 조기 은퇴 등)이면 중립 안내만.
+ */
+function endingNotices(ending: Ending | null): { fatalWarning: string | null; endingNotice: string | null } {
+  if (!ending) return { fatalWarning: null, endingNotice: null };
+  // 중립 안내는 '사건이 제안한 퇴직'(희망퇴직 수락 등)이 정상 엔딩이 되는 경우만.
+  // 50세 이후라도 과로·번아웃·부채 등 무너져서 끝나는 경우는 빨간 경고를 유지한다.
+  const offeredExit =
+    ending.category === 'NORMAL' && (JOB_LOSS_REASONS as readonly string[]).includes(ending.cause);
+  return offeredExit
+    ? {
+        fatalWarning: null,
+        endingNotice: `선택 시 ${ending.title.split(' — ')[0]} · 회사 생활이 여기서 끝납니다`,
+      }
+    : { fatalWarning: `⚠ 선택 시 ${ending.title}`, endingNotice: null };
 }
 
 /** §26.3 경고 임계치 이하 자원·부채 경고 */
@@ -256,7 +280,7 @@ function toPublicGoalProgress(state: GameRunState, content: ContentIndex): Publi
       progressLabel = `${p.current}세 / ${p.target}세 정년`;
       break;
     case 'WELLBEING':
-      progressLabel = `체력·정신력 중 낮은 쪽 ${p.current} (기준 ${p.target}) · 50세 이후까지`;
+      progressLabel = `지금 ${p.current} · 커리어 최저 ${state.statistics.lowestWellbeing} (은퇴 시 ${p.target}↑, 최저 ${def.floor ?? 0}↑)`;
       break;
     case 'ACE':
       progressLabel = `연말 평가 S ${p.current}회 / ${p.target}회`;
@@ -471,7 +495,8 @@ function toStory(
     aftermath: chatLines(aftermathLines, state, participant, content),
     success: ev.success,
     verdictLabel,
-    resultText: ev.resultText ?? fallback,
+    // 반응 대화가 있으면 판에 박힌 기본 문장은 생략 (대화가 결과를 말해준다)
+    resultText: ev.resultText ?? ((aftermathLines?.length ?? 0) > 0 ? '' : fallback),
     factors,
     effects,
     relationChanges,
@@ -505,8 +530,10 @@ export function toPublicActiveEvent(state: GameRunState, content: ContentIndex):
         risk: c.risk,
         riskLabel: c.risk ? RISK_LABELS[c.risk] : null,
         appliedTraits,
-        costs: costLabels(c.choice.guaranteedEffects ?? []),
-        fatalWarning: fatalWarning(state, c.choice, participant, active.occurrenceId, event.id, content),
+        costs: costLabels(c.choice.guaranteedEffects ?? [], priceIndex(state, content)),
+        ...endingNotices(
+          guaranteedEnding(state, c.choice, participant, active.occurrenceId, event.id, content),
+        ),
       };
       if (c.choice.description) view.description = c.choice.description;
       if (!c.enabled) view.lockedHint = lockedHint(c.choice.requirementHint, c.choice.enabledIf, content);

@@ -15,7 +15,7 @@ export const CARD_COUNT = 3;
 /**
  * §3.1 랜덤 캐릭터 카드 3장 생성. 프로필(이름·성별)은 입력값으로만 쓰고 RNG에 영향을 주지 않는다.
  * RNG는 배경·특성·초기 자원에만 사용한다. 각 범주는 섞은 뒤 앞에서 3개를 뽑으므로
- * 세 카드의 대학·전공·가정·강점·약점이 서로 겹치지 않는다(다양성 보장).
+ * 세 카드의 대학·전공·강점·약점이 서로 겹치지 않는다(다양성 보장).
  * 영구 능력/부정 특성은 모든 카드에서 빈 컬렉션이다.
  */
 export function generateCharacterCards(
@@ -41,20 +41,12 @@ export function generateCharacterCards(
 
   const universities = draw('UNIVERSITY');
   const majors = draw('MAJOR');
-  const families = draw('FAMILY');
   const strengths = draw('STRENGTH');
   const weaknesses = draw('WEAKNESS');
 
   return Array.from({ length: CARD_COUNT }, (_, i) => {
-    const parts = [
-      universities[i],
-      majors[i],
-      families[i],
-      strengths[i],
-      weaknesses[i],
-    ] as BackgroundTraitDefinition[];
-    const [university, major, family, strength, weakness] = parts as [
-      BackgroundTraitDefinition,
+    const parts = [universities[i], majors[i], strengths[i], weaknesses[i]] as BackgroundTraitDefinition[];
+    const [university, major, strength, weakness] = parts as [
       BackgroundTraitDefinition,
       BackgroundTraitDefinition,
       BackgroundTraitDefinition,
@@ -69,8 +61,11 @@ export function generateCharacterCards(
       resources[key] = clampStat(rules.character.baseResources[key] + delta + jitter);
     }
 
-    const baseCash = family.cash ?? rules.character.baseCash;
-    const cash = Math.max(0, baseCash + parts.reduce((sum, p) => sum + (p.cashDelta ?? 0), 0));
+    // 가정 환경은 S6에서 제거: 시작 현금은 모두 같은 기준에서 강점·약점 보정만 받는다
+    const cash = Math.max(
+      0,
+      rules.character.baseCash + parts.reduce((sum, p) => sum + (p.cashDelta ?? 0), 0),
+    );
     const debt = parts.reduce((sum, p) => sum + (p.debtDelta ?? 0), 0);
 
     return {
@@ -79,7 +74,6 @@ export function generateCharacterCards(
       startAge: rules.startAge,
       universityId: university.id,
       majorId: major.id,
-      familyId: family.id,
       strengthId: strength.id,
       weaknessId: weakness.id,
       backgroundTraits: parts.map((p) => p.id),

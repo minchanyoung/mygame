@@ -22,7 +22,7 @@ export function StoryOutcome({ story }: { story: PublicStory }) {
           {verdict}
         </span>
         <p className="story-result" style={{ margin: 0 }}>
-          {story.resultText}
+          {story.resultText || `${story.verdictLabel} — ${story.choiceLabel}`}
         </p>
       </div>
       {story.factors.length > 0 && (

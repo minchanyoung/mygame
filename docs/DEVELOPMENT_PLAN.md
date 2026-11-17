@@ -1384,10 +1384,11 @@ DEVELOPMENT_PLAN.md v1.2를 기준으로 개발해줘.
 | 현재 상태 | 허용 명령 | 다음 상태 | 중복·오류 처리 |
 |---|---|---|---|
 | `PROFILE_INPUT` | `createCards` | `CHARACTER_SELECTION` | 생성 결과 서버 고정 |
-| `CHARACTER_SELECTION` | `chooseCharacter(cardId)` | `JOB_OFFERS` | 서버 발급 ID만 허용 |
+| `CHARACTER_SELECTION` | `chooseCharacter(cardId)` | `GOAL_SELECTION` | 서버 발급 ID만 허용 (S5: 인생 목표 후보 3장 고정) |
+| `GOAL_SELECTION` | `chooseGoal(goalId)` | `JOB_OFFERS` | 제시된 목표만 허용 (S5) |
 | `JOB_OFFERS` | `apply(offerId)` | `MONTH_START` 또는 `JOB_OFFERS` | 합격 시 NPC 3명, 실패 시 구직 월 진행/재지원 |
 | `MONTH_START` | `startMonth` | `EVENT_PENDING` 또는 `MONTH_SUMMARY` | 정산 및 정기 처리 1회 |
-| `EVENT_PENDING` | `choose(eventId,choiceId)` | `MONTH_SUMMARY` | idempotencyKey + revision 확인 |
+| `EVENT_PENDING` | `choose(eventId,choiceId)` | `EVENT_PENDING`(다음 사건) 또는 `MONTH_SUMMARY` | 한 달 2사건(업무→일상, S4); idempotencyKey + revision 확인 |
 | `MONTH_SUMMARY` | `nextMonth` | `MONTH_START` 또는 `GAME_OVER` | 턴 +1; 위기 상태 확인 |
 | `GAME_OVER` | `getResult` | `GAME_OVER` | 쓰기 거부 |
 

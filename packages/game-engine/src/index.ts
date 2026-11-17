@@ -15,6 +15,8 @@ export * from './ending';
 export * from './annual';
 export * from './promotion';
 export * from './goals';
+export * from './economy';
+export * from './migrate';
 export * from './month';
 export * from './simulation';
 export * from './playtest';

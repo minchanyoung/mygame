@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { GameRunStateSchema, type GameRunState } from '@company-life/shared';
+import type { GameRunState } from '@company-life/shared';
+import { migrateRunState } from '@company-life/game-engine';
 
 /** 저장된 명령 결과 (같은 idempotencyKey 재요청 시 그대로 반환) */
 export interface IdempotencyEntry {
@@ -118,8 +119,8 @@ export class FileRunStore implements RunStore {
       throw err;
     }
     const parsed = JSON.parse(raw) as RunRecord;
-    // 저장된 상태도 스키마 계약을 통과해야 한다 (손상/구버전 세이브 조기 발견)
-    return { ...parsed, state: GameRunStateSchema.parse(parsed.state) };
+    // 구버전 세이브는 현재 스키마로 끌어올리고, 그래도 계약을 통과하지 못하면 예외 (손상 세이브 조기 발견)
+    return { ...parsed, state: migrateRunState(parsed.state) };
   }
 
   update<T>(

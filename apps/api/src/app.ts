@@ -21,6 +21,7 @@ import {
   applyForJob,
   chooseCharacter,
   chooseGoal,
+  rebindContentVersion,
   chooseInMonth,
   createRun,
   EngineError,
@@ -129,12 +130,18 @@ export function buildApp(options: AppOptions): FastifyInstance {
 
   app.setNotFoundHandler((req, reply) => send(reply, req, new ApiError(404, 'NOT_FOUND', 'route not found')));
 
-  const contentFor = (state: GameRunState): ContentIndex => {
-    const content = contents.get(state.contentVersion);
-    if (!content) {
+  /**
+   * run이 고정된 콘텐츠를 찾는다. 그 버전이 더 이상 서버에 없으면(업데이트 후) 최신 콘텐츠로 옮길 수 있는지
+   * 확인해 옮긴다 — 진행 중 사건·회사·목표 등 참조가 모두 남아 있을 때만. 옮길 수 없으면 503.
+   */
+  const prepare = (state: GameRunState): { state: GameRunState; content: ContentIndex } => {
+    const pinned = contents.get(state.contentVersion);
+    if (pinned) return { state, content: pinned };
+    const rebound = rebindContentVersion(state, latestContent);
+    if (!rebound) {
       throw new ApiError(503, 'CONTENT_VERSION_UNAVAILABLE', `content ${state.contentVersion} is not loaded`);
     }
-    return content;
+    return { state: rebound, content: latestContent };
   };
 
   /** 소유권 검증: 게스트 토큰이 없으면 401, 다르면 403 (§11.4) */
@@ -150,7 +157,8 @@ export function buildApp(options: AppOptions): FastifyInstance {
 
   const loadView = async (req: FastifyRequest<{ Params: { id: string } }>): Promise<PublicRunView> => {
     const record = authorize(req, await store.get(req.params.id));
-    return toPublicView(record.state, contentFor(record.state));
+    const { state, content } = prepare(record.state);
+    return toPublicView(state, content);
   };
 
   /**
@@ -180,8 +188,8 @@ export function buildApp(options: AppOptions): FastifyInstance {
           currentRevision: record.state.stateRevision,
         });
       }
-      const content = contentFor(record.state);
-      const out = exec(record.state, content);
+      const { state: current, content } = prepare(record.state);
+      const out = exec(current, content);
       const nextState = GameRunStateSchema.parse({
         ...out.state,
         stateRevision: record.state.stateRevision + 1,
@@ -340,20 +348,21 @@ export function buildApp(options: AppOptions): FastifyInstance {
 
   app.get<{ Params: { id: string } }>('/api/runs/:id/skills', async (req) => {
     const record = authorize(req, await store.get(req.params.id));
-    const view = toPublicView(record.state, contentFor(record.state));
-    return { skills: view.skills, history: record.state.skillHistory };
+    const { state, content } = prepare(record.state);
+    const view = toPublicView(state, content);
+    return { skills: view.skills, history: state.skillHistory };
   });
 
   app.get<{ Params: { id: string } }>('/api/runs/:id/negative-traits', async (req) => {
     const record = authorize(req, await store.get(req.params.id));
-    const content = contentFor(record.state);
-    const view = toPublicView(record.state, content);
+    const { state, content } = prepare(record.state);
+    const view = toPublicView(state, content);
     return {
       negativeTraits: view.negativeTraits.map((t) => ({
         ...t,
         recoveryHint: content.traits.get(t.id)?.recoveryHint ?? null,
       })),
-      history: record.state.traitHistory,
+      history: state.traitHistory,
     };
   });
 
@@ -365,7 +374,8 @@ export function buildApp(options: AppOptions): FastifyInstance {
 
     app.get<{ Params: { id: string } }>('/api/playtest/runs/:id/debug', async (req) => {
       const record = authorize(req, await store.get(req.params.id));
-      return playtestDebugView(record.state, contentFor(record.state));
+      const { state, content } = prepare(record.state);
+      return playtestDebugView(state, content);
     });
 
     app.post<{ Params: { id: string } }>('/api/playtest/runs/:id/patch', async (req, reply) => {

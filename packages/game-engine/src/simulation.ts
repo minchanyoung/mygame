@@ -6,6 +6,7 @@ import {
   type PlayerRank,
 } from '@company-life/shared';
 import type { ContentIndex } from './content-index';
+import { inflate, priceIndex } from './economy';
 import { EngineError } from './errors';
 import { evaluateChoices, type ChoiceEvaluation } from './events';
 import { applyForJob } from './jobs';
@@ -68,7 +69,15 @@ function pickChoice(
   const weight = (key: keyof GameRunState['resources'], amount: number) =>
     amount < 0 && state.resources[key] <= 30 ? amount * 3 : amount;
   // 실직은 게임오버이므로 어떤 자원 손실보다 무겁게 본다
-  const JOB_LOSS_PENALTY = -200;
+  const JOB_LOSS_PENALTY = -600;
+  // 돈: 월 실수령 한 달 치 = 자원 8점으로 환산. 빚이 있거나 현금이 바닥이면 지출을 2배로 무겁게
+  const monthly = Math.max(1, Math.floor((state.employment.current?.annualSalary ?? 0) / 12));
+  const index = priceIndex(state, content);
+  const tight = state.debt > 0 || state.cash < monthly * 2;
+  const money = (won: number) => {
+    const pts = (won / monthly) * 8;
+    return pts < 0 && tight ? pts * 2 : pts;
+  };
   const sum = (effects: readonly Effect[] | undefined) =>
     (effects ?? []).reduce(
       (s, e) =>
@@ -77,7 +86,11 @@ function pickChoice(
           ? weight(e.key, e.amount)
           : e.type === 'EMPLOYMENT_CHANGE'
             ? JOB_LOSS_PENALTY
-            : 0),
+            : e.type === 'CASH_DELTA'
+              ? money(inflate(e.amount, index))
+              : e.type === 'SALARY_MONTHS'
+                ? money(monthly * e.months)
+                : 0),
       0,
     );
   const expected = (c: ChoiceEvaluation) => {

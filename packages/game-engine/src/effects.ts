@@ -6,6 +6,7 @@ import type {
   TraitHistoryEntry,
   TraitLevel,
 } from '@company-life/shared';
+import { inflate } from './economy';
 import { EngineError } from './errors';
 import { clampStat } from './numbers';
 import { currentTeamNpcs } from './npcs';
@@ -14,6 +15,8 @@ export interface EffectContext {
   eventId: string;
   occurrenceId: string;
   participantNpcId: string | null;
+  /** 물가 지수 (생략 시 1). CASH_DELTA는 첫해 물가 기준 금액이라 이 지수를 곱해 적용한다. */
+  priceIndex?: number;
 }
 
 export interface TraitChange {
@@ -62,10 +65,15 @@ export function applyEffects(
         draft.resources[effect.key] = clampStat(draft.resources[effect.key] + effect.amount);
         break;
 
-      case 'CASH_DELTA': {
+      case 'CASH_DELTA':
+      case 'SALARY_MONTHS': {
         // 현금은 음수로 두지 않고 부족분만 부채로 전환한다 (§20.2)
-        const next = draft.cash + effect.amount;
-        if (effect.amount < 0) draft.statistics.totalSpent += -effect.amount;
+        const amount =
+          effect.type === 'SALARY_MONTHS'
+            ? Math.floor((draft.employment.current?.annualSalary ?? 0) / 12) * effect.months
+            : inflate(effect.amount, ctx.priceIndex ?? 1);
+        const next = draft.cash + amount;
+        if (amount < 0) draft.statistics.totalSpent += -amount;
         if (next < 0) {
           draft.debt += -next;
           draft.cash = 0;

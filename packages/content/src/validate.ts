@@ -62,7 +62,7 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
   for (const t of pack.traits) {
     if (t.maxLevel > pack.rules.maxTraitLevel) add(`traits.${t.id}`, `maxLevel ${t.maxLevel} > 규칙 상한`);
   }
-  for (const kind of ['UNIVERSITY', 'MAJOR', 'FAMILY', 'STRENGTH', 'WEAKNESS'] as const) {
+  for (const kind of ['UNIVERSITY', 'MAJOR', 'STRENGTH', 'WEAKNESS'] as const) {
     if (pack.backgroundTraits.filter((b) => b.kind === kind).length < 3)
       add('backgroundTraits', `${kind} 3개 이상 필요`);
   }

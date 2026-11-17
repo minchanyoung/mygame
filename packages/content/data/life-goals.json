@@ -6,7 +6,7 @@
     "emoji": "🏠",
     "description": "은퇴할 때 순자산(현금 − 빚) 10억 원. 서울에 내 아파트 한 채, 월세 탈출이 인생의 목표다.",
     "amount": 1000000000,
-    "affinity": ["fam_student_loan", "fam_self_made", "fam_single_parent"],
+    "affinity": ["wk_spender", "uni_regional", "maj_economics"],
     "achievedText": "은퇴 기념으로 등기권리증을 액자에 넣었다. 대출은 아직 조금 남았지만, 이건 내 집이다.",
     "failedText": "집주인의 문자는 은퇴 후에도 계속 왔다. '계약 갱신 관련해서요~'"
   },
@@ -27,7 +27,7 @@
     "title": "정년 완주",
     "emoji": "🎖",
     "description": "가늘고 길게. 60세 정년 퇴임식 꽃다발을 받는 날까지 버틴다.",
-    "affinity": ["str_stamina", "fam_middle", "wk_shy"],
+    "affinity": ["str_stamina", "wk_shy", "uni_national"],
     "achievedText": "36년 만의 퇴임식. 꽃다발이 생각보다 무거웠다. 버틴 세월만큼.",
     "failedText": "정년 퇴임식 꽃다발은 다른 사람의 것이 되었다."
   },
@@ -38,7 +38,7 @@
     "emoji": "💸",
     "description": "빚 0원, 통장에 현금 5억 원. 누구에게도 이자를 내지 않는 노후.",
     "amount": 500000000,
-    "affinity": ["fam_student_loan", "wk_spender", "str_detail"],
+    "affinity": ["wk_spender", "str_detail", "maj_business"],
     "achievedText": "마지막 대출 상환 문자를 캡처해 두었다. 이제 은행은 나에게 이자를 준다.",
     "failedText": "은퇴 축하 문자보다 대출 상환 안내 문자가 먼저 왔다."
   },
@@ -47,11 +47,12 @@
     "kind": "WELLBEING",
     "title": "워라밸 수호자",
     "emoji": "🌿",
-    "description": "회사에 영혼까지 팔지는 않는다. 체력·정신력 모두 90 이상으로 은퇴한다.",
+    "description": "회사에 영혼까지 팔지는 않는다. 한 번도 체력·정신력 40 아래로 무너지지 않고, 90 이상으로 은퇴한다.",
     "stat": 90,
     "affinity": ["wk_frail", "wk_pressure", "str_empathy"],
     "achievedText": "은퇴 다음 날 등산을 갔다. 숨이 차지 않았다. 마음도 가벼웠다.",
-    "failedText": "은퇴하고 나서야 알았다. 몸과 마음이 먼저 퇴사했었다는 걸."
+    "failedText": "은퇴하고 나서야 알았다. 몸과 마음이 먼저 퇴사했었다는 걸.",
+    "floor": 40
   },
   {
     "id": "goal_ace",

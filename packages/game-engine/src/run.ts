@@ -69,6 +69,7 @@ export function createRun(input: CreateRunInput, content: ContentIndex): GameRun
       jobChanges: 0,
       highestRank: null,
       consecutiveHighRiskMonths: 0,
+      lowestWellbeing: 100,
     },
     currentMonth: null,
     pendingEnding: null,

@@ -54,6 +54,11 @@ export function PlaytestPanel({ session, view, busy, run }: Props) {
     ['49세로', { age: 49 }],
     ['50세로', { age: 50 }],
     ['59세로', { age: 59 }],
+    // S5 승진 확인: 다음 1월에 바로 심사 대상이 되도록
+    ['12월로 (평가 직전)', { month: 12 }],
+    ['승진 심사 대상으로', { month: 1, promotionPoints: 30, yearsInRank: 10 }],
+    ['차장으로', { rank: 'DEPUTY_HEAD', yearsInRank: 0, promotionPoints: 0 }],
+    ['부장으로', { rank: 'DEPARTMENT_HEAD' }],
   ];
 
   const applyDraft = () => {

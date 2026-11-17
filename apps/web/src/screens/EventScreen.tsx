@@ -114,6 +114,7 @@ export function EventScreen({ view, busy, onChoose }: Props) {
               ))}
             </span>
             {!c.enabled && c.lockedHint && <span className="small muted">{c.lockedHint}</span>}
+            {c.endingNotice && <span className="ending-notice">{c.endingNotice}</span>}
             {c.fatalWarning && (
               <span className="fatal">
                 <Icon name="warning" size={16} />
@@ -125,7 +126,9 @@ export function EventScreen({ view, busy, onChoose }: Props) {
         );
       })}
       <span className="tiny muted" style={{ textAlign: 'center' }}>
-        정확한 확률은 공개되지 않아요. 결과는 확률에 따라 달라집니다.
+        정확한 확률은 공개되지 않아요.
+        {!isLife &&
+          ' 위험을 감수한 업무에서 성공할수록 연말 평가의 ‘업무 성과’가 올라가요. 확정 선택만 하면 성과는 보통(50점)에 머뭅니다.'}
       </span>
     </div>
   );

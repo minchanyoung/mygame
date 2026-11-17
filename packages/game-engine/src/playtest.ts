@@ -9,6 +9,7 @@ import { npcMatches } from './conditions';
 import { requireFrom, type ContentIndex } from './content-index';
 import { debtLimit } from './ending';
 import { EngineError } from './errors';
+import { higherRank } from './promotion';
 import { evaluateChoices, getEligibleEvents } from './events';
 import { startMonth } from './month';
 import { currentTeamNpcs } from './npcs';
@@ -51,14 +52,37 @@ export function applyPlaytestPatch(
     }
     turnIndex = (patch.age - rules.startAge) * 12 + (state.turnIndex % 12);
   }
+  // 월 지정 (예: 1월로 옮겨 승진 심사 확인)
+  if (patch.month !== undefined) turnIndex = Math.floor(turnIndex / 12) * 12 + (patch.month - 1);
   if (patch.skills) checkTraits(patch.skills, 'POSITIVE', content);
   if (patch.negativeTraits) checkTraits(patch.negativeTraits, 'NEGATIVE', content);
+
+  // S5 승진 조정: 직급·포인트·현 직급 근속(년)
+  const job = state.employment.current;
+  const current =
+    job &&
+    (patch.rank !== undefined || patch.promotionPoints !== undefined || patch.yearsInRank !== undefined)
+      ? {
+          ...job,
+          rank: patch.rank ?? job.rank,
+          promotionPoints: patch.promotionPoints ?? job.promotionPoints,
+          rankSinceTurn:
+            patch.yearsInRank !== undefined
+              ? Math.max(0, turnIndex - patch.yearsInRank * 12)
+              : job.rankSinceTurn,
+        }
+      : job;
 
   const changed = Object.keys(patch).join(', ');
   return markModified(
     {
       ...state,
       turnIndex,
+      employment: { ...state.employment, current },
+      statistics:
+        patch.rank !== undefined
+          ? { ...state.statistics, highestRank: higherRank(state.statistics.highestRank, patch.rank) }
+          : state.statistics,
       resources: { ...state.resources, ...patch.resources },
       cash: patch.cash ?? state.cash,
       debt: patch.debt ?? state.debt,

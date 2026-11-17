@@ -96,7 +96,7 @@ export interface PublicEffect {
 
 export interface PublicBackgroundTrait {
   id: string;
-  kind: 'UNIVERSITY' | 'MAJOR' | 'FAMILY' | 'STRENGTH' | 'WEAKNESS';
+  kind: 'UNIVERSITY' | 'MAJOR' | 'STRENGTH' | 'WEAKNESS';
   name: string;
   description: string;
   rare: boolean;
@@ -111,7 +111,6 @@ export interface PublicCharacterCard {
   startAge: number;
   university: PublicBackgroundTrait;
   major: PublicBackgroundTrait;
-  family: PublicBackgroundTrait;
   strength: PublicBackgroundTrait;
   weakness: PublicBackgroundTrait;
   resources: Resources;
@@ -175,6 +174,8 @@ export interface PublicChoice {
   costs: string[];
   /** 확정 비용만으로 실직 엔딩에 닿는 선택지 경고 (§26.3), 예: "⚠ 선택 시 과로 실직" */
   fatalWarning: string | null;
+  /** 확정적으로 정상 엔딩(조기 은퇴 등)에 닿는 선택지 안내 — 실패가 아니므로 경고 대신 중립 표시 */
+  endingNotice: string | null;
 }
 
 export interface PublicWarning {
@@ -424,6 +425,12 @@ export const PlaytestPatchRequestSchema = z
     debt: z.number().int().min(0).max(100_000_000_000).optional(),
     /** 나이만 바꾸고 월은 유지한다 */
     age: z.number().int().min(15).max(79).optional(),
+    /** 월만 바꾼다 (1~12) — 예: 1월로 옮겨 승진 심사 확인 */
+    month: z.number().int().min(1).max(12).optional(),
+    /** S5 승진 조정 */
+    rank: z.enum(['STAFF', 'ASSISTANT_MANAGER', 'MANAGER', 'DEPUTY_HEAD', 'DEPARTMENT_HEAD']).optional(),
+    promotionPoints: z.number().int().min(0).max(60).optional(),
+    yearsInRank: z.number().int().min(0).max(40).optional(),
     /** 지정하면 해당 컬렉션 전체를 교체한다 */
     skills: z.record(z.string(), OwnedLevel).optional(),
     negativeTraits: z.record(z.string(), OwnedLevel).optional(),

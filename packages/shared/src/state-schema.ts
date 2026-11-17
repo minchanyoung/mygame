@@ -43,7 +43,6 @@ export const CharacterCardSchema = z
     startAge: z.number().int(),
     universityId: ContentIdSchema,
     majorId: ContentIdSchema,
-    familyId: ContentIdSchema,
     strengthId: ContentIdSchema,
     weaknessId: ContentIdSchema,
     backgroundTraits: z.array(ContentIdSchema),
@@ -470,6 +469,8 @@ export const GameRunStateSchema = z
         jobChanges: z.number().int().min(0),
         highestRank: PlayerRankSchema.nullable(),
         consecutiveHighRiskMonths: z.number().int().min(0),
+        /** 매달 말 체력·정신력 중 낮은 쪽의 커리어 최저값 (워라밸 목표 판정) */
+        lowestWellbeing: z.number().int().min(0).max(100),
       })
       .strict(),
     currentMonth: MonthLogSchema.nullable(),

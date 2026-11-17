@@ -32,6 +32,23 @@ export function App() {
   const [notice, setNotice] = useState<string | null>(null);
   // 선택 직후 결과 대화를 본 이야기(occurrenceId). 이 값과 다르면 결과 화면을 먼저 보여준다.
   const [seenStory, setSeenStory] = useState<string | null>(null);
+  // 새로고침해도 같은 결과 화면이 다시 뜨지 않도록 브라우저에 기억 (보조 편의 기능 — 실패해도 동작에는 지장 없음)
+  const seenKey = (runId: string) => `oneul:seenStory:${runId}`;
+  const readSeen = (runId: string): string | null => {
+    try {
+      return localStorage.getItem(seenKey(runId));
+    } catch {
+      return null;
+    }
+  };
+  const markSeen = (runId: string, occurrenceId: string) => {
+    setSeenStory(occurrenceId);
+    try {
+      localStorage.setItem(seenKey(runId), occurrenceId);
+    } catch {
+      // 저장소 사용 불가 (사생활 보호 모드 등)
+    }
+  };
   // 같은 행동의 재시도는 같은 idempotencyKey를 써서 서버에서 한 번만 적용되게 한다
   const pendingKey = useRef<{ action: string; key: string } | null>(null);
 
@@ -156,6 +173,7 @@ export function App() {
     const showStory =
       story !== null &&
       story.occurrenceId !== seenStory &&
+      story.occurrenceId !== readSeen(view.runId) &&
       ((view.phase === 'EVENT_PENDING' && view.activeEvent?.occurrenceId !== story.occurrenceId) ||
         view.phase === 'MONTH_SUMMARY');
     if (showStory) {
@@ -170,7 +188,7 @@ export function App() {
                 ? '그 후…'
                 : `${view.turn.monthOfYear}월 결산 보기`
           }
-          onContinue={() => setSeenStory(story.occurrenceId)}
+          onContinue={() => markSeen(view.runId, story.occurrenceId)}
         />
       );
     } else

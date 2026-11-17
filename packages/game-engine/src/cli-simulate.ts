@@ -17,9 +17,9 @@ const console = host.console;
 const runs = Number(argv[2] ?? 1000);
 const content = indexContent(loadContentPack());
 
-/** 밸런스 목표 (S1 임시안 — 사용자 검수로 확정) */
+/** 밸런스 목표 (봇별). 무작위 봇은 아무렇게나 해도 이 정도로 실패, 신중 봇은 정확한 확률을 아는 상한선. */
 const TARGET = {
-  failureRate: { min: 0.3, max: 0.4 },
+  failureRate: { random: { min: 0.3, max: 0.4 }, cautious: { min: 0.1, max: 0.25 } },
   /** 실패 원인 한 가지가 전체 판에서 차지하는 최대 비율 (엔딩 다양성) */
   maxSingleFailureCause: 0.15,
 };
@@ -40,6 +40,7 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
   const pct = (n: number) => `${((n / runs) * 100).toFixed(1)}%`;
 
   const failRate = failures.length / runs;
+  const target = TARGET.failureRate[policy];
   const failByCause = new Map<string, number>();
   for (const r of failures)
     failByCause.set(r.endingType ?? '?', (failByCause.get(r.endingType ?? '?') ?? 0) + 1);
@@ -51,7 +52,7 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
     `${mark(stuck.length === 0)} 진행 불능: ${stuck.length}건${stuck[0] ? ` (예: ${stuck[0].seed} ${stuck[0].stuck})` : ''}`,
   );
   console.log(
-    `${mark(failRate >= TARGET.failureRate.min && failRate <= TARGET.failureRate.max)} 50세 전 실패 엔딩: ${pct(failures.length)} (목표 ${TARGET.failureRate.min * 100}~${TARGET.failureRate.max * 100}%)`,
+    `${mark(failRate >= target.min && failRate <= target.max)} 50세 전 실패 엔딩: ${pct(failures.length)} (목표 ${target.min * 100}~${target.max * 100}%)`,
   );
   console.log(
     `${mark(topShare <= TARGET.maxSingleFailureCause)} 최다 실패 원인: ${topCause?.[0] ?? '-'} ${pct(topCause?.[1] ?? 0)} (목표 ≤${TARGET.maxSingleFailureCause * 100}%)`,

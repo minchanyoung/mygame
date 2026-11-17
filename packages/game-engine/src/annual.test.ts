@@ -235,7 +235,7 @@ describe('스펙 카드 근거와 이달의 이야기', () => {
       content,
     );
     for (const card of toPublicView(run, content).characterCards) {
-      for (const t of [card.strength, card.weakness, card.university, card.major, card.family]) {
+      for (const t of [card.strength, card.weakness, card.university, card.major]) {
         expect(t.effects.length).toBeGreaterThan(0);
       }
       expect(card.recommendedJob.label).toBeTruthy();

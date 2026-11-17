@@ -14,6 +14,7 @@ import { requireFrom, type ContentIndex } from './content-index';
 import { applyEffects, levelEffectsApplicable, type TraitChange } from './effects';
 import { EngineError } from './errors';
 import { currentTeamNpcs } from './npcs';
+import { priceIndex } from './economy';
 import { cloneForEffects } from './numbers';
 import { SeededRng } from './rng';
 import { assertCommand, assertTransition } from './state-machine';
@@ -267,6 +268,7 @@ export function resolveChoice(
     eventId: event.id,
     occurrenceId: active.occurrenceId,
     participantNpcId: active.participantNpcId,
+    priceIndex: priceIndex(state, content),
   };
   // 조건부 효과의 when은 해결 "직전" 상태로 평가한다 (이번 결과로 얻은 특성은 소급되지 않음)
   const conditional = (choice.conditionalEffects ?? [])
