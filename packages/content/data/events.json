@@ -10430,5 +10430,2247 @@
         ]
       }
     ]
+  },
+  {
+    "id": "evt_arc_rival_1",
+    "version": 1,
+    "status": "published",
+    "title": "같은 TF, 두 개의 이름",
+    "description": "신사업 TF 공동 리더로 당신과 동기가 함께 지명됐다. 리더 자리는 하나처럼 보인다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 7,
+    "maxOccurrencesPerRun": 1,
+    "series": {
+      "id": "rival",
+      "title": "라이벌 동기",
+      "episode": 1,
+      "total": 4,
+      "farewellEventId": "evt_arc_rival_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "tenureMonths": {
+        "min": 12
+      },
+      "seriesNone": true,
+      "npc": {
+        "role": "PEER",
+        "personalityAny": ["COMPETITIVE", "SKILLED"]
+      }
+    },
+    "dialogue": [
+      {
+        "speaker": "BOSS",
+        "text": "이번 TF는 {me} 씨랑 두 사람이 같이 이끌어요. 결과 보고 나서 리더 정합시다."
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "(개인 메시지) 잘해봐요 ㅎㅎ 근데 발표는 제가 하는 게 낫지 않을까요?"
+      }
+    ],
+    "choices": [
+      {
+        "id": "lead",
+        "label": "주도권을 잡는다",
+        "reply": "발표는 제가 할게요. 기획 초안도 제가 이미 써뒀거든요.",
+        "guaranteedEffects": [
+          {
+            "type": "FLAG_SET",
+            "key": "arc_rival_enemy",
+            "scope": "NPC"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_rival_2",
+            "delayMonths": 2
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.55,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "rivalry",
+              "amount": 12
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "PARTICIPANT",
+              "text": "…그래요. 이번엔 양보할게요. 이번엔."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -6
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "rivalry",
+              "amount": 8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "발표는 저 친구가 하는 걸로 하죠. 정리가 더 깔끔하네."
+            }
+          ]
+        }
+      },
+      {
+        "id": "split",
+        "label": "역할을 나누자고 제안한다",
+        "reply": "기획은 제가, 발표는 그쪽이 맡으면 어때요? 둘 다 이기는 게임으로 가요.",
+        "guaranteedEffects": [
+          {
+            "type": "FLAG_SET",
+            "key": "arc_rival_ally",
+            "scope": "NPC"
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "rivalry",
+            "amount": -10
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": 6
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_rival_2",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "의외네요. 좋아요, 그렇게 해봐요."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_rival_2",
+    "version": 1,
+    "status": "published",
+    "title": "보고서 표지의 이름",
+    "description": "TF 최종 보고서가 올라갔다. 표지에는 동기의 이름만 있다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "rival",
+      "title": "라이벌 동기",
+      "episode": 2,
+      "total": 4,
+      "farewellEventId": "evt_arc_rival_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "SYSTEM",
+        "text": "📎 신사업TF_최종보고서.pdf — 작성: (동기 이름만)"
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "아 표지요? 양식에 칸이 하나밖에 없더라고요 ㅎㅎ 신경 쓰지 마요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "credit_claim",
+        "label": "기여도를 정리해 팀장에게 보낸다",
+        "reply": "(팀장님께) 보고서 파트별 작성자 정리해서 공유드립니다.",
+        "guaranteedEffects": [
+          {
+            "type": "FLAG_SET",
+            "key": "arc_rival_enemy",
+            "scope": "NPC"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_rival_3",
+            "delayMonths": 3
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 8
+            },
+            {
+              "type": "PROMOTION_POINT_DELTA",
+              "amount": 1
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "아, 핵심 파트는 {me} 씨가 썼구나. 평가에 반영할게요."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -6
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "rivalry",
+              "amount": 10
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "같은 팀끼리 이런 걸 따지는 건 좀…"
+            }
+          ]
+        }
+      },
+      {
+        "id": "let_go",
+        "label": "이번은 넘어간다",
+        "reply": "(답장하지 않는다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_rival_3",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "그날 저녁, 동기가 커피를 사 왔다. 아무 말도 없이."
+          }
+        ]
+      },
+      {
+        "id": "co_sign",
+        "label": "둘 이름을 같이 올리자고 말한다",
+        "reply": "우리 같이 했잖아요. 표지에 이름 둘 다 넣어요. 그게 맞아요.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "arc_rival_ally",
+              "scope": "NPC"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "trust",
+            "amount": 10
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_rival_3",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "…맞아요. 미안해요. 바로 수정할게요."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_rival_3",
+    "version": 1,
+    "status": "published",
+    "title": "자리는 하나",
+    "description": "다음 인사 때 팀 내 승진 추천은 한 명뿐이라는 말이 돈다. 후보는 당신과 동기, 둘이다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "highRisk": true,
+    "series": {
+      "id": "rival",
+      "title": "라이벌 동기",
+      "episode": 3,
+      "total": 4,
+      "farewellEventId": "evt_arc_rival_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "BOSS",
+        "text": "솔직히 말할게요. 추천은 한 명만 가능해요. 두 사람 다 연말까지 보여줘요."
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "(개인 메시지) 우리… 이번엔 정정당당하게 해요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "all_in",
+        "label": "모든 걸 걸고 경쟁한다",
+        "reply": "그래요. 정정당당하게.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_rival_4",
+            "delayMonths": 3
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "PROMOTION_POINT_DELTA",
+              "amount": 2
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "arc_rival_won",
+              "scope": "NPC"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "올해 추천은 {me} 씨로 갑니다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -8
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "arc_rival_enemy",
+              "scope": "NPC"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "이번엔 저 친구로 갈게요. 다음엔 꼭."
+            }
+          ]
+        }
+      },
+      {
+        "id": "recommend_rival",
+        "label": "동기를 추천한다",
+        "reply": "(팀장님께) 이번엔 저 친구가 더 준비돼 있다고 생각합니다.",
+        "guaranteedEffects": [
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": -1
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": 12
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "trust",
+            "amount": 12
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "arc_rival_ally",
+            "scope": "NPC"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_rival_4",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "…팀장님한테 들었어요. 왜 그랬어요. 바보같이."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_rival_4",
+    "version": 1,
+    "status": "published",
+    "title": "그 후, 우리 둘",
+    "description": "몇 년을 함께 달려온 동기와 회사 앞 포장마차에 마주 앉았다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "rival",
+      "title": "라이벌 동기",
+      "episode": 4,
+      "total": 4
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "우리 입사 동기 단톡방에 이제 둘만 남은 거 알아요?"
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "잔이 부딪쳤다. 오래된 이야기가 시작됐다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "toast_together",
+        "label": "\"앞으로도 같이 가자\"",
+        "reply": "경쟁은 이제 그만하고, 같이 올라가요. 진짜로.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "arc_rival_ally",
+              "scope": "NPC"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 10
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 5
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "trust",
+            "amount": 15
+          }
+        ],
+        "resultText": "라이벌은 가장 든든한 아군이 됐다. 회사에서 '저 둘'이라고 부르기 시작했다."
+      },
+      {
+        "id": "winner",
+        "label": "\"결국 내가 이겼네\"",
+        "reply": "솔직히 말해서, 내가 이길 줄 알았어요.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "arc_rival_won",
+              "scope": "NPC"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "rivalry",
+            "amount": 15
+          }
+        ],
+        "resultText": "이겼다. 다만 그 뒤로 동기 단톡방에는 한 명만 남았다."
+      },
+      {
+        "id": "shake_hands",
+        "label": "악수하고 각자의 길을 간다",
+        "reply": "그동안 고마웠어요. 덕분에 여기까지 왔네요.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 5
+          }
+        ],
+        "resultText": "미워했고, 존경했다. 둘 다 진심이었다."
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_rival_farewell",
+    "version": 1,
+    "status": "published",
+    "title": "라이벌의 마지막 메시지",
+    "description": "동기가 회사를 떠났다. 퇴사 다음 날, 메시지 한 통이 왔다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "rival",
+      "title": "라이벌 동기",
+      "episode": 4,
+      "total": 4
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "솔직히 {me} 씨 때문에 버틴 것도 있어요. 지기 싫어서."
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "나 없는 데서는 1등 해요. 잘 지내요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "reply",
+        "label": "진심으로 답장한다",
+        "reply": "나도 그랬어요. 어디서든 잘해요. 진짜로.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          }
+        ],
+        "resultText": "경쟁자가 사라진 사무실은 이상하게 조용했다."
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_mentor_1",
+    "version": 1,
+    "status": "published",
+    "title": "퇴근 후 30분",
+    "description": "팀장이 '매주 목요일 퇴근 후 30분, 같이 일 얘기 할래요?'라고 물었다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 7,
+    "maxOccurrencesPerRun": 1,
+    "series": {
+      "id": "mentor",
+      "title": "멘토가 된 상사",
+      "episode": 1,
+      "total": 4,
+      "farewellEventId": "evt_arc_mentor_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "tenureMonths": {
+        "min": 6
+      },
+      "seriesNone": true,
+      "npc": {
+        "role": "BOSS",
+        "personalityAny": ["MENTOR", "SUPPORTIVE", "FAIR"]
+      }
+    },
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "{me} 씨는 감이 좋은데 다듬어지지가 않았어요. 아까워서 그래요."
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "부담 갖지 말고. 커피는 내가 살게요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "accept",
+        "label": "매주 코칭을 받는다",
+        "reply": "꼭 하고 싶습니다. 목요일마다 노트 챙길게요!",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -4
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "trust",
+            "amount": 10
+          },
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 1
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "arc_mentor_close",
+            "scope": "NPC"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_mentor_2",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "좋아요. 첫 숙제: 지난 보고서를 세 줄로 줄여 와요."
+          }
+        ]
+      },
+      {
+        "id": "politely_skip",
+        "label": "바쁘다며 정중히 사양한다",
+        "reply": "감사하지만 요즘 개인 일정이 좀…",
+        "guaranteedEffects": [
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": -4
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_mentor_2",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "그래요, 언제든 생각나면 말해요."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_mentor_2",
+    "version": 1,
+    "status": "published",
+    "title": "팀장님이 감사 대상이래",
+    "description": "익명 게시판에 팀장 이름이 올라왔다. '예산 집행 건으로 감사실 호출'. 사실인지는 아무도 모른다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "highRisk": true,
+    "series": {
+      "id": "mentor",
+      "title": "멘토가 된 상사",
+      "episode": 2,
+      "total": 4,
+      "farewellEventId": "evt_arc_mentor_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "익명",
+        "text": "그 팀장 결국 터졌네 ㅋㅋ 줄 잘 서라"
+      },
+      {
+        "speaker": "PEER",
+        "text": "(개인 메시지) {me} 씨 팀장님이랑 친하잖아요… 괜찮아요?"
+      }
+    ],
+    "choices": [
+      {
+        "id": "defend",
+        "label": "공개적으로 팀장을 변호한다",
+        "reply": "(게시판 댓글) 제가 옆에서 본 바로는 그런 분 아닙니다.",
+        "guaranteedEffects": [
+          {
+            "type": "FLAG_SET",
+            "key": "arc_mentor_loyal",
+            "scope": "NPC"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_mentor_3",
+            "delayMonths": 2
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "RESOURCE",
+              "key": "reputation",
+              "range": {
+                "min": 60
+              },
+              "bonus": 0.15
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "trust",
+              "amount": 15
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "PARTICIPANT",
+              "text": "…봤어요, 댓글. 고마워요. 진짜로."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "익명",
+              "text": "ㅋㅋ 측근 등판"
+            }
+          ]
+        }
+      },
+      {
+        "id": "distance",
+        "label": "조용히 거리를 둔다",
+        "reply": "(목요일 코칭을 '일정이 생겨서'로 취소한다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -5
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "arc_mentor_betrayed",
+            "scope": "NPC"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_mentor_3",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "알겠어요. …이해해요."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_mentor_3",
+    "version": 1,
+    "status": "published",
+    "title": "상무님의 제안",
+    "description": "상무가 따로 불렀다. '팀장 건, 자네가 아는 걸 진술해주면 그 자리 자네가 맡게 될 거야.'",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "highRisk": true,
+    "series": {
+      "id": "mentor",
+      "title": "멘토가 된 상사",
+      "episode": 3,
+      "total": 4,
+      "farewellEventId": "evt_arc_mentor_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "상무 · 1:1",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "상무님",
+        "text": "어려운 부탁인 거 알아. 근데 회사가 원하는 건 정리야."
+      },
+      {
+        "speaker": "NAMED",
+        "name": "상무님",
+        "text": "대답은 금요일까지."
+      }
+    ],
+    "choices": [
+      {
+        "id": "refuse",
+        "label": "아는 게 없다고 거절한다",
+        "reply": "죄송합니다. 제가 아는 팀장님은 그런 분이 아닙니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -4
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "arc_mentor_loyal",
+            "scope": "NPC"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_mentor_4",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "상무님",
+            "text": "…그래. 기억해두지."
+          }
+        ]
+      },
+      {
+        "id": "testify",
+        "label": "진술서를 쓴다",
+        "reply": "(진술서에 서명한다)",
+        "guaranteedEffects": [
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -10
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "trust",
+            "amount": -30
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "arc_mentor_betrayed",
+            "scope": "NPC"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_mentor_4",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "펜을 내려놓는 손이 생각보다 무겁지 않았다. 그게 더 무서웠다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_mentor_4",
+    "version": 1,
+    "status": "published",
+    "title": "팀장님의 마지막 출근",
+    "description": "감사 결과가 나왔다. 팀장은 지방 지사로 발령. 오늘이 이 층에서의 마지막 날이다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "mentor",
+      "title": "멘토가 된 상사",
+      "episode": 4,
+      "total": 4
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "짐이 생각보다 적네요. 책 몇 권이랑 화분 하나."
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "엘리베이터 앞에서 팀장이 돌아봤다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "see_off",
+        "label": "1층까지 짐을 들어 배웅한다",
+        "reply": "제가 들게요. 목요일 30분, 덕분에 여기까지 왔습니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "arc_mentor_loyal",
+              "scope": "NPC"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 10
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          },
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 1
+          }
+        ],
+        "resultText": "팀장은 화분을 건넸다. '이거 물 주는 거 잊지 마요. 나 대신 키워요.'"
+      },
+      {
+        "id": "take_seat",
+        "label": "그 자리에 앉는다",
+        "reply": "(팀장 자리 명패를 바꿔 단다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "arc_mentor_betrayed",
+              "scope": "NPC"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -12
+          }
+        ],
+        "resultText": "의자는 아직 따뜻했다. 그 온기가 오래 남았다."
+      },
+      {
+        "id": "brief_bow",
+        "label": "짧게 고개 숙여 인사한다",
+        "reply": "그동안 감사했습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 2
+          }
+        ],
+        "resultText": "엘리베이터 문이 닫혔다."
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_mentor_farewell",
+    "version": 1,
+    "status": "published",
+    "title": "떠난 팀장님의 문자",
+    "description": "먼저 회사를 떠난 옛 팀장에게서 문자가 왔다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "mentor",
+      "title": "멘토가 된 상사",
+      "episode": 4,
+      "total": 4
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "잘 지내요? 새 회사에서 {me} 씨 얘기 자주 해요. '내가 키운 애'라고 ㅎㅎ"
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "목요일 30분, 이제 혼자서도 할 수 있죠?"
+      }
+    ],
+    "choices": [
+      {
+        "id": "reply",
+        "label": "고맙다고 답장한다",
+        "reply": "네. 팀장님처럼 하고 있어요. 언젠가 꼭 갚을게요.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": 4
+          }
+        ],
+        "resultText": "좋은 상사는 떠나도 남는다."
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_mentee_1",
+    "version": 1,
+    "status": "published",
+    "title": "신입이 배정됐다",
+    "description": "올해 공채 신입 한 명이 당신 밑으로 왔다. 첫인사부터 목소리가 떨린다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 7,
+    "maxOccurrencesPerRun": 1,
+    "series": {
+      "id": "mentee",
+      "title": "나의 첫 사수 역할",
+      "episode": 1,
+      "total": 4
+    },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "ranks": ["MANAGER", "DEPUTY_HEAD", "DEPARTMENT_HEAD"],
+      "seriesNone": true
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "신입 한 사원",
+        "text": "아, 안녕하십니까! 한서진입니다! 열심히 하겠습니다!"
+      },
+      {
+        "speaker": "BOSS",
+        "text": "{me} 과장이 잘 좀 키워줘요. 요즘 애들 석 달이면 나가요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "invest",
+        "label": "업무 노트를 직접 만들어 준다",
+        "reply": "서진 씨, 이거 내가 신입 때 쓰던 노트야. 하나씩 같이 보자.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -6
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "arc_mentee_invested",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_mentee_2",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "신입 한 사원",
+            "text": "과장님… 이거 보물이에요 🥹"
+          }
+        ]
+      },
+      {
+        "id": "sink_or_swim",
+        "label": "알아서 배우게 둔다",
+        "reply": "모르는 거 있으면 물어봐요. 근데 웬만하면 검색부터.",
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_mentee_2",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "신입 한 사원",
+            "text": "네…! 알겠습니다…!"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_mentee_2",
+    "version": 1,
+    "status": "published",
+    "title": "신입의 대형 사고",
+    "description": "신입이 고객사에 견적서를 잘못 보냈다. 0이 하나 빠졌다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "highRisk": true,
+    "series": {
+      "id": "mentee",
+      "title": "나의 첫 사수 역할",
+      "episode": 2,
+      "total": 4
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "🚨 팀 긴급방",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "신입 한 사원",
+        "text": "과장님 죄송합니다 제가 견적서에 0을 하나 빼먹고…"
+      },
+      {
+        "speaker": "BOSS",
+        "text": "누가 검토했어요? {me} 과장?"
+      }
+    ],
+    "choices": [
+      {
+        "id": "cover",
+        "label": "내 검토 실수라고 막아선다",
+        "reply": "제가 최종 검토를 놓쳤습니다. 제가 수습하겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -5
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "arc_mentee_ally",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_mentee_3",
+            "delayMonths": 3
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.6,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.2
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "고객사",
+              "text": "바로 연락 주셔서 다행이에요. 정정본으로 진행하죠."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "결국 손해 보고 계약했어요. 둘 다 정신 차립시다."
+            }
+          ]
+        }
+      },
+      {
+        "id": "blame",
+        "label": "신입의 실수라고 보고한다",
+        "reply": "신입이 단독으로 발송한 건입니다. 교육하겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "arc_mentee_hurt",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_mentee_3",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "그날 신입은 화장실에서 오래 나오지 않았다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_mentee_3",
+    "version": 1,
+    "status": "published",
+    "title": "신입의 아이디어",
+    "description": "신입이 쭈뼛거리며 기획안을 내밀었다. 생각보다, 아니 꽤 좋다. 다음 주 본부 회의 안건으로 올릴 만하다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "series": {
+      "id": "mentee",
+      "title": "나의 첫 사수 역할",
+      "episode": 3,
+      "total": 4
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "신입 한 사원",
+        "text": "과장님, 이거… 별로면 버리셔도 돼요."
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "본부장 앞에서 발표할 사람이 필요하다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "give_stage",
+        "label": "신입에게 발표를 맡긴다",
+        "reply": "서진 씨가 발표해. 내가 옆에 있을게.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "arc_mentee_ally",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_mentee_4",
+            "delayMonths": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "본부장",
+            "text": "신입이 이걸? 사수가 누구야. 잘 키웠네."
+          }
+        ]
+      },
+      {
+        "id": "take_credit",
+        "label": "내 이름으로 발표한다",
+        "reply": "(기획안 작성자 칸을 고친다)",
+        "guaranteedEffects": [
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 6
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "arc_mentee_hurt",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_mentee_4",
+            "delayMonths": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "신입 한 사원",
+            "text": "…발표 잘하셨어요, 과장님."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_mentee_4",
+    "version": 1,
+    "status": "published",
+    "title": "청출어람",
+    "description": "2년 뒤. 그 신입이 사내 혁신상을 받았다. 수상 소감 차례다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "series": {
+      "id": "mentee",
+      "title": "나의 첫 사수 역할",
+      "episode": 4,
+      "total": 4
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "한 대리",
+        "text": "이 상은… 제 첫 사수님께 드리고 싶습니다."
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "강당의 시선이 당신에게 모였다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "proud",
+        "label": "일어나 박수를 친다",
+        "reply": "(가장 먼저, 가장 크게 박수를 친다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "arc_mentee_ally",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 10
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 8
+          }
+        ],
+        "resultText": "'사람 키우는 사람'이라는 말이 붙었다. 어떤 승진보다 오래 남을 별명이었다."
+      },
+      {
+        "id": "awkward",
+        "label": "어색하게 고개를 숙인다",
+        "reply": "(박수 소리가 귀에 잘 들어오지 않는다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "arc_mentee_hurt",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -10
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -4
+          }
+        ],
+        "resultText": "소감은 '사수님 덕분'이 아니라 '사수님께 배운 게 많다'였다. 무엇을 배웠는지는 말하지 않았다."
+      },
+      {
+        "id": "nod",
+        "label": "조용히 고개를 끄덕인다",
+        "reply": "(웃으며 고개를 끄덕인다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          }
+        ],
+        "resultText": "언젠가 저 친구가 나를 앞지를 것이다. 그게 이상하게 기쁘다."
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_ledger_1",
+    "version": 1,
+    "status": "published",
+    "title": "숫자가 맞지 않는다",
+    "description": "협력사 정산 자료를 보다가 이상한 걸 발견했다. 같은 업체에 3년째 같은 금액이 두 번씩 나간다. 결재자는 팀장이다.",
+    "category": "work",
+    "rarity": "rare",
+    "weight": 5,
+    "maxOccurrencesPerRun": 1,
+    "highRisk": true,
+    "series": {
+      "id": "ledger",
+      "title": "장부의 비밀",
+      "episode": 1,
+      "total": 4,
+      "farewellEventId": "evt_arc_ledger_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "tenureMonths": {
+        "min": 36
+      },
+      "seriesNone": true,
+      "npc": {
+        "role": "BOSS"
+      }
+    },
+    "channel": "나와의 채팅",
+    "dialogue": [
+      {
+        "speaker": "SELF",
+        "text": "협력사 B 지급 내역: 매월 2회, 동일 금액, 동일 결재자"
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "모른 척하면 오늘도 정시 퇴근이다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "dig",
+        "label": "조용히 더 파본다",
+        "reply": "(지난 3년치 정산 파일을 내려받는다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -6
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_ledger_2",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "파일 하나를 열 때마다 심장이 빨라졌다."
+          }
+        ]
+      },
+      {
+        "id": "forget",
+        "label": "못 본 걸로 한다",
+        "reply": "(파일을 닫는다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "숫자는 머릿속에서 지워지지 않았다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_ledger_2",
+    "version": 1,
+    "status": "published",
+    "title": "증거",
+    "description": "패턴은 분명했다. 하지만 '패턴'은 증거가 아니다. 원본 계약서는 팀장 서랍에 있다.",
+    "category": "work",
+    "rarity": "rare",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "highRisk": true,
+    "series": {
+      "id": "ledger",
+      "title": "장부의 비밀",
+      "episode": 2,
+      "total": 4,
+      "farewellEventId": "evt_arc_ledger_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "나와의 채팅",
+    "dialogue": [
+      {
+        "speaker": "NARRATION",
+        "text": "팀장은 오늘 오후 출장이다. 서랍은 잠겨 있지 않다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "collect",
+        "label": "계약서를 몰래 복사한다",
+        "reply": "(복사기 앞에서 손이 떨린다)",
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_ledger_3",
+            "delayMonths": 2
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.55,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.2
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "FLAG_SET",
+              "key": "arc_ledger_evidence",
+              "scope": "RUN"
+            }
+          ],
+          "resultText": "이면 계약서. 이제 '패턴'이 아니라 '증거'다."
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -10
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "trust",
+              "amount": -10
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "PARTICIPANT",
+              "text": "(복사실 앞에서) {me} 씨? 여기서 뭐 해요?"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ask_boss",
+        "label": "팀장에게 슬쩍 물어본다",
+        "reply": "팀장님, 협력사 B 정산이 좀 이상해서요…",
+        "guaranteedEffects": [
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": -10
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_ledger_3",
+            "delayMonths": 1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "…그거 내가 알아서 할게요. 신경 쓰지 마요."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_ledger_3",
+    "version": 1,
+    "status": "published",
+    "title": "회유",
+    "description": "팀장이 저녁을 샀다. 비싼 한우집. 디저트가 나올 무렵 본론이 나왔다.",
+    "category": "company",
+    "rarity": "rare",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "highRisk": true,
+    "series": {
+      "id": "ledger",
+      "title": "장부의 비밀",
+      "episode": 3,
+      "total": 4,
+      "farewellEventId": "evt_arc_ledger_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "{me} 씨, 다음 인사 때 내가 확실히 밀어줄게요."
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "그 정산 건은… 회사 관행이에요. 알죠?"
+      }
+    ],
+    "choices": [
+      {
+        "id": "refuse",
+        "label": "관행이 아니라고 말한다",
+        "reply": "팀장님, 그건 관행이 아닙니다. 저는 못 본 척 못 하겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -8
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": -20
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "arc_ledger_whistle",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_ledger_4",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "…후회할 거예요."
+          }
+        ]
+      },
+      {
+        "id": "accept",
+        "label": "고개를 끄덕인다",
+        "reply": "…알겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 2
+          },
+          {
+            "type": "CASH_DELTA",
+            "amount": 1000000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "arc_ledger_complicit",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_arc_ledger_4",
+            "delayMonths": 6
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "다음 날 '격려금' 명목으로 100만 원이 들어왔다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_ledger_4",
+    "version": 1,
+    "status": "published",
+    "title": "감사실의 호출",
+    "description": "외부 제보로 감사가 시작됐다. 감사실에서 당신을 불렀다.",
+    "category": "company",
+    "rarity": "rare",
+    "weight": 1,
+    "scheduledOnly": true,
+    "highRisk": true,
+    "series": {
+      "id": "ledger",
+      "title": "장부의 비밀",
+      "episode": 4,
+      "total": 4
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "감사실",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "감사실",
+        "text": "{me} 님, 협력사 B 정산 건에 대해 아시는 대로 말씀해주세요."
+      },
+      {
+        "speaker": "NAMED",
+        "name": "감사실",
+        "text": "참고로, 협조하신 분은 보호됩니다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "submit_all",
+        "label": "모든 증거를 제출한다",
+        "reply": "(이면 계약서 사본과 3년치 정산 분석표를 내민다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "arc_ledger_whistle",
+              "scope": "RUN"
+            },
+            {
+              "key": "arc_ledger_evidence",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 15
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 6
+          },
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 2
+          }
+        ],
+        "resultText": "감사 결과 발표 날, 대표가 당신의 이름을 불렀다. '이런 직원이 회사를 지킵니다.'"
+      },
+      {
+        "id": "deny",
+        "label": "모른다고 버틴다",
+        "reply": "저는 결재 과정에 관여하지 않았습니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "arc_ledger_complicit",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "outcome": {
+          "baseChance": 0.5
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -6
+            }
+          ],
+          "resultText": "넘어갔다. 하지만 '격려금'이 입금된 통장 내역은 지워지지 않는다."
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -20
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -10
+            },
+            {
+              "type": "PROMOTION_POINT_DELTA",
+              "amount": -3
+            }
+          ],
+          "resultText": "격려금 100만 원의 출처가 드러났다. 징계는 감봉으로 끝났지만, 꼬리표는 오래갔다."
+        }
+      },
+      {
+        "id": "partial",
+        "label": "아는 만큼만 말한다",
+        "reply": "이상한 점을 본 적은 있습니다. 그 이상은 모릅니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          }
+        ],
+        "resultText": "감사는 팀장의 징계로 끝났다. 당신의 이름은 보고서 어디에도 없었다."
+      }
+    ]
+  },
+  {
+    "id": "evt_arc_ledger_farewell",
+    "version": 1,
+    "status": "published",
+    "title": "떠난 팀장의 USB",
+    "description": "팀장이 갑자기 퇴사했다. 책상 정리를 돕다가 서랍 구석에서 USB 하나를 발견했다.",
+    "category": "work",
+    "rarity": "rare",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "ledger",
+      "title": "장부의 비밀",
+      "episode": 4,
+      "total": 4
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "나와의 채팅",
+    "dialogue": [
+      {
+        "speaker": "SELF",
+        "text": "USB 폴더명: '협력사B_정산_원본'"
+      }
+    ],
+    "choices": [
+      {
+        "id": "hand_over",
+        "label": "감사실에 넘긴다",
+        "reply": "(감사실 메일) 전임 팀장 자료에서 확인이 필요한 파일을 발견했습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          }
+        ],
+        "resultText": "사람은 떠났고, 장부는 남았다. 정리는 남은 사람의 몫이었다."
+      },
+      {
+        "id": "toss",
+        "label": "서랍에 다시 넣는다",
+        "reply": "(USB를 서랍 깊숙이 밀어 넣는다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -3
+          }
+        ],
+        "resultText": "이미 떠난 사람이다. 그렇게 믿기로 했다."
+      }
+    ]
+  },
+  {
+    "id": "evt_news_wedding_gift",
+    "version": 1,
+    "status": "published",
+    "title": "동료의 청첩장",
+    "description": "팀 동료가 모바일 청첩장을 보냈다. 축의금을 얼마 할지 잠시 고민된다.",
+    "category": "life",
+    "rarity": "common",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "choices": [
+      {
+        "id": "generous",
+        "label": "10만 원 내고 식장에 간다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -100000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -2
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": 10
+          }
+        ],
+        "resultText": "신랑·신부가 테이블까지 와서 고맙다고 했다. 다음 주 회의에서 그 동료가 내 편을 들었다."
+      },
+      {
+        "id": "basic",
+        "label": "5만 원만 보낸다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -50000
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": 3
+          }
+        ],
+        "resultText": "'축하해요!' 이모티콘과 함께 송금했다. 무난했다."
+      },
+      {
+        "id": "skip",
+        "label": "바빠서 못 챙긴다",
+        "guaranteedEffects": [
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": -8
+          }
+        ],
+        "resultText": "축의금 명부에 내 이름이 없다는 걸, 그 동료는 기억할 것이다."
+      }
+    ]
+  },
+  {
+    "id": "evt_news_farewell",
+    "version": 1,
+    "status": "published",
+    "title": "송별회",
+    "description": "친하게 지낸 동료가 회사를 떠난다. 오늘 저녁 송별회가 있다.",
+    "category": "social",
+    "rarity": "common",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "송별회 단톡방",
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "다들 그동안 고마웠어요. 특히 {me} 씨, 덕분에 버텼어요."
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "오늘 2차는 제가 쏩니다!! 🍻"
+      }
+    ],
+    "choices": [
+      {
+        "id": "attend",
+        "label": "끝까지 함께한다",
+        "reply": "당연히 가죠. 오늘은 제가 1차 낼게요!",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -60000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "{me} 씨, 나중에 어디서 다시 만나면 꼭 같이 일해요."
+          }
+        ]
+      },
+      {
+        "id": "gift_only",
+        "label": "선물만 전하고 일찍 들어간다",
+        "reply": "작은 거예요. 새 회사에서도 잘 지내요!",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -30000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "헉 감동… 잘 쓸게요!"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_news_peer_promoted",
+    "version": 1,
+    "status": "published",
+    "title": "동료가 나를 앞질렀다",
+    "description": "같이 일하던 동료가 이번 인사에서 나보다 높은 직급이 됐다. 오늘부터 결재 라인이 바뀐다.",
+    "category": "work",
+    "rarity": "common",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "{me} 씨… 앞으로도 편하게 대해줘요. 진짜로요."
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "축하 이모티콘을 누르려던 손가락이 잠깐 멈췄다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "congrats",
+        "label": "진심으로 축하한다",
+        "reply": "축하해요! 잘됐다. 오늘 커피는 내가 살게요.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -5
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": 8
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "고마워요. {me} 씨도 곧이에요. 내가 장담해요."
+          }
+        ]
+      },
+      {
+        "id": "jealous",
+        "label": "속이 쓰려 말을 아낀다",
+        "reply": "(축하합니다. 한 줄만 남긴다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -10
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "rivalry",
+            "amount": 10
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "그날 퇴근길이 유난히 길었다."
+          }
+        ]
+      }
+    ]
   }
 ]

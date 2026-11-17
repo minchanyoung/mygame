@@ -145,6 +145,7 @@ export function EventScreen({ view, busy, onChoose }: Props) {
           </div>
           <span className="life-tag">
             <Icon name="story" size={14} /> 오늘의 일상
+            {event.series && ` · 연재 ${event.series.title} ${event.series.episode}/${event.series.total}화`}
           </span>
           <h2 className="event-title" style={{ alignSelf: 'flex-start', textAlign: 'left' }}>
             {event.title}
@@ -179,6 +180,14 @@ export function EventScreen({ view, busy, onChoose }: Props) {
       </header>
 
       <div className="msg-body">
+        {event.series && (
+          <span className="series-badge">
+            📺 연재 · {event.series.title}{' '}
+            <strong>
+              {event.series.episode}/{event.series.total}화
+            </strong>
+          </span>
+        )}
         <span className="event-pill">
           {view.turn.monthOfYear}월 · {event.title}
         </span>

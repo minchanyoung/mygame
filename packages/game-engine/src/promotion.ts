@@ -217,6 +217,7 @@ export function processPromotion(
               dueTurn: state.turnIndex,
               priority: 10,
               sourceOccurrenceId: null,
+              participantNpcId: null,
               status: 'PENDING' as const,
             },
           ]

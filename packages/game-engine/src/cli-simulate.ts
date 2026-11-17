@@ -108,6 +108,14 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
     (k) => `${k} ${share(normal.filter((r) => r.retirementTier === k).length)}`,
   );
   console.log(`  이직 경험 ${pct(moved)} · 별을 달다(임원) ${pct(exec)} · 노후 등급: ${tiers.join(' / ')}`);
+  // S8 동료의 인생·연재
+  const years = results.reduce((s, r) => s + r.months / 12, 0);
+  const newsPerYear = results.reduce((s, r) => s + r.news, 0) / Math.max(1, years);
+  const started = results.reduce((s, r) => s + r.seriesStarted, 0);
+  const finished = results.reduce((s, r) => s + r.seriesFinished, 0);
+  console.log(
+    `  ${mark(newsPerYear >= 1 && newsPerYear <= 2)} 사내 소식 연 ${newsPerYear.toFixed(2)}건 (목표 1~2) · 연재 시작 판당 ${(started / runs).toFixed(2)}편, 완결률 ${started ? ((finished / started) * 100).toFixed(0) : 0}%`,
+  );
   console.log('  인생 목표 달성률 (목표 20~45%):');
   for (const [id, g] of [...byGoal.entries()].sort()) {
     const rate = g.ok / g.n;

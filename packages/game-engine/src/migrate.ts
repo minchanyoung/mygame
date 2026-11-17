@@ -39,9 +39,13 @@ export function migrateRunState(raw: unknown): GameRunState {
     const m = s.currentMonth;
     m.promotion ??= null;
     m.goalMilestone ??= null;
+    m.news ??= [];
     m.eventResults ??= [];
   }
   s.pendingEvents ??= [];
+  // S8: 예약 사건의 참여 동료
+  if (Array.isArray(s.scheduledEvents))
+    for (const x of s.scheduledEvents) if (isObj(x)) x.participantNpcId ??= null;
 
   // S6: 커리어 최저 컨디션 (기록이 없던 세이브는 현재 값으로 시작)
   if (isObj(s.statistics)) {

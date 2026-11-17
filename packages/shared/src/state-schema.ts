@@ -263,6 +263,17 @@ export const EventResultSchema = z
   .strict();
 export type EventResult = z.infer<typeof EventResultSchema>;
 
+/** S8 동료의 인생 소식 */
+export const NEWS_KINDS = ['MARRIAGE', 'BABY', 'PROMOTION', 'LEAVE', 'LAID_OFF', 'SICK', 'JOINED'] as const;
+export const NewsItemSchema = z
+  .object({
+    kind: z.enum(NEWS_KINDS),
+    npcId: z.string(),
+    text: z.string(),
+  })
+  .strict();
+export type NewsItem = z.infer<typeof NewsItemSchema>;
+
 /** 이번 달 기록 (월말 요약 표시용) */
 export const MonthLogSchema = z
   .object({
@@ -295,6 +306,8 @@ export const MonthLogSchema = z
       .nullable(),
     /** 1월이면 이번 달 승진 심사 결과 (자격이 없으면 null) */
     promotion: PromotionResultSchema.nullable(),
+    /** S8 이번 달 사내 소식 (동료의 인생) */
+    news: z.array(NewsItemSchema),
     /** 이번 달 새로 넘은 인생 목표 진행 구간 (25/50/75) */
     goalMilestone: z.number().int().nullable(),
     /** 이번 달 사건 결과 (업무 → 일상 순) */
@@ -374,6 +387,8 @@ export const ScheduledEventSchema = z
     dueTurn: z.number().int().min(0),
     priority: z.number().int(),
     sourceOccurrenceId: z.string().nullable(),
+    /** S8 예약한 사건의 참여 동료를 다음 화로 이어받는다 */
+    participantNpcId: z.string().nullable(),
     status: z.enum(['PENDING', 'DONE', 'EXPIRED']),
   })
   .strict();
@@ -430,6 +445,7 @@ export const HistoryEntrySchema = z
       'JOB_APPLICATION',
       'PROMOTION',
       'TRANSFER',
+      'NEWS',
       'NPC_TEAM_CREATED',
       'EVENT_RESOLVED',
       'ENDING',

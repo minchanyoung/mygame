@@ -13,6 +13,8 @@ import { buildEnding, finalizeEnding, withPendingEnding } from './ending';
 import { inflate, priceIndex } from './economy';
 import { EngineError } from './errors';
 import { updateLifeGoalMilestone } from './goals';
+import { rollNpcLife } from './npc-life';
+import { currentTeamNpcs } from './npcs';
 import { processPromotion } from './promotion';
 import {
   evaluateChoices,
@@ -139,12 +141,22 @@ function pickMonthlyEvents(
         (a, b) =>
           a.dueTurn - b.dueTurn || b.priority - a.priority || a.scheduleId.localeCompare(b.scheduleId),
       );
+    const npcOf = (id: string | null) => (id ? (state.npcs.find((n) => n.npcId === id) ?? null) : null);
     const scheduled = due.find((s) => {
       const ev = content.events.get(s.eventId)!;
-      return evaluateChoices(state, ev, null, content).some((c) => c.selectable);
+      return evaluateChoices(state, ev, npcOf(s.participantNpcId), content).some((c) => c.selectable);
     });
     if (scheduled) {
-      selections.push({ eventId: scheduled.eventId, participantNpcId: null });
+      // S8 연재: 참여 동료를 이어받는다. 그 동료가 팀을 떠났으면 연재의 정리 화로 대신한다.
+      const ev = content.events.get(scheduled.eventId)!;
+      const stillHere =
+        !scheduled.participantNpcId ||
+        currentTeamNpcs(state).some((t) => t.npc.npcId === scheduled.participantNpcId);
+      const farewell = ev.series?.farewellEventId;
+      selections.push({
+        eventId: !stillHere && farewell ? farewell : scheduled.eventId,
+        participantNpcId: scheduled.participantNpcId,
+      });
       scheduledEvents = scheduledEvents.map((x) =>
         x.scheduleId === scheduled.scheduleId ? { ...x, status: 'DONE' as const } : x,
       );
@@ -170,7 +182,10 @@ export function startMonth(
   const adjusted = processSalaryAdjustment(state, content);
   const promoted = processPromotion(adjusted.state, content);
   const settled = applyMonthlySettlement(promoted.state, content);
-  const reviewed = processAnnualReview(settled.state, content);
+  const annual = processAnnualReview(settled.state, content);
+  // S8 동료의 인생: 소식과 그에 따른 후속 사건 예약 (사건 선정 전)
+  const life = rollNpcLife(annual.state, content);
+  const reviewed = { state: life.state, review: annual.review };
   const rng = new SeededRng(reviewed.state.rngState);
   // forced는 플레이테스트 도구 전용 (추첨을 건너뛰고 지정 사건 1개만 연다)
   const { selections, scheduledEvents } = forced
@@ -192,6 +207,7 @@ export function startMonth(
       annualReview: reviewed.review,
       salaryAdjustment: adjusted.adjustment,
       promotion: promoted.result,
+      news: life.news,
       goalMilestone: null,
       eventResults: [],
     },

@@ -57,6 +57,8 @@ export const ConditionsSchema = z
     age: IntRangeSchema.optional(),
     /** 현재 회사 재직 개월 수 (입사 턴 기준) */
     tenureMonths: IntRangeSchema.optional(),
+    /** S8 진행 중인 연재가 없을 때만 (동시에 한 편) */
+    seriesNone: z.literal(true).optional(),
     /** S7 지금까지 이직 횟수 */
     transfers: IntRangeSchema.optional(),
     companyGrades: z.array(CompanyGradeSchema).min(1).optional(),
@@ -297,6 +299,20 @@ const EventObjectSchema = z
     highRisk: z.boolean().optional(),
     /** 예약(SCHEDULE_EVENT)으로만 발생하는 후속 사건. 무작위 추첨 후보에서 제외된다 (§7.4). */
     scheduledOnly: z.boolean().optional(),
+    /** S8 예약한 사건(또는 사내 소식)의 참여 동료를 이어받는다. scheduledOnly 사건만 가능 */
+    inheritsParticipant: z.boolean().optional(),
+    /** S8 연재: 같은 동료와 이어지는 n화 이야기. 2화부터는 예약 전용이며 참여 동료를 이어받는다 */
+    series: z
+      .object({
+        id: ContentIdSchema,
+        title: z.string().min(1).max(20),
+        episode: z.number().int().min(1).max(10),
+        total: z.number().int().min(1).max(10),
+        /** 참여 동료가 떠나 다음 화를 이어갈 수 없을 때 대신 여는 정리 화 */
+        farewellEventId: EventIdSchema.optional(),
+      })
+      .strict()
+      .optional(),
     /** 월 2개 사건 중 어느 칸인지. 없으면 분류로 결정 (work/company/social → 업무, 그 외 → 일상) */
     slot: z.enum(['work', 'life']).optional(),
     /** 메신저 채널 이름 (예: "개발팀 단톡방"). 없으면 등장 인물 1:1 또는 팀 채널 */
@@ -312,7 +328,15 @@ const EventObjectSchema = z
 type EventObject = z.infer<typeof EventObjectSchema>;
 
 function checkEventRules(event: EventObject, ctx: z.RefinementCtx): void {
-  const hasNpc = event.conditions?.npc !== undefined;
+  // 참여 NPC는 조건으로 뽑히거나(conditions.npc), 예약한 사건에서 이어받는다(inheritsParticipant)
+  const hasNpc = event.conditions?.npc !== undefined || event.inheritsParticipant === true;
+  if (event.inheritsParticipant && !event.scheduledOnly) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['inheritsParticipant'],
+      message: '참여자 승계는 scheduledOnly 사건만',
+    });
+  }
   const seenChoiceIds = new Set<string>();
 
   // PARTICIPANT 화자는 사건에 참여 NPC가 있어야 한다

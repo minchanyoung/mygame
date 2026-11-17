@@ -8,6 +8,7 @@ interface Props {
 }
 
 const MILESTONE_KINDS = new Set(['JOB_APPLICATION', 'GOAL_SELECTED', 'PROMOTION', 'TRANSFER', 'ENDING']);
+// 사내 소식(NEWS)은 연대기에서 제외 — 내 인생의 굵직한 사건만
 
 /** GAME_OVER — 퇴직 통지서(실패) / 퇴직 증명서(정상) + 인생 연대기 (정식 성적표는 Phase 2) */
 export function EndingScreen({ view, onNewGame, onHome }: Props) {

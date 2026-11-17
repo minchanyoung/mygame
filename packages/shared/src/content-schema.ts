@@ -330,6 +330,25 @@ export const GameRulesSchema = z
         startingReputation: z.number().int().min(0).max(100),
       })
       .strict(),
+    /** S8 동료의 인생: 팀원마다 매달 이 확률로 소식이 생긴다. 후속 사건과 플레이어에게 오는 파급 */
+    npcLife: z
+      .object({
+        monthlyChance: z.number().min(0).max(0.5),
+        maxNewsPerMonth: z.number().int().min(1).max(3),
+        friendlyFavor: z.number().int().min(0).max(100),
+        followUps: z
+          .object({ wedding: EventIdSchema, farewell: EventIdSchema, peerPromoted: EventIdSchema })
+          .strict(),
+        /** 소식의 직접 파급 (그달) */
+        impact: z
+          .object({
+            babyFocus: z.number().int().min(-30).max(0),
+            sickFocus: z.number().int().min(-30).max(0),
+            laidOffMental: z.number().int().min(-30).max(0),
+          })
+          .strict(),
+      })
+      .strict(),
     /** S7 나이 듦: 이 나이부터 매달 자연 변화에 보정 (누적) */
     aging: z.array(
       z

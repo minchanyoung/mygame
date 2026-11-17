@@ -311,6 +311,29 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
   // 예약 전용 사건은 반드시 어떤 사건(또는 승진 누락 규칙)이 예약해야 한다 (고아 콘텐츠 방지)
   const scheduledTargets = new Set([...scheduleEdges.values()].flat());
   scheduledTargets.add(promo.consecutiveMissEvent.eventId);
+  // S8 사내 소식 후속 사건과 연재 정리 화도 예약 대상
+  const life = pack.rules.npcLife.followUps;
+  for (const id of [life.wedding, life.farewell, life.peerPromoted]) {
+    if (!eventIds.has(id)) add('rules.npcLife.followUps', `알 수 없는 사건: ${id}`);
+    scheduledTargets.add(id);
+  }
+  for (const e of pack.events) {
+    const fw = e.series?.farewellEventId;
+    if (fw) {
+      if (!eventIds.has(fw)) add(`events.${e.id}.series`, `알 수 없는 정리 화: ${fw}`);
+      scheduledTargets.add(fw);
+    }
+  }
+  // S8 참여자 승계 사건을 예약하는 쪽에도 참여 NPC가 있어야 한다
+  const byId = new Map(pack.events.map((e) => [e.id, e]));
+  for (const [from, targets] of scheduleEdges) {
+    const src = byId.get(from);
+    const srcHasNpc = src?.conditions?.npc !== undefined || src?.inheritsParticipant === true;
+    for (const to of targets) {
+      if (byId.get(to)?.inheritsParticipant && !srcHasNpc)
+        add(`events.${from}`, `참여자를 이어받는 ${to}를 예약하려면 이 사건에 참여 NPC가 있어야 함`);
+    }
+  }
   for (const event of pack.events.filter((e) => e.scheduledOnly)) {
     if (!scheduledTargets.has(event.id))
       add(`events.${event.id}`, 'scheduledOnly 사건을 예약하는 사건이 없음');

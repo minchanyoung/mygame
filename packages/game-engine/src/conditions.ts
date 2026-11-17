@@ -83,6 +83,12 @@ export function matchesConditions(
     }
   }
   if (cond.transfers && !inRange(state.statistics.transfers, cond.transfers)) return false;
+  // S8 동시에 한 편: 아직 열리지 않은 연재 화가 예약돼 있으면 새 연재를 시작하지 않는다
+  if (
+    cond.seriesNone &&
+    state.scheduledEvents.some((s) => s.status === 'PENDING' && content.events.get(s.eventId)?.series)
+  )
+    return false;
   if (cond.tenureMonths && (!job || !inRange(state.turnIndex - job.startedTurn, cond.tenureMonths)))
     return false;
   if (cond.cash && !inRange(state.cash, cond.cash)) return false;

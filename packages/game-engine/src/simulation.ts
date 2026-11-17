@@ -45,6 +45,10 @@ export interface AutoPlayResult {
   /** S7 이직 횟수, 노후 등급 */
   transfers: number;
   retirementTier: string | null;
+  /** S8 동료 소식 수(충원 제외), 연재 시작·완결 수 */
+  news: number;
+  seriesStarted: number;
+  seriesFinished: number;
 }
 
 function pickChoice(
@@ -129,6 +133,13 @@ function careerStats(
     finalWellbeing: Math.min(state.resources.health, state.resources.mental),
     sGrades: state.annualReviews.filter((r) => r.grade === 'S').length,
     transfers: state.statistics.transfers,
+    news: state.eventHistory.filter((h) => h.kind === 'NEWS' && h.data?.['kind'] !== 'JOINED').length,
+    seriesStarted: state.eventOccurrences.filter((o) => content.events.get(o.eventId)?.series?.episode === 1)
+      .length,
+    seriesFinished: state.eventOccurrences.filter((o) => {
+      const s = content.events.get(o.eventId)?.series;
+      return s !== undefined && s.episode === s.total;
+    }).length,
     retirementTier: state.ending?.retirementTier ?? null,
   };
 }

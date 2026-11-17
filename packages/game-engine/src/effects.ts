@@ -246,6 +246,8 @@ export function applyEffects(
           dueTurn: draft.turnIndex + effect.delayMonths,
           priority: effect.priority ?? 0,
           sourceOccurrenceId: ctx.occurrenceId,
+          // S8 연재: 이 사건의 참여 동료를 다음 화로 이어받는다
+          participantNpcId: ctx.participantNpcId,
           status: 'PENDING',
         });
         break;

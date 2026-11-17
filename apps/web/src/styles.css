@@ -2127,3 +2127,29 @@ details summary {
 .retire-TIGHT {
   border-left-color: var(--stamp);
 }
+
+/* ── S8 연재 · 사내 소식 ── */
+.series-badge {
+  align-self: center;
+  font-size: 0.75rem;
+  color: var(--navy);
+  background: var(--navy-soft);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+.news-card {
+  gap: 6px;
+  border-left: 6px solid #e0912b;
+}
+.news-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--ink-2);
+}
+.former {
+  opacity: 0.8;
+}

@@ -321,5 +321,20 @@
   "retirement": {
     "comfortable": 600000000,
     "modest": 150000000
+  },
+  "npcLife": {
+    "monthlyChance": 0.033,
+    "maxNewsPerMonth": 2,
+    "friendlyFavor": 60,
+    "followUps": {
+      "wedding": "evt_news_wedding_gift",
+      "farewell": "evt_news_farewell",
+      "peerPromoted": "evt_news_peer_promoted"
+    },
+    "impact": {
+      "babyFocus": -6,
+      "sickFocus": -5,
+      "laidOffMental": -6
+    }
   }
 }

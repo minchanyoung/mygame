@@ -284,6 +284,8 @@ export interface PublicMonthSummary {
   debtDelta: number;
   /** 이달의 이야기들 (업무 → 일상) */
   events: PublicStory[];
+  /** S8 사내 소식 */
+  news: Array<{ kind: string; text: string }>;
 }
 
 export interface PublicReview {
@@ -351,6 +353,8 @@ export interface PublicActiveEvent {
   channelName: string;
   /** 사건 시작 대화 */
   dialogue: PublicChatLine[];
+  /** S8 연재 표시 (예: 라이벌 동기 2/4화) */
+  series: { title: string; episode: number; total: number } | null;
   participantName: string | null;
   participant: Omit<PublicNpc, 'npcId'> | null;
   choices: PublicChoice[];
@@ -419,6 +423,8 @@ export interface PublicRunView {
   skills: PublicTrait[];
   negativeTraits: PublicTrait[];
   npcs: PublicNpc[];
+  /** S8 함께 일했던 사람들 (떠났거나 전 직장) */
+  formerColleagues: Array<{ name: string; rankLabel: string; relationLabel: string; note: string }>;
   activeEvent: PublicActiveEvent | null;
   warnings: PublicWarning[];
   monthSummary: PublicMonthSummary | null;

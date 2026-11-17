@@ -340,6 +340,7 @@ function toMonthSummary(state: GameRunState, content: ContentIndex): PublicMonth
         }
       : null,
     goalMilestone: m.goalMilestone,
+    news: m.news.map((n) => ({ kind: n.kind, text: n.text })),
     resourceDelta,
     cashDelta: state.cash - m.start.cash,
     debtDelta: state.debt - m.start.debt,
@@ -554,6 +555,9 @@ export function toPublicActiveEvent(state: GameRunState, content: ContentIndex):
     categoryLabel: CATEGORY_LABELS[event.category] ?? event.category,
     channelName: channelName(event, state, participant),
     dialogue: chatLines(event.dialogue, state, participant, content),
+    series: event.series
+      ? { title: event.series.title, episode: event.series.episode, total: event.series.total }
+      : null,
     participantName: participant?.name ?? null,
     participant: participant ? (({ npcId: _id, ...rest }) => rest)(toPublicNpc(participant, content)) : null,
     choices,
@@ -699,6 +703,23 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
     skills: toPublicTraits(state.skills, content),
     negativeTraits: toPublicTraits(state.negativeTraits, content),
     npcs: currentTeamNpcs(state).map((t) => toPublicNpc(t.npc, content)),
+    formerColleagues: (() => {
+      const here = new Set(currentTeamNpcs(state).map((t) => t.npc.npcId));
+      return state.npcs
+        .filter((n) => !here.has(n.npcId))
+        .slice(-10)
+        .reverse()
+        .map((n) => ({
+          name: n.name,
+          rankLabel: RANK_LABELS[n.rank],
+          relationLabel: relationLabel(n),
+          note: !n.active
+            ? '회사를 떠남'
+            : n.companyId !== state.employment.current?.companyId
+              ? (content.companies.get(n.companyId)?.name ?? '전 직장') + ' 시절'
+              : '다른 자리로',
+        }));
+    })(),
     activeEvent: toPublicActiveEvent(state, content),
     warnings: computeWarnings(state, content),
     monthSummary: toMonthSummary(state, content),

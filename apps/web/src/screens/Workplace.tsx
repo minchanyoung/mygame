@@ -84,6 +84,30 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
             ))}
           </ul>
           <p className="tiny muted">정확한 호감·신뢰 수치는 비공개입니다.</p>
+          {view.formerColleagues.length > 0 && (
+            <>
+              <h3 className="small" style={{ marginTop: 8 }}>
+                함께 일했던 사람들
+              </h3>
+              <ul className="npc-list">
+                {view.formerColleagues.map((p, i) => (
+                  <li key={`${p.name}-${i}`} className="card former">
+                    <div className="npc-row">
+                      <span className="avatar avatar-small" aria-hidden="true">
+                        {p.name.slice(0, 1)}
+                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <strong>{p.name}</strong> <span className="chip">{p.rankLabel}</span>
+                        <p className="small muted">
+                          {p.note} · 관계 {p.relationLabel}
+                        </p>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </>
       )}
 

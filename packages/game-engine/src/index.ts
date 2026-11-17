@@ -18,6 +18,7 @@ export * from './goals';
 export * from './economy';
 export * from './migrate';
 export * from './transfer';
+export * from './npc-life';
 export * from './month';
 export * from './simulation';
 export * from './playtest';

@@ -146,6 +146,19 @@ export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
 
       {m?.annualReview && <ReviewSheet review={m.annualReview} age={view.turn.age} />}
 
+      {m && m.news.length > 0 && (
+        <div className="card news-card" aria-label="사내 소식">
+          <strong className="small">📢 사내 소식</strong>
+          <ul className="news-list">
+            {m.news.map((n, i) => (
+              <li key={`${n.kind}-${i}`} className="small">
+                {n.text}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {view.transferOffer && (
         <div className="sheet transfer-offer" aria-label="이직 제안서">
           <div className="sheet-title">
