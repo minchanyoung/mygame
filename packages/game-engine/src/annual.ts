@@ -68,7 +68,18 @@ export function computeAnnualReview(state: GameRunState, content: ContentIndex):
       weight: w.reputation,
       note: '사내 평판',
     },
-    { key: 'condition' as const, score: condition, weight: w.condition, note: '체력·집중력 상태' },
+    {
+      key: 'condition' as const,
+      score: condition,
+      // S7: 나이가 들면 '근태·컨디션' 비중이 커진다
+      weight:
+        w.condition +
+        (turnInfo(state.turnIndex, content.pack.rules.startAge).age >=
+        annualReview.seniorConditionWeight.fromAge
+          ? annualReview.seniorConditionWeight.bonus
+          : 0),
+      note: '체력·집중력 상태',
+    },
   ];
   const totalWeight = raw.reduce((s, r) => s + r.weight, 0) || 1;
   const weighted = raw.reduce((s, r) => s + r.score * r.weight, 0) / totalWeight;

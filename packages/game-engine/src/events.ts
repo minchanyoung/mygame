@@ -15,6 +15,7 @@ import { applyEffects, levelEffectsApplicable, type TraitChange } from './effect
 import { EngineError } from './errors';
 import { currentTeamNpcs } from './npcs';
 import { priceIndex } from './economy';
+import { generateTransferOffer } from './transfer';
 import { cloneForEffects } from './numbers';
 import { SeededRng } from './rng';
 import { assertCommand, assertTransition } from './state-machine';
@@ -280,12 +281,22 @@ export function resolveChoice(
         matchesConditions(state, ce.when, { participant }, content),
     )
     .flatMap((ce) => ce.effects);
+  const applied = [
+    ...(choice.guaranteedEffects ?? []),
+    ...(success === true ? (choice.onSuccess?.effects ?? []) : []),
+    ...(success === false ? (choice.onFailure?.effects ?? []) : []),
+    ...conditional,
+  ];
   const traitChanges = [
     ...applyEffects(draft, choice.guaranteedEffects ?? [], effectCtx),
     ...(success === true ? applyEffects(draft, choice.onSuccess?.effects ?? [], effectCtx) : []),
     ...(success === false ? applyEffects(draft, choice.onFailure?.effects ?? [], effectCtx) : []),
     ...applyEffects(draft, conditional, effectCtx),
   ];
+  // S7 이직 제안서: 회사·연봉 추첨은 시드 고정 스트림 (주 판정 RNG와 분리)
+  if (applied.some((e) => e.type === 'TRANSFER_OFFER')) {
+    draft.transferOffer = generateTransferOffer(draft, content);
+  }
 
   draft.rngState = rng.state;
   draft.activeEvent = null;

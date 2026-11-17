@@ -53,7 +53,9 @@ export function PlaytestPanel({ session, view, busy, run }: Props) {
       : []),
     ['49세로', { age: 49 }],
     ['50세로', { age: 50 }],
+    ['55세로', { age: 55 }],
     ['59세로', { age: 59 }],
+    ['헤드헌터 조건(28세·평판 80)', { age: 28, resources: { reputation: 80 } }],
     // S5 승진 확인: 다음 1월에 바로 심사 대상이 되도록
     ['12월로 (평가 직전)', { month: 12 }],
     ['승진 심사 대상으로', { month: 1, promotionPoints: 30, yearsInRank: 10 }],

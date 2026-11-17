@@ -76,6 +76,13 @@ export const api = {
       body: JSON.stringify({ goalId, expectedRevision, idempotencyKey }),
     }),
 
+  transfer: (s: Session, decision: 'accept' | 'decline', expectedRevision: number, idempotencyKey: string) =>
+    request<{ view: PublicRunView }>(`/api/runs/${s.runId}/transfer`, {
+      method: 'POST',
+      token: s.guestToken,
+      body: JSON.stringify({ decision, expectedRevision, idempotencyKey }),
+    }),
+
   applyJob: (s: Session, offerId: string, expectedRevision: number, idempotencyKey: string) =>
     request<{
       view: PublicRunView;

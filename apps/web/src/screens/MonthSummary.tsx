@@ -8,6 +8,8 @@ interface Props {
   view: PublicRunView;
   busy: boolean;
   onNext: () => void;
+  /** S7 결산의 이직 제안서 응답 */
+  onTransfer: (decision: 'accept' | 'decline') => void;
 }
 
 const won = (n: number) => n.toLocaleString('ko-KR');
@@ -88,7 +90,7 @@ function ReviewSheet({ review, age }: { review: PublicReview; age: number }) {
 }
 
 /** MONTH_SUMMARY — 이달의 이야기들 + 급여명세서 + 가계부 */
-export function MonthSummary({ view, busy, onNext }: Props) {
+export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
   const m = view.monthSummary;
   const ending = view.pendingEnding;
   const nextMonth = view.turn.monthOfYear === 12 ? 1 : view.turn.monthOfYear + 1;
@@ -144,6 +146,54 @@ export function MonthSummary({ view, busy, onNext }: Props) {
 
       {m?.annualReview && <ReviewSheet review={m.annualReview} age={view.turn.age} />}
 
+      {view.transferOffer && (
+        <div className="sheet transfer-offer" aria-label="이직 제안서">
+          <div className="sheet-title">
+            <strong>이직 제안서</strong>
+            <span className="tiny muted">이번 달 결산에서만 유효</span>
+          </div>
+          <div className="card-head">
+            <span className={`grade grade-${view.transferOffer.grade}`}>{view.transferOffer.grade}</span>
+            <strong>{view.transferOffer.companyName}</strong>
+            <span className="chip">{view.transferOffer.jobLabel}</span>
+          </div>
+          <p className="tiny muted">
+            {view.transferOffer.industry} · {view.transferOffer.companyDescription}
+          </p>
+          <div className="sheet-rows">
+            <div className="sheet-row">
+              <span>제시 연봉</span>
+              <strong className="num pos">
+                {formatKrw(view.transferOffer.currentSalary)} → {formatKrw(view.transferOffer.annualSalary)}{' '}
+                (+
+                {view.transferOffer.raisePercent}%)
+              </strong>
+            </div>
+            <div className="sheet-row small">
+              <span className="muted">직급</span>
+              <span>{view.employment.rankLabel} 그대로</span>
+            </div>
+          </div>
+          <ul className="transfer-cost small">
+            <li>승진 포인트·직급 근속이 처음부터 다시 시작돼요.</li>
+            <li>새 팀·새 상사와 관계를 다시 쌓고, 평판은 50에서 시작해요.</li>
+            <li>석 달 동안 수습 기간(텃세 사건이 잦아요).</li>
+          </ul>
+          <div className="transfer-actions">
+            <button type="button" className="btn" disabled={busy} onClick={() => onTransfer('decline')}>
+              남는다
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={busy}
+              onClick={() => onTransfer('accept')}
+            >
+              옮긴다
+            </button>
+          </div>
+        </div>
+      )}
       {m?.promotion && (
         <div className={`sheet appointment ${m.promotion.success ? '' : 'appointment-held'}`}>
           <div className="sheet-title">

@@ -82,6 +82,7 @@ export function matchesConditions(
       if (range && !inRange(state.resources[key as keyof GameRunState['resources']], range)) return false;
     }
   }
+  if (cond.transfers && !inRange(state.statistics.transfers, cond.transfers)) return false;
   if (cond.tenureMonths && (!job || !inRange(state.turnIndex - job.startedTurn, cond.tenureMonths)))
     return false;
   if (cond.cash && !inRange(state.cash, cond.cash)) return false;

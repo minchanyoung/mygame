@@ -9151,5 +9151,1284 @@
         "resultText": "'아… 커피요? 네 감사합니다 ^^' 웃음 뒤에 무언가가 있었다."
       }
     ]
+  },
+  {
+    "id": "evt_headhunter_call",
+    "version": 1,
+    "status": "published",
+    "title": "모르는 번호의 링크드인 메시지",
+    "description": "'안녕하세요, 서치펌 컨설턴트입니다. 좋은 포지션이 있어 연락드렸습니다.' 점심시간, 조용히 휴대폰을 엎어놓는다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 10,
+    "cooldownMonths": 12,
+    "tags": ["transfer"],
+    "channel": "링크드인 · 1:1",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "age": {
+        "min": 28,
+        "max": 54
+      },
+      "tenureMonths": {
+        "min": 24
+      },
+      "resources": {
+        "reputation": {
+          "min": 60
+        }
+      },
+      "transfers": {
+        "max": 1
+      },
+      "flagsNone": [
+        {
+          "key": "performance_warning",
+          "scope": "COMPANY"
+        }
+      ]
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "헤드헌터",
+        "text": "{me} 님, 업계에서 평판이 좋으시더라고요. 지금 회사보다 처우가 확실히 좋은 자리입니다."
+      },
+      {
+        "speaker": "NAMED",
+        "name": "헤드헌터",
+        "text": "부담 없이 이력서만 한번 보내주시겠어요? 비밀은 보장됩니다 🤫"
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "옆자리 팀장의 모니터가 유난히 크게 보인다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "send_resume",
+        "label": "이력서를 보내본다",
+        "reply": "주말에 정리해서 보내드리겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -5
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.55,
+          "modifiers": [
+            {
+              "source": "RESOURCE",
+              "key": "reputation",
+              "range": {
+                "min": 75
+              },
+              "bonus": 0.15
+            },
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "TRANSFER_OFFER"
+            }
+          ],
+          "resultText": "최종 면접까지 붙었다. 결산 때 이직 제안서를 확인하자.",
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "헤드헌터",
+              "text": "축하드립니다! 최종 합격입니다. 처우 조건 보내드릴게요 📄"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -6
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "헤드헌터",
+              "text": "아쉽게도 이번엔 내부 후보로 결정됐다고 하네요…"
+            }
+          ]
+        }
+      },
+      {
+        "id": "counter_offer",
+        "label": "이 제안을 팀장에게 슬쩍 흘린다",
+        "reply": "(팀장님께) 솔직히 말씀드리면, 요즘 다른 곳에서 연락이 오고 있습니다.",
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "RESOURCE",
+              "key": "reputation",
+              "range": {
+                "min": 75
+              },
+              "bonus": 0.15
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "COUNTER_OFFER",
+              "raisePermille": 80
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "BOSS",
+              "stat": "trust",
+              "amount": -6
+            }
+          ],
+          "resultText": "연봉이 올랐다. 팀장의 눈빛은 조금 식었다.",
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "…위에 얘기해서 처우 맞춰볼게요. 대신 딴생각은 접어요."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "BOSS",
+              "stat": "trust",
+              "amount": -12
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -6
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "가고 싶으면 가요. 붙잡을 생각 없어요."
+            }
+          ]
+        }
+      },
+      {
+        "id": "ignore",
+        "label": "정중히 거절한다",
+        "reply": "감사하지만 지금 회사에서 더 해보고 싶습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "헤드헌터",
+            "text": "알겠습니다. 마음 바뀌시면 언제든 연락 주세요!"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_headhunter_escape",
+    "version": 1,
+    "status": "published",
+    "title": "탈출 제안",
+    "description": "야근 중 받은 메일 한 통. '지금 계신 곳보다 훨씬 나은 환경입니다.' 사무실 형광등이 깜빡였다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 14,
+    "cooldownMonths": 10,
+    "tags": ["transfer"],
+    "channel": "개인 메일함",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "age": {
+        "min": 26,
+        "max": 50
+      },
+      "tenureMonths": {
+        "min": 18
+      },
+      "companyGrades": ["D", "F"],
+      "resources": {
+        "reputation": {
+          "min": 50
+        }
+      },
+      "transfers": {
+        "max": 1
+      },
+      "flagsNone": [
+        {
+          "key": "performance_warning",
+          "scope": "COMPANY"
+        }
+      ]
+    },
+    "dialogue": [
+      {
+        "speaker": "SYSTEM",
+        "text": "📧 [채용 제안] {me} 님께 드리는 포지션 안내"
+      },
+      {
+        "speaker": "NAMED",
+        "name": "리크루터",
+        "text": "작은 회사에서 고생하신 경험을 높게 보고 있습니다. 커피 한잔 어떠세요?"
+      }
+    ],
+    "choices": [
+      {
+        "id": "coffee_chat",
+        "label": "퇴근 후 커피챗에 나간다",
+        "reply": "목요일 저녁 7시 괜찮습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -4
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.55,
+          "modifiers": [
+            {
+              "source": "BACKGROUND",
+              "id": "str_eloquence",
+              "bonus": 0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_shy",
+              "bonus": -0.1
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "TRANSFER_OFFER"
+            }
+          ],
+          "resultText": "커피 한 잔이 면접이 되고, 면접이 합격이 됐다. 결산 때 제안서를 보자.",
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "리크루터",
+              "text": "대표님이 꼭 모시고 싶다고 하십니다!"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -5
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "리크루터",
+              "text": "경력이 조금 더 쌓이면 다시 연락드릴게요."
+            }
+          ]
+        }
+      },
+      {
+        "id": "stay_loyal",
+        "label": "의리로 남는다",
+        "reply": "(메일함 정리)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "형광등은 내일도 깜빡일 것이다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_probation_hazing",
+    "version": 1,
+    "status": "published",
+    "title": "수습 기간의 텃세",
+    "description": "이직 첫 달. 팀 단톡방에 초대됐지만, 진짜 대화는 다른 방에서 오가는 것 같다.",
+    "category": "work",
+    "rarity": "common",
+    "weight": 40,
+    "maxOccurrencesPerRun": 2,
+    "cooldownMonths": 2,
+    "tags": ["transfer"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "flagsAll": [
+        {
+          "key": "new_hire_probation",
+          "scope": "RUN"
+        }
+      ]
+    },
+    "dialogue": [
+      {
+        "speaker": "PEER",
+        "text": "아 그 건은… 저희가 예전부터 하던 방식이 있어서요 ㅎㅎ"
+      },
+      {
+        "speaker": "PEER",
+        "text": "전 회사에선 어떻게 하셨는지 모르겠지만 여기선 좀 달라요~"
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "경력직의 첫 석 달은 시험대다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "prove_quietly",
+        "label": "말 대신 결과로 보여준다",
+        "reply": "알겠습니다. 이번 건은 여기 방식대로 해볼게요.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -8
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.6,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 8
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PEERS",
+              "stat": "trust",
+              "amount": 8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "PEER",
+              "text": "와… 전 회사에서 에이스셨구나. 점심 같이 가요!"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "PEER",
+              "text": "역시 처음이라 좀 헤매시네요 ㅎㅎ"
+            }
+          ]
+        }
+      },
+      {
+        "id": "buy_coffee",
+        "label": "팀 전체에 커피를 돌린다",
+        "reply": "(커피 쿠폰 10장을 단톡방에 뿌린다) 앞으로 잘 부탁드립니다!",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -60000
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": 6
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PEER",
+            "text": "오 감사합니다~ 😊"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_former_colleague",
+    "version": 1,
+    "status": "published",
+    "title": "전 직장 동료의 연락",
+    "description": "전 회사 단톡방 알림이 아직 꺼지지 않았다. 옛 동료에게서 개인 메시지가 왔다.",
+    "category": "life",
+    "rarity": "common",
+    "weight": 6,
+    "maxOccurrencesPerRun": 2,
+    "cooldownMonths": 12,
+    "tags": ["transfer"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "transfers": {
+        "min": 1
+      }
+    },
+    "choices": [
+      {
+        "id": "meet",
+        "label": "퇴근 후 소주 한잔한다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -70000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -3
+          }
+        ],
+        "resultText": "'너 나가고 나서 그 팀장이…' 이야기는 새벽 1시까지 이어졌다. 조금 통쾌했고, 조금 그리웠다."
+      },
+      {
+        "id": "short_reply",
+        "label": "짧게 안부만 전한다",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 1
+          }
+        ],
+        "resultText": "'잘 지내지? 언제 밥 한번 먹자.' 그 '언제'는 오지 않을 것이다."
+      }
+    ]
+  },
+  {
+    "id": "evt_why_did_you_move",
+    "version": 1,
+    "status": "published",
+    "title": "왜 옮기셨어요?",
+    "description": "새 회사 첫 회식. 부장님이 소주잔을 내밀며 물었다. '근데 전 회사는 왜 나오셨어요?'",
+    "category": "social",
+    "rarity": "common",
+    "weight": 30,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["transfer"],
+    "channel": "팀 회식",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "flagsAll": [
+        {
+          "key": "new_hire_probation",
+          "scope": "RUN"
+        }
+      ]
+    },
+    "dialogue": [
+      {
+        "speaker": "BOSS",
+        "text": "자자 {me} 씨 환영합니다! 근데 전 회사는 왜 나오셨어요? 솔직하게 ㅎㅎ"
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "테이블이 조용해졌다. 모두가 답을 기다린다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "diplomatic",
+        "label": "성장하고 싶어서라고 한다",
+        "reply": "더 큰 무대에서 배워보고 싶었습니다. 이 팀이 그런 곳이라고 들었고요!",
+        "outcome": {
+          "baseChance": 0.65,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "BOSS",
+              "stat": "favor",
+              "amount": 8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "좋아요 좋아! 자 건배!"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "PEER",
+              "text": "(속닥) 면접 답변 같네…"
+            }
+          ]
+        }
+      },
+      {
+        "id": "honest_rant",
+        "label": "전 회사 험담을 늘어놓는다",
+        "reply": "솔직히 거기 팀장이 진짜…",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -6
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "다들 웃었다. 그리고 다들 생각했다. '여기 나가면 우리 욕도 하겠네.'"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_senior_health_check",
+    "version": 1,
+    "status": "published",
+    "title": "건강검진 결과지",
+    "description": "회사 건강검진 결과가 나왔다. 빨간 글씨 세 줄. '정밀 검사 요망'.",
+    "category": "life",
+    "rarity": "uncommon",
+    "weight": 10,
+    "cooldownMonths": 18,
+    "tags": ["senior"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "age": {
+        "min": 45
+      }
+    },
+    "choices": [
+      {
+        "id": "full_checkup",
+        "label": "휴가를 내고 정밀 검사를 받는다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -800000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -4
+          }
+        ],
+        "resultText": "초기에 잡았다. 의사가 '조금만 늦었어도'라고 말했다. 그 말이 계속 맴돈다."
+      },
+      {
+        "id": "lifestyle",
+        "label": "술·담배를 줄이고 운동을 시작한다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -200000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 4
+          }
+        ],
+        "resultText": "회식 자리에서 사이다를 시켰다. 어색했지만, 다음 날 아침이 달랐다."
+      },
+      {
+        "id": "ignore",
+        "label": "바빠서 나중에 한다",
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_senior_health_recheck",
+            "delayMonths": 4
+          }
+        ],
+        "resultText": "결과지를 서랍 깊숙이 넣었다."
+      }
+    ]
+  },
+  {
+    "id": "evt_senior_health_recheck",
+    "version": 1,
+    "status": "published",
+    "title": "미뤄둔 결과지",
+    "description": "출근길 계단에서 숨이 턱 막혔다. 서랍 속 그 결과지가 떠올랐다.",
+    "category": "life",
+    "rarity": "rare",
+    "weight": 1,
+    "scheduledOnly": true,
+    "highRisk": true,
+    "tags": ["senior"],
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "choices": [
+      {
+        "id": "hospital_now",
+        "label": "당장 병원에 간다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -3000000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -10
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -4
+          }
+        ],
+        "resultText": "2주 입원. 병실 천장을 보며 처음으로 '은퇴 후'를 생각했다."
+      },
+      {
+        "id": "keep_going",
+        "label": "약국 약으로 버틴다",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -25
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -8
+          }
+        ],
+        "resultText": "버텼다. 몸은 그 대가를 기억할 것이다."
+      }
+    ]
+  },
+  {
+    "id": "evt_senior_tuition",
+    "version": 1,
+    "status": "published",
+    "title": "등록금 고지서",
+    "description": "아이의 대학 등록금 고지서와 학원비 영수증이 같은 날 도착했다. 가족 단톡방이 조용하다.",
+    "category": "life",
+    "rarity": "uncommon",
+    "weight": 8,
+    "cooldownMonths": 12,
+    "maxOccurrencesPerRun": 4,
+    "tags": ["senior"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "age": {
+        "min": 45,
+        "max": 58
+      }
+    },
+    "choices": [
+      {
+        "id": "pay_all",
+        "label": "부모로서 전부 낸다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -5000000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          }
+        ],
+        "resultText": "'아빠/엄마 고마워' 한 줄에 마음이 녹았다. 통장은 얼어붙었다."
+      },
+      {
+        "id": "student_loan",
+        "label": "학자금 대출을 같이 알아본다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -2000000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          }
+        ],
+        "resultText": "아이에게 처음으로 '돈 얘기'를 했다. 생각보다 어른스럽게 들어줬다."
+      }
+    ]
+  },
+  {
+    "id": "evt_senior_parent_care",
+    "version": 1,
+    "status": "published",
+    "title": "어머니가 넘어지셨다",
+    "description": "본가에서 전화가 왔다. 어머니가 화장실에서 넘어져 고관절 수술을 받으셔야 한단다. 간병이 필요하다.",
+    "category": "life",
+    "rarity": "uncommon",
+    "weight": 7,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "highRisk": true,
+    "tags": ["senior"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "age": {
+        "min": 48
+      }
+    },
+    "choices": [
+      {
+        "id": "hire_caregiver",
+        "label": "간병인을 쓴다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -6000000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          }
+        ],
+        "resultText": "주말마다 병원에 갔다. 돈으로 시간을 샀지만, 마음까지 사지는 못했다."
+      },
+      {
+        "id": "care_myself",
+        "label": "연차를 몰아 쓰고 직접 돌본다",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -12
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          }
+        ],
+        "resultText": "병실 보조침대에서 쪽잠을 잤다. 어머니가 '바쁜데 미안하다'고 했다. 미안할 일이 아니었다."
+      },
+      {
+        "id": "siblings",
+        "label": "형제들과 번갈아 맡는다",
+        "outcome": {
+          "baseChance": 0.5
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "CASH_DELTA",
+              "amount": -2000000
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "health",
+              "amount": -4
+            }
+          ],
+          "resultText": "가족 단톡방에 간병 시간표가 올라왔다. 오랜만에 형제들이 한 팀이 됐다."
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "CASH_DELTA",
+              "amount": -4000000
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -12
+            }
+          ],
+          "resultText": "'너는 서울 살잖아.' 결국 큰 몫은 내 차지가 됐고, 형제 사이엔 금이 갔다."
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_senior_young_boss",
+    "version": 1,
+    "status": "published",
+    "title": "열두 살 어린 팀장님",
+    "description": "조직 개편 공지. 새 팀장은 당신이 신입 때 사수였던 후배다. 이제 그에게 보고해야 한다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 8,
+    "cooldownMonths": 36,
+    "maxOccurrencesPerRun": 1,
+    "tags": ["senior"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "age": {
+        "min": 45
+      },
+      "ranks": ["STAFF", "ASSISTANT_MANAGER", "MANAGER", "DEPUTY_HEAD"]
+    },
+    "dialogue": [
+      {
+        "speaker": "SYSTEM",
+        "text": "[조직 개편] OO팀 팀장: 최OO 차장 (신임)"
+      },
+      {
+        "speaker": "NAMED",
+        "name": "새 팀장",
+        "text": "선배님… 아니 {me} 님, 앞으로 잘 부탁드립니다. 불편하시면 편하게 말씀 주세요."
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "후배의 목소리가 조금 떨렸다. 당신의 손도 그랬다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "support",
+        "label": "든든한 선배로 도와준다",
+        "reply": "축하해요, 팀장님. 제가 아는 건 다 도울게요.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 6
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "trust",
+            "amount": 6
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "새 팀장",
+            "text": "선배님 덕분에 첫 분기 잘 넘겼어요. 진심으로요."
+          }
+        ]
+      },
+      {
+        "id": "keep_distance",
+        "label": "선을 긋고 내 일만 한다",
+        "reply": "네, 팀장님. 지시하실 것 있으면 주세요.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "깔끔했다. 그리고 쓸쓸했다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_senior_digital_shift",
+    "version": 1,
+    "status": "published",
+    "title": "전사 디지털 전환 교육",
+    "description": "모든 결재가 새 협업 툴로 바뀐다. 교육은 3시간, 실습은 '각자 알아서'. 신입들은 벌써 단축키를 쓴다.",
+    "category": "work",
+    "rarity": "common",
+    "weight": 8,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["senior"],
+    "channel": "전사 공지",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "age": {
+        "min": 48
+      }
+    },
+    "dialogue": [
+      {
+        "speaker": "SYSTEM",
+        "text": "[공지] 다음 주 월요일부터 모든 보고·결재는 새 시스템에서만 가능합니다."
+      },
+      {
+        "speaker": "PEER",
+        "text": "(개인 메시지) 선배님 혹시 어려우시면 말씀하세요 ㅎㅎ 제가 알려드릴게요"
+      }
+    ],
+    "choices": [
+      {
+        "id": "learn_hard",
+        "label": "주말에 독학으로 마스터한다",
+        "reply": "괜찮아요, 제가 한번 파볼게요.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -6
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.55,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "PEER",
+              "text": "선배님 단축키 저보다 많이 아시는데요?? 😳"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "SYSTEM",
+              "text": "[알림] 결재 요청이 반려되었습니다: 첨부 파일 형식 오류 (3회째)"
+            }
+          ]
+        }
+      },
+      {
+        "id": "ask_junior",
+        "label": "후배에게 솔직히 배운다",
+        "reply": "고마워요. 점심 살 테니 30분만 알려줘요.",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -30000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -3
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": 6
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PEER",
+            "text": "선배님이 이렇게 물어봐 주시니까 오히려 좋아요!"
+          }
+        ]
+      },
+      {
+        "id": "resist",
+        "label": "종이 결재를 고집한다",
+        "reply": "(출력한 보고서를 팀장 책상에 올려놓는다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -10
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "BOSS",
+            "text": "…이건 시스템에 다시 올려주세요."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_senior_executive_review",
+    "version": 1,
+    "status": "published",
+    "title": "임원 후보 명단",
+    "description": "인사팀 대외비 메일. 올해 임원 승진 후보 다섯 명 중에 당신 이름이 있다. 자리는 하나다.",
+    "category": "company",
+    "rarity": "rare",
+    "weight": 12,
+    "cooldownMonths": 12,
+    "maxOccurrencesPerRun": 3,
+    "highRisk": true,
+    "tags": ["senior"],
+    "channel": "인사팀 · 대외비",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "age": {
+        "min": 50
+      },
+      "ranks": ["DEPARTMENT_HEAD"],
+      "resources": {
+        "reputation": {
+          "min": 70
+        }
+      }
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "인사팀장",
+        "text": "{me} 부장님, 축하드립니다. 올해 임원 후보로 추천되셨습니다."
+      },
+      {
+        "speaker": "NAMED",
+        "name": "인사팀장",
+        "text": "다음 주 사장님 면담이 있습니다. 다만… 이번에 안 되시면 내년 거취를 고민하셔야 할 수도 있습니다."
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "별을 달거나, 짐을 싸거나. 50대 부장의 갈림길이다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "go_for_it",
+        "label": "모든 걸 걸고 면담을 준비한다",
+        "reply": "준비하겠습니다. 3년 중장기 전략안 들고 가겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -8
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.35,
+          "modifiers": [
+            {
+              "source": "RESOURCE",
+              "key": "reputation",
+              "range": {
+                "min": 85
+              },
+              "bonus": 0.15
+            },
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.05,
+                "2": 0.1
+              }
+            },
+            {
+              "source": "NEGATIVE_TRAIT",
+              "id": "officeStigma",
+              "levels": {
+                "1": -0.1,
+                "2": -0.2
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "EXECUTIVE_PROMOTION"
+            }
+          ],
+          "resultText": "사장님이 악수를 청했다. '내일부터 상무님이라고 불러야겠네.'",
+          "dialogue": [
+            {
+              "speaker": "SYSTEM",
+              "text": "[인사발령] {me} — 상무 승진"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -10
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "voluntary_retirement_wave",
+              "scope": "COMPANY",
+              "expiresInMonths": 6
+            }
+          ],
+          "resultText": "다른 후보의 이름이 발표됐다. 인사팀장이 조용히 커피를 사 왔다.",
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "인사팀장",
+              "text": "부장님, 조만간 한번 따로 뵙죠…"
+            }
+          ]
+        }
+      },
+      {
+        "id": "step_aside",
+        "label": "후배에게 길을 양보한다",
+        "reply": "저보다 더 오래 회사를 이끌 사람이 맡는 게 맞다고 생각합니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "인사팀장",
+            "text": "…쉽지 않은 결정이셨을 텐데요. 회사가 기억할 겁니다."
+          }
+        ]
+      }
+    ]
   }
 ]

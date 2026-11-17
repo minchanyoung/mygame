@@ -6,9 +6,11 @@ import {
   type EndingCause,
   type EndingText,
   type GameRunState,
+  type RetirementTier,
 } from '@company-life/shared';
 import { matchesConditions } from './conditions';
 import type { ContentIndex } from './content-index';
+import { priceIndex } from './economy';
 import { judgeLifeGoal } from './goals';
 import { currentTeamNpcs } from './npcs';
 
@@ -32,6 +34,8 @@ export function detectJobLossCause(
   }
   const limit = debtLimit(state, content);
   if (limit !== null && state.debt >= limit) return { cause: 'DEBT_SPIRAL', sourceEventId: null };
+  // S7 임원 승진은 '실직'이 아니라 커리어의 정상 종료 — 붕괴·부채보다 뒤, 사건 실직보다 앞
+  if (state.employment.promotedToExecutive) return { cause: 'EXECUTIVE_PROMOTION', sourceEventId: null };
   const loss = state.employment.jobLoss;
   if (state.employment.status === 'UNEMPLOYED' && loss)
     return { cause: loss.reason, sourceEventId: loss.eventId };
@@ -62,13 +66,17 @@ export function buildEnding(
   const causeDef = endings.causes[cause];
   const causeText = pickText(causeDef, state, content);
   const base = { cause, age, turnIndex: state.turnIndex, sourceEventId };
-  // 인생 목표 판정은 엔딩 종류가 정해진 뒤에 붙인다 (실패 엔딩은 자동 미달성)
-  const withGoal = (e: Omit<Ending, 'goal'>): Ending => ({ ...e, goal: judgeLifeGoal(state, e, content) });
+  // 인생 목표·노후 등급은 엔딩 종류가 정해진 뒤에 붙인다 (실패 엔딩은 목표 자동 미달성, 노후 등급 없음)
+  const withGoal = (e: Omit<Ending, 'goal' | 'retirementTier'>): Ending => ({
+    ...e,
+    goal: judgeLifeGoal(state, e, content),
+    retirementTier: e.category === 'NORMAL' ? retirementTier(state, content) : null,
+  });
 
-  if (cause === 'RETIREMENT') {
+  if (cause === 'RETIREMENT' || cause === 'EXECUTIVE_PROMOTION') {
     return withGoal({
       ...base,
-      type: 'RETIREMENT',
+      type: cause,
       category: 'NORMAL',
       title: causeDef.title,
       text: causeText,
@@ -85,6 +93,16 @@ export function buildEnding(
     title: `${early.title} — ${causeDef.title}`,
     text: `${causeText} ${pickText(early, state, content)}`,
   });
+}
+
+/** S7 노후 등급: 순자산이 (첫해 물가 기준 기준선 × 물가 지수) 이상인가 */
+export function retirementTier(state: GameRunState, content: ContentIndex): RetirementTier {
+  const index = priceIndex(state, content);
+  const net = state.cash - state.debt;
+  const r = content.pack.rules.retirement;
+  if (net >= r.comfortable * index) return 'COMFORTABLE';
+  if (net >= r.modest * index) return 'MODEST';
+  return 'TIGHT';
 }
 
 /** MONTH_SUMMARY 진입 시 호출: 원인이 있으면 pendingEnding을 기록한다. */

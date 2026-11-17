@@ -49,10 +49,21 @@ export function migrateRunState(raw: unknown): GameRunState {
     s.statistics.lowestWellbeing ??= Math.min(Number(r.health ?? 100), Number(r.mental ?? 100));
   }
 
-  // S5: 엔딩의 목표 판정
+  // S5: 엔딩의 목표 판정 / S7: 노후 등급
   for (const key of ['ending', 'pendingEnding'] as const) {
     const e = s[key];
-    if (isObj(e)) e.goal ??= null;
+    if (isObj(e)) {
+      e.goal ??= null;
+      e.retirementTier ??= null;
+    }
+  }
+
+  // S7: 이직·임원
+  s.transferOffer ??= null;
+  if (isObj(s.statistics)) s.statistics.transfers ??= 0;
+  if (isObj(employment)) {
+    employment.promotedToExecutive ??= false;
+    if (isObj(employment.current)) employment.current.probationUntilTurn ??= null;
   }
 
   const parsed = GameRunStateSchema.safeParse(s);

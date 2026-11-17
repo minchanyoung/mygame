@@ -188,6 +188,10 @@ export const GameRulesSchema = z
             condition: z.number().int().min(0),
           })
           .strict(),
+        /** S7: 이 나이부터 '근태·컨디션' 가중치에 더하는 값 */
+        seniorConditionWeight: z
+          .object({ fromAge: z.number().int(), bonus: z.number().int().min(0) })
+          .strict(),
         /** 등급별 성과급 (월급 대비 ‰, 1000 = 한 달 치) */
         bonusPermilleByGrade: z.record(ReviewGradeSchema, z.number().int().min(0).max(10000)),
         /** 등급별 상사 코멘트 후보 ({boss} {me} 사용 가능) */
@@ -313,6 +317,32 @@ export const GameRulesSchema = z
         ),
       })
       .strict(),
+    /** S7 이직: 제안서 연봉 인상 범위(‰)·등급 상승 폭·한 판 최대 횟수·수습 기간·이직 직후 평판 */
+    transfer: z
+      .object({
+        raisePermille: z.object({ min: z.number().int().min(0), max: z.number().int().min(0) }).strict(),
+        gradeUp: z
+          .object({ min: z.number().int().min(0).max(5), max: z.number().int().min(0).max(5) })
+          .strict(),
+        maxTransfers: z.number().int().min(0).max(10),
+        probationMonths: z.number().int().min(0).max(12),
+        probationFlag: ContentIdSchema,
+        startingReputation: z.number().int().min(0).max(100),
+      })
+      .strict(),
+    /** S7 나이 듦: 이 나이부터 매달 자연 변화에 보정 (누적) */
+    aging: z.array(
+      z
+        .object({
+          fromAge: z.number().int().min(20).max(80),
+          naturalChange: z.partialRecord(ResourceKeySchema, z.number().int().min(-10).max(10)),
+        })
+        .strict(),
+    ),
+    /** S7 노후 등급: 정상 엔딩 순자산이 (첫해 물가 기준 금액 × 물가 지수) 이상이면 */
+    retirement: z
+      .object({ comfortable: z.number().int().positive(), modest: z.number().int().positive() })
+      .strict(),
     /** 인생 목표 진행 축하 구간(%)과 보상 */
     lifeGoal: z
       .object({
@@ -350,6 +380,12 @@ export const EndingsSchema = z
         typeof EndingTextSchema
       >,
     ),
+    /** S7 노후 등급 문구 */
+    retirementTiers: z.object({
+      COMFORTABLE: z.object({ title: z.string().min(1).max(20), text: z.string().min(1).max(200) }).strict(),
+      MODEST: z.object({ title: z.string().min(1).max(20), text: z.string().min(1).max(200) }).strict(),
+      TIGHT: z.object({ title: z.string().min(1).max(20), text: z.string().min(1).max(200) }).strict(),
+    }),
     /** 50세 이상 실직 시: "조기 은퇴 — 원인" 제목에 원인 문구 + 이 문구를 덧붙인다 */
     earlyRetirement: EndingTextSchema,
   })

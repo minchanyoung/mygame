@@ -39,6 +39,16 @@ export const ChooseGoalRequestSchema = z
   .strict();
 export type ChooseGoalRequest = z.infer<typeof ChooseGoalRequestSchema>;
 
+/** S7 결산의 이직 제안서 응답 */
+export const TransferDecisionRequestSchema = z
+  .object({
+    decision: z.enum(['accept', 'decline']),
+    idempotencyKey: IdempotencyKeySchema,
+    expectedRevision: RevisionSchema,
+  })
+  .strict();
+export type TransferDecisionRequest = z.infer<typeof TransferDecisionRequestSchema>;
+
 export const ApplyJobRequestSchema = z
   .object({
     offerId: z.string().min(1).max(100),
@@ -191,6 +201,8 @@ export interface PublicEnding {
   age: number;
   /** 커리어 최고 직급 */
   highestRankLabel: string | null;
+  /** S7 노후 등급 (정상 엔딩만) */
+  retirement: { tier: 'COMFORTABLE' | 'MODEST' | 'TIGHT'; title: string; text: string } | null;
   /** 인생 목표 판정 (목표가 없으면 null). 실패 엔딩은 자동 미달성. */
   goal: { title: string; emoji: string; achieved: boolean; text: string } | null;
 }
@@ -222,6 +234,20 @@ export interface PublicPromotionStatus {
   blocked: boolean;
   /** 다음 1월 심사 대상 */
   eligible: boolean;
+}
+
+/** S7 이직 제안서 */
+export interface PublicTransferOffer {
+  companyName: string;
+  companyDescription: string;
+  grade: CompanyGrade;
+  industry: string;
+  jobLabel: string;
+  annualSalary: number;
+  currentSalary: number;
+  raisePercent: number;
+  workload: number;
+  stability: number;
 }
 
 /** 1월 인사발령 */
@@ -376,7 +402,13 @@ export interface PublicRunView {
     startedAge: number | null;
     startedMonth: number | null;
     promotion: PublicPromotionStatus | null;
+    /** S7 이직 직후 수습 남은 개월 (아니면 null) */
+    probationMonthsLeft: number | null;
+    /** S7 지금까지 이직 횟수 */
+    transfers: number;
   };
+  /** S7 이달 결산의 이직 제안서 */
+  transferOffer: PublicTransferOffer | null;
   /** GOAL_SELECTION에서 고를 인생 목표 후보 */
   lifeGoalOffers: PublicLifeGoal[];
   lifeGoal: PublicLifeGoalProgress | null;

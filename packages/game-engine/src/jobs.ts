@@ -204,8 +204,10 @@ export function applyForJob(
         rankSinceTurn: state.turnIndex,
         promotionPoints: 0,
         promotionMisses: 0,
+        probationUntilTurn: null,
       },
       jobLoss: null,
+      promotedToExecutive: false,
     },
     statistics: { ...state.statistics, highestRank: state.statistics.highestRank ?? 'STAFF' },
     eventHistory: [

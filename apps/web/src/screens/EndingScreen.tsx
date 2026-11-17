@@ -7,13 +7,14 @@ interface Props {
   onHome: () => void;
 }
 
-const MILESTONE_KINDS = new Set(['JOB_APPLICATION', 'GOAL_SELECTED', 'PROMOTION', 'ENDING']);
+const MILESTONE_KINDS = new Set(['JOB_APPLICATION', 'GOAL_SELECTED', 'PROMOTION', 'TRANSFER', 'ENDING']);
 
 /** GAME_OVER — 퇴직 통지서(실패) / 퇴직 증명서(정상) + 인생 연대기 (정식 성적표는 Phase 2) */
 export function EndingScreen({ view, onNewGame, onHome }: Props) {
   const e = view.ending;
   if (!e) return null;
   const fail = e.category === 'FAILURE';
+  const star = e.type === 'EXECUTIVE_PROMOTION';
   const years = Math.floor(view.turn.turnIndex / 12);
   const months = view.turn.turnIndex % 12;
   // 연대기: 입사·엔딩 + 특성 변화/연봉 같은 굵직한 기록만 골라 오래된 순으로
@@ -25,7 +26,9 @@ export function EndingScreen({ view, onNewGame, onHome }: Props) {
   return (
     <section className="screen">
       <div className={`sheet certificate flip-in ${fail ? 'cert-fail' : 'cert-normal'}`}>
-        <span className="cert-kind">{fail ? '퇴 직 통 지 서' : '퇴 직 증 명 서'}</span>
+        <span className="cert-kind">
+          {fail ? '퇴 직 통 지 서' : star ? '임 원 발 령 장' : '퇴 직 증 명 서'}
+        </span>
         <span className="tiny muted">{fail ? '실패 엔딩' : '정상 엔딩'}</span>
         <h1>{e.title}</h1>
         <p style={{ lineHeight: 1.7 }}>{e.text}</p>
@@ -33,9 +36,21 @@ export function EndingScreen({ view, onNewGame, onHome }: Props) {
           {view.profile.displayName} · {e.age}세 · 사회생활 {years}년 {months}개월
         </p>
         <span className={`stamp stamp-big stamp-slam ${fail ? '' : 'stamp-navy'}`} aria-hidden="true">
-          {fail ? '퇴직' : '수고'}
+          {fail ? '퇴직' : star ? '★' : '수고'}
         </span>
       </div>
+
+      {e.retirement && (
+        <div className={`card retire-tier retire-${e.retirement.tier}`}>
+          <div className="career-head">
+            <strong>노후 · {e.retirement.title}</strong>
+            <span className="tiny muted">은퇴 시 순자산 기준</span>
+          </div>
+          <p className="small" style={{ lineHeight: 1.7 }}>
+            {e.retirement.text}
+          </p>
+        </div>
+      )}
 
       {e.goal && (
         <div className={`card goal-verdict ${e.goal.achieved ? 'goal-ok' : 'goal-miss'}`}>

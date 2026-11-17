@@ -6,6 +6,7 @@ import {
   PlaytestPatchRequestSchema,
   ChooseCharacterRequestSchema,
   ChooseGoalRequestSchema,
+  TransferDecisionRequestSchema,
   ChooseRequestSchema,
   CommandRequestSchema,
   GameRunStateSchema,
@@ -21,6 +22,8 @@ import {
   applyForJob,
   chooseCharacter,
   chooseGoal,
+  acceptTransfer,
+  declineTransfer,
   rebindContentVersion,
   chooseInMonth,
   createRun,
@@ -276,6 +279,15 @@ export function buildApp(options: AppOptions): FastifyInstance {
     const body = parseBody(ChooseGoalRequestSchema, req.body);
     const out = await runCommand(req, 'chooseGoal', body, (state, content) => ({
       state: chooseGoal(state, body.goalId, content),
+    }));
+    return reply.status(out.statusCode).send(out.body);
+  });
+
+  app.post<{ Params: { id: string } }>('/api/runs/:id/transfer', async (req, reply) => {
+    const body = parseBody(TransferDecisionRequestSchema, req.body);
+    const command = body.decision === 'accept' ? 'acceptTransfer' : 'declineTransfer';
+    const out = await runCommand(req, command, body, (state, content) => ({
+      state: body.decision === 'accept' ? acceptTransfer(state, content) : declineTransfer(state),
     }));
     return reply.status(out.statusCode).send(out.body);
   });

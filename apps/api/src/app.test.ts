@@ -358,6 +358,15 @@ describe('monthly loop and game over over HTTP (§26)', () => {
     }
   });
 
+  it('S7 transfer: only in MONTH_SUMMARY with an offer (otherwise 409/400)', async () => {
+    const { post } = await employed(new MemoryRunStore());
+    const early = await post('transfer', { decision: 'accept' }, 3);
+    expect(early.status).toBe(409);
+    expect(early.json.code).toBe('INVALID_PHASE');
+    const bad = await post('transfer', { decision: 'maybe' }, 3);
+    expect(bad.status).toBe(400);
+  });
+
   it('health 0 → 과로 실직 엔딩, 이후 모든 쓰기 409, 결과는 재조회해도 동일', async () => {
     const store = new MemoryRunStore();
     const { app, runId, headers, post } = await employed(store);

@@ -108,7 +108,10 @@ describe('§26 job-loss endings', () => {
   });
 
   it('입사 전(첫 구직 단계)에는 실직 판정을 하지 않는다', () => {
-    const before = { ...base, employment: { status: 'UNEMPLOYED' as const, current: null, jobLoss: null } };
+    const before = {
+      ...base,
+      employment: { status: 'UNEMPLOYED' as const, current: null, jobLoss: null, promotedToExecutive: false },
+    };
     expect(cause({ ...before, resources: { ...before.resources, mental: 0 } })).toBeNull();
   });
 });

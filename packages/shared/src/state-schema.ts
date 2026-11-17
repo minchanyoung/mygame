@@ -17,6 +17,7 @@ import {
   OwnedTraitLevelSchema,
   PlayerRankSchema,
   ReviewGradeSchema,
+  RetirementTierSchema,
   RunPhaseSchema,
   TraitLevelSchema,
 } from './enums';
@@ -72,6 +73,20 @@ export const JobOfferSchema = z
   .strict();
 export type JobOffer = z.infer<typeof JobOfferSchema>;
 
+/** S7 이직 제안서 */
+export const TransferOfferSchema = z
+  .object({
+    offerId: z.string().min(1),
+    companyId: CompanyIdSchema,
+    grade: CompanyGradeSchema,
+    jobId: JobIdSchema,
+    annualSalary: Krw.positive(),
+    /** 이 턴의 결산에서만 수락 가능 */
+    turnIndex: z.number().int().min(0),
+  })
+  .strict();
+export type TransferOffer = z.infer<typeof TransferOfferSchema>;
+
 export const JobSearchSchema = z
   .object({
     round: z.number().int().min(0),
@@ -107,6 +122,8 @@ export const EmploymentSchema = z
         promotionPoints: z.number().int().min(0),
         /** 현 직급에서 연속 승진 누락 횟수 */
         promotionMisses: z.number().int().min(0),
+        /** S7 이직 직후 수습 기간이 끝나는 턴 (없으면 null) */
+        probationUntilTurn: z.number().int().min(0).nullable(),
       })
       .strict()
       .nullable(),
@@ -115,6 +132,8 @@ export const EmploymentSchema = z
       .object({ reason: JobLossReasonSchema, eventId: EventIdSchema, turnIndex: z.number().int().min(0) })
       .strict()
       .nullable(),
+    /** S7 임원 승진 확정 ('별을 달다' 엔딩 판정용) */
+    promotedToExecutive: z.boolean(),
   })
   .strict();
 export type Employment = z.infer<typeof EmploymentSchema>;
@@ -132,6 +151,8 @@ export const EndingSchema = z
     text: z.string(),
     /** 인생 목표 판정. 실패 엔딩은 자동 미달성 (S5 Q3) */
     goal: z.object({ goalId: ContentIdSchema, achieved: z.boolean(), text: z.string() }).strict().nullable(),
+    /** S7 노후 등급 (정상 엔딩만, 실패 엔딩은 null) */
+    retirementTier: RetirementTierSchema.nullable(),
   })
   .strict();
 export type Ending = z.infer<typeof EndingSchema>;
@@ -408,6 +429,7 @@ export const HistoryEntrySchema = z
       'GOAL_SELECTED',
       'JOB_APPLICATION',
       'PROMOTION',
+      'TRANSFER',
       'NPC_TEAM_CREATED',
       'EVENT_RESOLVED',
       'ENDING',
@@ -440,6 +462,8 @@ export const GameRunStateSchema = z
     lifeGoalOffers: z.array(ContentIdSchema),
     lifeGoal: LifeGoalStateSchema.nullable(),
     jobOffers: z.array(JobOfferSchema),
+    /** S7 이직 제안서 (헤드헌터 사건 성공 시, 그달 결산에서만 유효) */
+    transferOffer: TransferOfferSchema.nullable(),
     jobSearch: JobSearchSchema,
     employment: EmploymentSchema,
     resources: ResourcesSchema,
@@ -471,6 +495,8 @@ export const GameRunStateSchema = z
         consecutiveHighRiskMonths: z.number().int().min(0),
         /** 매달 말 체력·정신력 중 낮은 쪽의 커리어 최저값 (워라밸 목표 판정) */
         lowestWellbeing: z.number().int().min(0).max(100),
+        /** S7 이직 횟수 */
+        transfers: z.number().int().min(0),
       })
       .strict(),
     currentMonth: MonthLogSchema.nullable(),

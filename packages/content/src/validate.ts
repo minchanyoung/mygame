@@ -284,6 +284,17 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
   if (!missEvent)
     add('rules.promotion.consecutiveMissEvent', `알 수 없는 사건: ${promo.consecutiveMissEvent.eventId}`);
 
+  // S7 이직·나이 듦·노후
+  const tr = pack.rules.transfer;
+  if (tr.raisePermille.min > tr.raisePermille.max) add('rules.transfer.raisePermille', 'min > max');
+  if (tr.gradeUp.min > tr.gradeUp.max) add('rules.transfer.gradeUp', 'min > max');
+  pack.rules.aging.forEach((a, i) => {
+    if (i > 0 && a.fromAge <= pack.rules.aging[i - 1]!.fromAge)
+      add(`rules.aging[${i}]`, '나이는 오름차순이어야 함');
+  });
+  if (pack.rules.retirement.modest >= pack.rules.retirement.comfortable)
+    add('rules.retirement', '보통(modest) 기준은 여유(comfortable)보다 작아야 함');
+
   // S5 인생 목표
   checkUnique(
     pack.lifeGoals.map((g) => g.id),

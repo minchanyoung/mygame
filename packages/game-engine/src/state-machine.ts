@@ -12,7 +12,12 @@ export const TRANSITIONS: Readonly<Record<RunPhase, Partial<Record<RunCommand, r
   JOB_OFFERS: { apply: ['MONTH_START', 'JOB_OFFERS'] },
   MONTH_START: { startMonth: ['EVENT_PENDING', 'MONTH_SUMMARY'] },
   EVENT_PENDING: { choose: ['MONTH_SUMMARY', 'EVENT_PENDING'] },
-  MONTH_SUMMARY: { nextMonth: ['MONTH_START', 'GAME_OVER'] },
+  MONTH_SUMMARY: {
+    nextMonth: ['MONTH_START', 'GAME_OVER'],
+    // S7 결산의 이직 제안서 (같은 결산 화면에 머문다)
+    acceptTransfer: ['MONTH_SUMMARY'],
+    declineTransfer: ['MONTH_SUMMARY'],
+  },
   GAME_OVER: { getResult: ['GAME_OVER'] },
 };
 

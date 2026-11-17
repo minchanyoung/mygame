@@ -5,7 +5,13 @@
       "text": "결국 쓰러졌다. 회복하고 돌아왔을 때, 내 자리는 이미 채워져 있었다.",
       "variants": [
         {
-          "when": { "negativeTraitLevels": { "workaholic": { "min": 1 } } },
+          "when": {
+            "negativeTraitLevels": {
+              "workaholic": {
+                "min": 1
+              }
+            }
+          },
           "text": "책상에서 잠든 채 발견되었다. 강제 휴직 후, 돌아갈 자리는 없었다."
         }
       ]
@@ -15,7 +21,13 @@
       "text": "어느 월요일 아침, 현관문 앞에서 한 발짝도 움직일 수 없었다. 그렇게 회사와의 인연이 끝났다.",
       "variants": [
         {
-          "when": { "negativeTraitLevels": { "burnout": { "min": 1 } } },
+          "when": {
+            "negativeTraitLevels": {
+              "burnout": {
+                "min": 1
+              }
+            }
+          },
           "text": "오래 켜져 있던 경고등이 마침내 꺼졌다. 더는 출근할 수 없었다."
         }
       ]
@@ -24,12 +36,34 @@
       "title": "대형 사고 실직",
       "text": "피곤한 손끝이 만든 단 한 번의 실수. 회사는 그 한 번을 오래 기억하기로 했다.",
       "variants": [
-        { "when": { "jobs": ["DEV"] }, "text": "금요일 오후 6시, 운영 DB에서 WHERE 없는 DELETE를 실행했다." },
-        { "when": { "jobs": ["FINANCE"] }, "text": "송금액에 0을 하나 더 붙였다. 거래처는 무척 기뻐했다." },
-        { "when": { "jobs": ["SALES"] }, "text": "계약서 단가란에 경쟁사 견적을 그대로 붙여 넣었다." },
-        { "when": { "jobs": ["HR"] }, "text": "전 직원 연봉표를 '전체 메일'로 보냈다." },
         {
-          "when": { "jobs": ["PLANNING"] },
+          "when": {
+            "jobs": ["DEV"]
+          },
+          "text": "금요일 오후 6시, 운영 DB에서 WHERE 없는 DELETE를 실행했다."
+        },
+        {
+          "when": {
+            "jobs": ["FINANCE"]
+          },
+          "text": "송금액에 0을 하나 더 붙였다. 거래처는 무척 기뻐했다."
+        },
+        {
+          "when": {
+            "jobs": ["SALES"]
+          },
+          "text": "계약서 단가란에 경쟁사 견적을 그대로 붙여 넣었다."
+        },
+        {
+          "when": {
+            "jobs": ["HR"]
+          },
+          "text": "전 직원 연봉표를 '전체 메일'로 보냈다."
+        },
+        {
+          "when": {
+            "jobs": ["PLANNING"]
+          },
           "text": "사장님 보고 슬라이드 마지막 장에 '이거 망할 듯' 메모가 남아 있었다."
         }
       ]
@@ -39,11 +73,26 @@
       "text": "어느 날 출근해 보니 내 자리에 다른 사람의 화분이 놓여 있었다.",
       "variants": [
         {
-          "when": { "negativeTraitLevels": { "officeStigma": { "min": 1 } } },
+          "when": {
+            "negativeTraitLevels": {
+              "officeStigma": {
+                "min": 1
+              }
+            }
+          },
           "text": "끝내 누명을 벗지 못했다. 회의 초대가 하나둘 끊기더니, 마지막엔 면담 일정만 남았다."
         },
         {
-          "when": { "npc": { "role": "BOSS", "relation": { "favor": { "max": 30 } } } },
+          "when": {
+            "npc": {
+              "role": "BOSS",
+              "relation": {
+                "favor": {
+                  "max": 30
+                }
+              }
+            }
+          },
           "text": "새로 짠 조직도 어디에도 내 이름은 없었다. 팀장님의 '라인 정리'는 깔끔했다."
         }
       ]
@@ -71,6 +120,10 @@
     "RETIREMENT": {
       "title": "정년 은퇴",
       "text": "36년 동안 출근 카드를 찍었다. 마지막 퇴근길은 생각보다 가벼웠다."
+    },
+    "EXECUTIVE_PROMOTION": {
+      "title": "별을 달다",
+      "text": "임원 승진 발령. 명패에 상무가 새겨졌다. 신입 시절 사원증 사진 속 얼굴이 조금 낯설게 웃고 있었다."
     }
   },
   "earlyRetirement": {
@@ -78,9 +131,32 @@
     "text": "조금 이르지만, 그렇게 직장 생활의 막을 내렸다.",
     "variants": [
       {
-        "when": { "resources": { "reputation": { "max": 0 } }, "cash": { "min": 500000000 } },
+        "when": {
+          "resources": {
+            "reputation": {
+              "max": 0
+            }
+          },
+          "cash": {
+            "min": 500000000
+          }
+        },
         "text": "회사에서는 조용히 사라졌지만, 다음 달 건물주가 되어 있었다."
       }
     ]
+  },
+  "retirementTiers": {
+    "COMFORTABLE": {
+      "title": "여유로운 노후",
+      "text": "통장을 볼 때 더 이상 숨을 참지 않는다. 평일 오전의 산책이 이렇게 길 줄 몰랐다."
+    },
+    "MODEST": {
+      "title": "그럭저럭 노후",
+      "text": "아껴 쓰면 된다. 가끔은 손주 용돈도 줄 수 있다."
+    },
+    "TIGHT": {
+      "title": "빠듯한 노후",
+      "text": "은퇴 다음 달, 아파트 경비 구인 공고를 오래 들여다봤다."
+    }
   }
 }

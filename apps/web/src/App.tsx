@@ -280,6 +280,12 @@ export function App() {
                   async (s, v, key) => (await api.nextMonth(s, v.revision, key)).view,
                 )
               }
+              onTransfer={(decision) =>
+                command(
+                  `transfer:${view.turn.turnIndex}:${decision}`,
+                  async (s, v, key) => (await api.transfer(s, decision, v.revision, key)).view,
+                )
+              }
             />
           );
           break;

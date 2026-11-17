@@ -398,7 +398,7 @@ describe('event safety rails (§21.3)', () => {
   it('unemployed state gets no work-slot candidates (work fallback is used by selection)', () => {
     const unemployed = {
       ...base,
-      employment: { status: 'UNEMPLOYED' as const, current: null, jobLoss: null },
+      employment: { status: 'UNEMPLOYED' as const, current: null, jobLoss: null, promotedToExecutive: false },
     };
     expect(getEligibleEvents(unemployed, content, 'work')).toEqual([]);
   });

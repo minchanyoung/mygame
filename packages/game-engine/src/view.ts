@@ -233,6 +233,9 @@ function toPublicEnding(
     text: ending.text,
     age: ending.age,
     highestRankLabel: best ? RANK_LABELS[best] : null,
+    retirement: ending.retirementTier
+      ? { tier: ending.retirementTier, ...content.pack.endings.retirementTiers[ending.retirementTier] }
+      : null,
     goal:
       ending.goal && def
         ? { title: def.title, emoji: def.emoji, achieved: ending.goal.achieved, text: ending.goal.text }
@@ -661,7 +664,29 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
       startedAge: job ? turnInfo(job.startedTurn, content.pack.rules.startAge).age : null,
       startedMonth: job ? turnInfo(job.startedTurn, content.pack.rules.startAge).monthOfYear : null,
       promotion: toPublicPromotionStatus(state, content),
+      probationMonthsLeft:
+        job?.probationUntilTurn != null && job.probationUntilTurn > state.turnIndex
+          ? job.probationUntilTurn - state.turnIndex
+          : null,
+      transfers: state.statistics.transfers,
     },
+    transferOffer: (() => {
+      const o = state.transferOffer;
+      if (!o || !job || state.phase !== 'MONTH_SUMMARY' || o.turnIndex !== state.turnIndex) return null;
+      const c = requireFrom(content.companies, o.companyId, 'company');
+      return {
+        companyName: c.name,
+        companyDescription: c.description,
+        grade: c.grade,
+        industry: c.industry,
+        jobLabel: JOB_LABELS[o.jobId],
+        annualSalary: o.annualSalary,
+        currentSalary: job.annualSalary,
+        raisePercent: Math.round(((o.annualSalary - job.annualSalary) / job.annualSalary) * 100),
+        workload: c.workload,
+        stability: c.stability,
+      };
+    })(),
     lifeGoalOffers:
       state.phase === 'GOAL_SELECTION'
         ? state.lifeGoalOffers.map((id) => toPublicGoal(goalDef(content, id), state))

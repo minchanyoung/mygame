@@ -76,7 +76,8 @@ export function applyMonthlySettlement(
   let cash = state.cash + netSalary - livingCost;
   let debt = state.debt + interest;
   // 원금 상환은 실제로 낼 현금이 있을 때만 (빚으로 빚을 갚지 않는다)
-  const debtRepayment = Math.max(0, Math.min(debt, monthly.debtRepayment, cash));
+  // 상환 상한도 물가를 따라 오른다 (고정이면 후반에 이자를 못 따라가 빚이 저절로 불어남)
+  const debtRepayment = Math.max(0, Math.min(debt, inflate(monthly.debtRepayment, index), cash));
   cash -= debtRepayment;
   debt -= debtRepayment;
   if (cash < 0) {
@@ -85,9 +86,15 @@ export function applyMonthlySettlement(
   }
   // 자연 변화 + 직급 부담 (과장 이상은 회복이 줄어든다)
   const burden = content.pack.rules.promotion.rankBurden[job.rank] ?? {};
+  // S7 나이 듦: 50세·55세부터 체력 회복 감소 (누적)
+  const age = turnInfo(state.turnIndex, content.pack.rules.startAge).age;
+  const aging = content.pack.rules.aging.filter((a) => age >= a.fromAge);
   const resources = { ...state.resources };
   for (const key of RESOURCE_KEYS) {
-    resources[key] = clampStat(resources[key] + (monthly.naturalChange[key] ?? 0) + (burden[key] ?? 0));
+    const agingDelta = aging.reduce((s, a) => s + (a.naturalChange[key] ?? 0), 0);
+    resources[key] = clampStat(
+      resources[key] + (monthly.naturalChange[key] ?? 0) + (burden[key] ?? 0) + agingDelta,
+    );
   }
   return {
     state: {
@@ -297,7 +304,13 @@ export function nextMonth(state: GameRunState, content: ContentIndex, now: strin
     assertTransition(state.phase, 'nextMonth', 'GAME_OVER');
     return finalizeEnding(state, state.pendingEnding, now);
   }
-  const advanced: GameRunState = { ...state, turnIndex: state.turnIndex + 1, currentMonth: null };
+  // 받지 않은 이직 제안서는 이달로 만료
+  const advanced: GameRunState = {
+    ...state,
+    turnIndex: state.turnIndex + 1,
+    currentMonth: null,
+    transferOffer: null,
+  };
   if (turnInfo(advanced.turnIndex, content.pack.rules.startAge).age >= content.pack.rules.retireAge) {
     assertTransition(state.phase, 'nextMonth', 'GAME_OVER');
     return finalizeEnding(advanced, buildEnding(advanced, 'RETIREMENT', null, content), now);

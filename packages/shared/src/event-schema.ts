@@ -57,6 +57,8 @@ export const ConditionsSchema = z
     age: IntRangeSchema.optional(),
     /** 현재 회사 재직 개월 수 (입사 턴 기준) */
     tenureMonths: IntRangeSchema.optional(),
+    /** S7 지금까지 이직 횟수 */
+    transfers: IntRangeSchema.optional(),
     companyGrades: z.array(CompanyGradeSchema).min(1).optional(),
     jobs: z.array(JobIdSchema).min(1).optional(),
     ranks: z.array(PlayerRankSchema).min(1).optional(),
@@ -125,6 +127,12 @@ export const EffectSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('DEBT_DELTA'), amount: z.number().int() }).strict(),
   /** 현 연봉 기준 N개월치 현금 (위로금·성과급 등). 물가 지수는 곱하지 않는다. */
   z.object({ type: z.literal('SALARY_MONTHS'), months: z.number().int().min(1).max(60) }).strict(),
+  /** S7 이직 제안서 생성 (그달 결산에서 수락/거절). 지금보다 높은 등급 회사 */
+  z.object({ type: z.literal('TRANSFER_OFFER') }).strict(),
+  /** S7 카운터 오퍼: 현 연봉 ‰ 인상 */
+  z.object({ type: z.literal('COUNTER_OFFER'), raisePermille: z.number().int().min(1).max(500) }).strict(),
+  /** S7 임원 승진 확정 → '별을 달다' 정상 엔딩 */
+  z.object({ type: z.literal('EXECUTIVE_PROMOTION') }).strict(),
   /** S5 승진 포인트 증감 (현 직급, 0 미만으로 내려가지 않음) */
   z.object({ type: z.literal('PROMOTION_POINT_DELTA'), amount: z.number().int().min(-5).max(5) }).strict(),
   z

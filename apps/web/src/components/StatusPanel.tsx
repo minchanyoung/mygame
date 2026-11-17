@@ -39,7 +39,11 @@ export function EmployeeBadge({ view }: { view: PublicRunView }) {
             </span>
           )}
           <div className="badge-chips">
-            {e.grade && <span className="chip chip-pill">{e.grade}등급 회사</span>}
+            {e.grade && <span className={`chip chip-pill grade-chip-${e.grade}`}>{e.grade}등급 회사</span>}
+            {e.probationMonthsLeft !== null && (
+              <span className="chip chip-pill chip-accent">수습 {e.probationMonthsLeft}개월 남음</span>
+            )}
+            {e.transfers > 0 && <span className="chip chip-pill">이직 {e.transfers}회</span>}
             {traits.map((t) => (
               <span key={t.id} className={`chip chip-pill ${t.bad ? 'chip-danger' : 'chip-trait'}`}>
                 {t.name} Lv.{t.level}

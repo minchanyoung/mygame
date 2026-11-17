@@ -101,6 +101,13 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
   console.log(
     `  정상 엔딩 순자산(억): ${dist(normal.map((r) => eok(r.finalCash - r.finalDebt)))} · 체력·정신력 최소: ${dist(normal.map((r) => r.finalWellbeing))} · S등급 횟수: ${dist(normal.map((r) => r.sGrades))}`,
   );
+  // S7 이직·50대·노후
+  const moved = results.filter((r) => r.transfers > 0).length;
+  const exec = results.filter((r) => r.endingType === 'EXECUTIVE_PROMOTION').length;
+  const tiers = ['COMFORTABLE', 'MODEST', 'TIGHT'].map(
+    (k) => `${k} ${share(normal.filter((r) => r.retirementTier === k).length)}`,
+  );
+  console.log(`  이직 경험 ${pct(moved)} · 별을 달다(임원) ${pct(exec)} · 노후 등급: ${tiers.join(' / ')}`);
   console.log('  인생 목표 달성률 (목표 20~45%):');
   for (const [id, g] of [...byGoal.entries()].sort()) {
     const rate = g.ok / g.n;

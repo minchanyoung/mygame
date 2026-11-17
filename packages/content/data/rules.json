@@ -3,28 +3,61 @@
   "retireAge": 60,
   "chanceMin": 0.05,
   "chanceMax": 0.95,
-  "riskThresholds": { "low": 0.7, "medium": 0.4 },
+  "riskThresholds": {
+    "low": 0.7,
+    "medium": 0.4
+  },
   "defaultCooldownMonths": 3,
   "maxTraitLevel": 2,
   "highRiskStreakLimit": 2,
   "character": {
-    "baseResources": { "health": 70, "mental": 60, "focus": 60, "reputation": 50 },
+    "baseResources": {
+      "health": 70,
+      "mental": 60,
+      "focus": 60,
+      "reputation": 50
+    },
     "resourceJitter": 5,
     "baseCash": 5000000
   },
   "hiring": {
-    "baseChanceByGrade": { "S": 0.15, "A": 0.25, "B": 0.4, "C": 0.55, "D": 0.7, "F": 0.85 },
+    "baseChanceByGrade": {
+      "S": 0.15,
+      "A": 0.25,
+      "B": 0.4,
+      "C": 0.55,
+      "D": 0.7,
+      "F": 0.85
+    },
     "majorFitBonus": 0.1,
     "reputationFactor": 0.002,
     "rejectionMentalCost": 5,
     "offerTiers": [
-      { "S": 1, "A": 2, "B": 3 },
-      { "B": 1, "C": 2 },
-      { "D": 1, "F": 1 }
+      {
+        "S": 1,
+        "A": 2,
+        "B": 3
+      },
+      {
+        "B": 1,
+        "C": 2
+      },
+      {
+        "D": 1,
+        "F": 1
+      }
     ],
     "firstJobOfferTiers": [
-      { "A": 1, "B": 3, "C": 5 },
-      { "B": 1, "C": 3, "D": 4 }
+      {
+        "A": 1,
+        "B": 3,
+        "C": 5
+      },
+      {
+        "B": 1,
+        "C": 3,
+        "D": 4
+      }
     ],
     "firstJobGuaranteedGrade": "F"
   },
@@ -36,11 +69,40 @@
     "recoveryWeightBonus": 25
   },
   "annualReview": {
-    "weights": { "performance": 3, "boss": 3, "peers": 1, "reputation": 2, "condition": 1 },
-    "gradeThresholds": { "S": 75, "A": 62, "B": 48, "C": 35 },
-    "raisePermilleByGrade": { "S": 80, "A": 50, "B": 30, "C": 10, "D": 0 },
-    "reputationDeltaByGrade": { "S": 5, "A": 3, "B": 0, "C": 0, "D": -2 },
-    "bonusPermilleByGrade": { "S": 2000, "A": 1000, "B": 500, "C": 0, "D": 0 },
+    "weights": {
+      "performance": 3,
+      "boss": 3,
+      "peers": 1,
+      "reputation": 2,
+      "condition": 1
+    },
+    "gradeThresholds": {
+      "S": 75,
+      "A": 62,
+      "B": 48,
+      "C": 35
+    },
+    "raisePermilleByGrade": {
+      "S": 80,
+      "A": 50,
+      "B": 30,
+      "C": 10,
+      "D": 0
+    },
+    "reputationDeltaByGrade": {
+      "S": 5,
+      "A": 3,
+      "B": 0,
+      "C": 0,
+      "D": -2
+    },
+    "bonusPermilleByGrade": {
+      "S": 2000,
+      "A": 1000,
+      "B": 500,
+      "C": 0,
+      "D": 0
+    },
     "comments": {
       "S": [
         "{me} 씨 없었으면 올해 우리 팀 실적표는 백지였을 겁니다. 내년엔 더 큰 일 맡깁시다.",
@@ -63,16 +125,42 @@
         "인사팀에서 먼저 연락이 올 겁니다. 이번이 마지막 기회라고 생각하세요."
       ]
     },
-    "warningFlag": { "grades": ["D"], "key": "performance_warning", "expiresInMonths": 6 },
-    "traitAdjustments": { "officeStigma": { "1": -5, "2": -15 }, "socialSkill": { "2": 3 } }
+    "warningFlag": {
+      "grades": ["D"],
+      "key": "performance_warning",
+      "expiresInMonths": 6
+    },
+    "traitAdjustments": {
+      "officeStigma": {
+        "1": -5,
+        "2": -15
+      },
+      "socialSkill": {
+        "2": 3
+      }
+    },
+    "seniorConditionWeight": {
+      "fromAge": 50,
+      "bonus": 1
+    }
   },
   "monthly": {
     "taxPermille": 150,
-    "livingCosts": { "housing": 550000, "food": 450000, "transport": 150000, "misc": 150000 },
+    "livingCosts": {
+      "housing": 550000,
+      "food": 450000,
+      "transport": 150000,
+      "misc": 150000
+    },
     "livingCostGrowthPermille": 40,
     "debtInterestPermille": 5,
     "debtRepayment": 200000,
-    "naturalChange": { "health": 2, "mental": 3, "focus": 2, "reputation": 1 }
+    "naturalChange": {
+      "health": 2,
+      "mental": 3,
+      "focus": 2,
+      "reputation": 1
+    }
   },
   "salary": {
     "baseAnnualByGrade": {
@@ -84,14 +172,38 @@
       "F": 23000000
     },
     "rangeByGrade": {
-      "S": { "min": 45000000, "max": 65000000 },
-      "A": { "min": 38000000, "max": 52000000 },
-      "B": { "min": 30000000, "max": 40000000 },
-      "C": { "min": 26000000, "max": 34000000 },
-      "D": { "min": 24000000, "max": 30000000 },
-      "F": { "min": 20000000, "max": 26000000 }
+      "S": {
+        "min": 45000000,
+        "max": 65000000
+      },
+      "A": {
+        "min": 38000000,
+        "max": 52000000
+      },
+      "B": {
+        "min": 30000000,
+        "max": 40000000
+      },
+      "C": {
+        "min": 26000000,
+        "max": 34000000
+      },
+      "D": {
+        "min": 24000000,
+        "max": 30000000
+      },
+      "F": {
+        "min": 20000000,
+        "max": 26000000
+      }
     },
-    "jobCoefficientPermille": { "DEV": 1080, "HR": 980, "SALES": 1000, "FINANCE": 1040, "PLANNING": 1000 },
+    "jobCoefficientPermille": {
+      "DEV": 1080,
+      "HR": 980,
+      "SALES": 1000,
+      "FINANCE": 1040,
+      "PLANNING": 1000
+    },
     "roundingUnit": 100000
   },
   "promotion": {
@@ -129,29 +241,85 @@
         "chanceAdjust": -0.35
       }
     ],
-    "pointsByGrade": { "S": 3, "A": 2, "B": 1, "C": 0, "D": 0 },
+    "pointsByGrade": {
+      "S": 3,
+      "A": 2,
+      "B": 1,
+      "C": 0,
+      "D": 0
+    },
     "baseChance": 0.55,
     "perExtraPoint": 0.08,
     "maxExtraBonus": 0.24,
     "policy": {
       "seniorityPerYear": 0.05,
-      "performanceByGrade": { "S": 0.15, "A": 0.08, "B": 0, "C": -0.1, "D": -0.1 },
+      "performanceByGrade": {
+        "S": 0.15,
+        "A": 0.08,
+        "B": 0,
+        "C": -0.1,
+        "D": -0.1
+      },
       "politicsFavorHigh": 70,
       "politicsFavorLow": 40,
       "politicsBonus": 0.12
     },
     "bossTrustMin": 70,
     "bossTrustBonus": 0.05,
-    "traitAdjustments": { "officeStigma": { "1": -0.05, "2": -0.15 } },
+    "traitAdjustments": {
+      "officeStigma": {
+        "1": -0.05,
+        "2": -0.15
+      }
+    },
     "blockedByFlag": "performance_warning",
     "missBonus": 0.1,
-    "missPenalty": { "mental": 8, "reputation": 5, "bossFavor": 8 },
-    "consecutiveMissEvent": { "misses": 2, "eventId": "evt_promotion_passed_over" },
+    "missPenalty": {
+      "mental": 8,
+      "reputation": 5,
+      "bossFavor": 8
+    },
+    "consecutiveMissEvent": {
+      "misses": 2,
+      "eventId": "evt_promotion_passed_over"
+    },
     "rankBurden": {}
   },
   "lifeGoal": {
     "offerCount": 3,
     "milestones": [25, 50, 75],
     "milestoneMental": 3
+  },
+  "transfer": {
+    "raisePermille": {
+      "min": 150,
+      "max": 300
+    },
+    "gradeUp": {
+      "min": 1,
+      "max": 2
+    },
+    "maxTransfers": 2,
+    "probationMonths": 3,
+    "probationFlag": "new_hire_probation",
+    "startingReputation": 50
+  },
+  "aging": [
+    {
+      "fromAge": 50,
+      "naturalChange": {
+        "health": -1
+      }
+    },
+    {
+      "fromAge": 55,
+      "naturalChange": {
+        "health": -1
+      }
+    }
+  ],
+  "retirement": {
+    "comfortable": 600000000,
+    "modest": 150000000
   }
 }

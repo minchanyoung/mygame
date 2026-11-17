@@ -13,6 +13,7 @@ import { applyForJob } from './jobs';
 import { chooseInMonth, nextMonth, startMonth } from './month';
 import { SeededRng } from './rng';
 import { chooseCharacter, chooseGoal, createRun } from './run';
+import { acceptTransfer, declineTransfer } from './transfer';
 import { toPublicActiveEvent } from './view';
 
 /**
@@ -41,6 +42,9 @@ export interface AutoPlayResult {
   finalDebt: number;
   finalWellbeing: number;
   sGrades: number;
+  /** S7 이직 횟수, 노후 등급 */
+  transfers: number;
+  retirementTier: string | null;
 }
 
 function pickChoice(
@@ -90,7 +94,14 @@ function pickChoice(
               ? money(inflate(e.amount, index))
               : e.type === 'SALARY_MONTHS'
                 ? money(monthly * e.months)
-                : 0),
+                : e.type === 'COUNTER_OFFER'
+                  ? money(((monthly * e.raisePermille) / 1000) * 24)
+                  : // 이직 제안·임원 승진은 커리어 기회로 높게 본다 (사람도 노리는 목표)
+                    e.type === 'TRANSFER_OFFER'
+                    ? 25
+                    : e.type === 'EXECUTIVE_PROMOTION'
+                      ? 120
+                      : 0),
       0,
     );
   const expected = (c: ChoiceEvaluation) => {
@@ -117,6 +128,8 @@ function careerStats(
     finalDebt: state.debt,
     finalWellbeing: Math.min(state.resources.health, state.resources.mental),
     sGrades: state.annualReviews.filter((r) => r.grade === 'S').length,
+    transfers: state.statistics.transfers,
+    retirementTier: state.ending?.retirementTier ?? null,
   };
 }
 
@@ -157,6 +170,14 @@ export function autoPlay(seed: string, policy: AutoPlayPolicy, content: ContentI
           };
         }
         state = chooseInMonth(state, choiceId, content).state;
+      }
+      // S7 이직 제안서: 무작위 봇은 동전 던지기, 신중 봇은 포인트가 거의 다 찼으면 남고 아니면 옮긴다
+      if (state.phase === 'MONTH_SUMMARY' && state.transferOffer && !state.pendingEnding) {
+        const job = state.employment.current!;
+        const step = content.pack.rules.promotion.ladder.find((s) => s.from === job.rank);
+        const nearPromotion = step !== undefined && job.promotionPoints >= step.points - 1;
+        const take = policy === 'random' ? policyRng.nextFloat() < 0.5 : !nearPromotion;
+        state = take ? acceptTransfer(state, content) : declineTransfer(state);
       }
       state = nextMonth(state, content, now);
     } catch (err) {

@@ -41,6 +41,8 @@ export const RUN_COMMANDS = [
   'chooseCharacter',
   'chooseGoal',
   'apply',
+  'acceptTransfer',
+  'declineTransfer',
   'startMonth',
   'choose',
   'nextMonth',
@@ -48,6 +50,7 @@ export const RUN_COMMANDS = [
 ] as const;
 export type RunCommand = (typeof RUN_COMMANDS)[number];
 
+/** 높은 등급부터. 인덱스가 작을수록 좋은 회사 */
 export const COMPANY_GRADES = ['S', 'A', 'B', 'C', 'D', 'F'] as const;
 export const CompanyGradeSchema = z.enum(COMPANY_GRADES);
 export type CompanyGrade = z.infer<typeof CompanyGradeSchema>;
@@ -154,6 +157,8 @@ export const ENDING_CAUSES = [
   'DEBT_SPIRAL',
   ...JOB_LOSS_REASONS,
   'RETIREMENT',
+  /** S7 임원 승진 '별을 달다' — 정상 엔딩 */
+  'EXECUTIVE_PROMOTION',
 ] as const;
 export const EndingCauseSchema = z.enum(ENDING_CAUSES);
 export type EndingCause = z.infer<typeof EndingCauseSchema>;
@@ -173,3 +178,8 @@ export const TraitLevelSchema = z.union([z.literal(0), z.literal(1), z.literal(2
 export type TraitLevel = z.infer<typeof TraitLevelSchema>;
 export const OwnedTraitLevelSchema = z.union([z.literal(1), z.literal(2)]);
 export type OwnedTraitLevel = z.infer<typeof OwnedTraitLevelSchema>;
+
+/** S7 노후 등급 (정상 엔딩 순자산 기준) */
+export const RETIREMENT_TIERS = ['COMFORTABLE', 'MODEST', 'TIGHT'] as const;
+export const RetirementTierSchema = z.enum(RETIREMENT_TIERS);
+export type RetirementTier = z.infer<typeof RetirementTierSchema>;

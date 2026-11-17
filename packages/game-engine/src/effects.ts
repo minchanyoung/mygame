@@ -87,6 +87,22 @@ export function applyEffects(
         draft.debt = Math.max(0, draft.debt + effect.amount);
         break;
 
+      case 'TRANSFER_OFFER':
+        // 회사·연봉 추첨에 콘텐츠와 RNG가 필요해 resolveChoice가 효과 적용 뒤에 처리한다
+        break;
+
+      case 'COUNTER_OFFER':
+        if (draft.employment.current) {
+          const cur = draft.employment.current;
+          cur.annualSalary =
+            Math.floor((cur.annualSalary * (1000 + effect.raisePermille)) / 1000 / 100_000) * 100_000;
+        }
+        break;
+
+      case 'EXECUTIVE_PROMOTION':
+        if (draft.employment.current) draft.employment.promotedToExecutive = true;
+        break;
+
       case 'PROMOTION_POINT_DELTA':
         // 재직 중일 때만 의미가 있다. 실직 상태면 무시.
         if (draft.employment.current) {
