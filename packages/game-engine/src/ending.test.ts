@@ -185,10 +185,15 @@ describe('monthly loop (§20.1)', () => {
     const net = gross - Math.floor((gross * 150) / 1000);
     expect(started.phase).toBe('EVENT_PENDING');
     expect(started.currentMonth?.settlement).toEqual({
+      grossSalary: gross,
+      tax: gross - net,
       netSalary: net,
       livingCost: 1_300_000,
       interest: 50_000,
     });
+    // 급여명세서: 기본급 − 공제 = 실지급
+    const s2 = started.currentMonth!.settlement;
+    expect(s2.grossSalary - s2.tax).toBe(s2.netSalary);
     expect(started.cash).toBe(Math.max(0, 1_000_000 + net - 1_300_000));
     expect(started.debt).toBe(10_050_000 + Math.max(0, -(1_000_000 + net - 1_300_000)));
     expect(started.resources.focus).toBe(Math.min(100, s.resources.focus + 2));

@@ -169,6 +169,9 @@ export interface PublicEnding {
 
 export interface PublicMonthSummary {
   turnIndex: number;
+  /** 급여명세서: 월 기본급(세전) → 공제 → 실지급 */
+  grossSalary: number;
+  tax: number;
   netSalary: number;
   livingCost: number;
   interest: number;
@@ -193,8 +196,30 @@ export interface PublicActiveEvent {
   eventId: string;
   title: string;
   description: string;
+  category: string;
+  /** 표시용 사건 분류 이름 (업무, 사내 공지 등) */
+  categoryLabel: string;
   participantName: string | null;
+  participant: Omit<PublicNpc, 'npcId'> | null;
   choices: PublicChoice[];
+}
+
+/** 메인 화면 1년 달력 (§UI-1). 예약 사건이 있는 달은 내용 없이 '?'로만 알린다. */
+export interface PublicCalendar {
+  age: number;
+  months: Array<{
+    month: number;
+    status: 'PAST' | 'CURRENT' | 'FUTURE';
+    review: boolean;
+    scheduled: boolean;
+  }>;
+}
+
+export interface PublicHistoryEntry {
+  age: number;
+  month: number;
+  kind: string;
+  summary: string;
 }
 
 export interface PublicRunView {
@@ -221,6 +246,9 @@ export interface PublicRunView {
     annualSalary: number | null;
     /** 가장 최근 인사평가 등급 */
     lastReviewGrade: ReviewGrade | null;
+    /** 현재 회사 입사 시점 */
+    startedAge: number | null;
+    startedMonth: number | null;
   };
   resources: Resources;
   cash: number;
@@ -237,6 +265,9 @@ export interface PublicRunView {
   ending: PublicEnding | null;
   /** 플레이테스트 도구로 조작된 run */
   playtestModified: boolean;
+  calendar: PublicCalendar;
+  /** 최근 인생 기록 (최신순, 내부 판정 수치 제외) */
+  history: PublicHistoryEntry[];
 }
 
 export interface CreateRunResponse {

@@ -20,6 +20,8 @@ import { assertCommand, assertTransition } from './state-machine';
 export const MAX_SCHEDULE_DELAY_MONTHS = 3;
 
 export interface Settlement {
+  grossSalary: number;
+  tax: number;
   netSalary: number;
   livingCost: number;
   interest: number;
@@ -39,7 +41,8 @@ export function applyMonthlySettlement(
     throw new EngineError('INVARIANT_VIOLATION', 'monthly settlement requires employment');
   }
   const gross = Math.floor(job.annualSalary / 12);
-  const netSalary = gross - Math.floor((gross * monthly.taxPermille) / 1000);
+  const tax = Math.floor((gross * monthly.taxPermille) / 1000);
+  const netSalary = gross - tax;
   const interest = Math.floor((state.debt * monthly.debtInterestPermille) / 1000);
   const livingCost = monthly.livingCost;
 
@@ -65,7 +68,7 @@ export function applyMonthlySettlement(
         totalSpent: state.statistics.totalSpent + livingCost + interest,
       },
     },
-    settlement: { netSalary, livingCost, interest },
+    settlement: { grossSalary: gross, tax, netSalary, livingCost, interest },
   };
 }
 

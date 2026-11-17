@@ -28,7 +28,8 @@ export function CharacterSelect({ view, busy, onConfirm }: Props) {
               type="button"
               role="radio"
               aria-checked={on}
-              className={`card ${on ? 'card-on' : ''}`}
+              className={`card flip-in ${on ? 'card-on' : ''}`}
+              style={{ animationDelay: `${i * 160}ms` }}
               onClick={() => setSelected(card.cardId)}
             >
               <div className="card-head">

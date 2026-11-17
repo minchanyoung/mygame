@@ -155,6 +155,47 @@ describe('scheduled follow-up events (§7.4)', () => {
   });
 });
 
+describe('UI-1 public view additions', () => {
+  it('달력은 이번 달·지난달·12월 평가·예약 사건(내용 없이)을 표시한다', () => {
+    const s = {
+      ...base,
+      turnIndex: 2,
+      scheduledEvents: [
+        {
+          scheduleId: 's1',
+          eventId: 'evt_tech_debt_return',
+          dueTurn: 6,
+          priority: 0,
+          sourceOccurrenceId: null,
+          status: 'PENDING' as const,
+        },
+      ],
+    };
+    const cal = toPublicView(s, content).calendar;
+    expect(cal.months.map((m) => m.status).slice(0, 4)).toEqual(['PAST', 'PAST', 'CURRENT', 'FUTURE']);
+    expect(cal.months[6]).toMatchObject({ month: 7, scheduled: true });
+    expect(cal.months[11]).toMatchObject({ month: 12, review: true });
+    expect(JSON.stringify(cal)).not.toContain('evt_tech_debt_return');
+  });
+
+  it('기록에는 내부 판정 수치(roll, chance)가 들어가지 않는다', () => {
+    const json = JSON.stringify(toPublicView(base, content).history);
+    expect(json).not.toMatch(/roll|chance/);
+    expect(toPublicView(base, content).history[0]?.kind).toBe('NPC_TEAM_CREATED');
+  });
+
+  it('사건 화면에 참여 NPC 정보와 분류 이름이 나온다 (숨김 수치 제외)', () => {
+    const peer = currentTeamNpcs(base).find((t) => t.role === 'PEER')!.npc;
+    const ev = toPublicActiveEvent(
+      open(base, 'evt_peer_help_request', { participantNpcId: peer.npcId }),
+      content,
+    )!;
+    expect(ev.participant?.name).toBe(peer.name);
+    expect(ev.categoryLabel).toBe('사내 관계');
+    expect(JSON.stringify(ev.participant)).not.toMatch(/"trust"|"favor"/);
+  });
+});
+
 describe('§21.2 boss replacement', () => {
   it('플레이어가 상사 직급 이상이 되면 기존 상사는 FORMER_BOSS로 보존하고 더 높은 새 상사를 배치', () => {
     const oldBoss = currentTeamNpcs(base).find((t) => t.role === 'BOSS')!.npc;

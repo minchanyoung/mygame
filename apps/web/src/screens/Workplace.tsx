@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import type { PublicRunView } from '@company-life/shared';
-import { formatKrw } from '../api';
-import { StatusPanel, Warnings } from '../components/StatusPanel';
+import { Icon, type IconName } from '../components/Icons';
+import { EmployeeBadge, Gauges, MoneyRow, Warnings, YearCalendar } from '../components/StatusPanel';
 
 interface Props {
   view: PublicRunView;
@@ -9,90 +10,129 @@ interface Props {
   onHome: () => void;
 }
 
-/** MONTH_START 대시보드: 상태 요약 → 이번 달 시작 */
+type Tab = 'company' | 'people' | 'me' | 'record';
+const TABS: Array<{ id: Tab; label: string; icon: IconName }> = [
+  { id: 'company', label: '회사', icon: 'company' },
+  { id: 'people', label: '사람', icon: 'people' },
+  { id: 'me', label: '나', icon: 'me' },
+  { id: 'record', label: '기록', icon: 'record' },
+];
+
+/** MONTH_START: 사원증 메인 + 하단 탭 (회사 / 사람 / 나 / 기록) */
 export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
-  const e = view.employment;
-  const skills = view.skills;
-  const negatives = view.negativeTraits;
+  const [tab, setTab] = useState<Tab>('company');
+
   return (
     <section className="screen">
-      <div className="card">
-        <div className="card-head">
-          {e.grade && <span className={`grade grade-${e.grade}`}>{e.grade}</span>}
-          <strong>{e.companyName ?? '무직'}</strong>
-          {e.jobLabel && <span className="chip">{e.jobLabel}</span>}
-          {e.rankLabel && <span className="chip">{e.rankLabel}</span>}
-        </div>
-        {e.annualSalary !== null && (
-          <p className="small">
-            연봉 {formatKrw(e.annualSalary)}
-            {e.lastReviewGrade && ` · 최근 평가 ${e.lastReviewGrade}등급`}
-            {view.turn.monthOfYear === 12 && ' · 이번 달 연말 평가'}
-          </p>
-        )}
-      </div>
+      {tab === 'company' && (
+        <>
+          <EmployeeBadge view={view} />
+          <Warnings view={view} />
+          <Gauges view={view} />
+          <MoneyRow view={view} />
+          <YearCalendar view={view} />
+          <div className="cta-wrap">
+            <button type="button" className="btn btn-primary" onClick={onStartMonth} disabled={busy}>
+              {busy ? '출근 중…' : `${view.turn.monthOfYear}월 출근하기`}
+            </button>
+          </div>
+        </>
+      )}
 
-      <Warnings view={view} />
-      <StatusPanel view={view} />
-
-      <details className="card">
-        <summary>
-          <strong>우리 팀</strong> <span className="muted small">상사 1 · 동료 2</span>
-        </summary>
-        <ul className="npc-list">
-          {view.npcs.map((n) => (
-            <li key={n.npcId}>
-              <strong>{n.name}</strong>{' '}
-              <span className="chip">
-                {n.roleLabel} · {n.rankLabel}
-              </span>
-              <p className="small">
-                {n.personalities.map((p) => p.name).join(' · ')} — 관계: {n.relationLabel}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </details>
-
-      <details className="card" open={skills.length + negatives.length > 0}>
-        <summary>
-          <strong>발견한 특성</strong>{' '}
-          <span className="muted small">{skills.length + negatives.length}개</span>
-        </summary>
-        {skills.length + negatives.length === 0 ? (
-          <p className="muted small">아직 없음 — 특별한 사건을 통해 얻게 됩니다.</p>
-        ) : (
-          <ul className="small trait-list">
-            {skills.map((t) => (
-              <li key={t.id}>
-                👍{' '}
-                <strong>
-                  {t.name} Lv.{t.level}
-                </strong>{' '}
-                — {t.effect}
-              </li>
-            ))}
-            {negatives.map((t) => (
-              <li key={t.id}>
-                👎{' '}
-                <strong>
-                  {t.name} Lv.{t.level}
-                </strong>{' '}
-                — {t.effect}
+      {tab === 'people' && (
+        <>
+          <h2>우리 팀</h2>
+          <ul className="npc-list">
+            {view.npcs.map((n) => (
+              <li key={n.npcId} className="card">
+                <div className="npc-row">
+                  <span className="avatar avatar-small" aria-hidden="true">
+                    {n.name.slice(0, 1)}
+                  </span>
+                  <div style={{ minWidth: 0 }}>
+                    <strong>{n.name}</strong>{' '}
+                    <span className="chip">
+                      {n.roleLabel} · {n.rankLabel}
+                    </span>
+                    <p className="small muted">
+                      {n.personalities.map((p) => p.name).join(' · ')} — 관계 {n.relationLabel}
+                    </p>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
-        )}
-      </details>
+          <p className="tiny muted">정확한 호감·신뢰 수치는 비공개입니다.</p>
+        </>
+      )}
 
-      <div className="action-bar">
-        <button type="button" className="btn" onClick={onHome} disabled={busy}>
-          처음 화면
-        </button>
-        <button type="button" className="btn btn-primary" onClick={onStartMonth} disabled={busy}>
-          {busy ? '진행 중…' : `${view.turn.monthOfYear}월 시작하기`}
-        </button>
-      </div>
+      {tab === 'me' && (
+        <>
+          <h2>나</h2>
+          <Gauges view={view} />
+          <MoneyRow view={view} />
+          <div className="card">
+            <strong>발견한 특성</strong>
+            {view.skills.length + view.negativeTraits.length === 0 ? (
+              <p className="small muted">아직 없음 — 특별한 사건을 통해 얻게 됩니다.</p>
+            ) : (
+              <ul className="trait-list">
+                {view.skills.map((t) => (
+                  <li key={t.id} className="small">
+                    <span className="chip chip-trait">
+                      <Icon name="star" size={12} />
+                      {t.name} Lv.{t.level}
+                    </span>{' '}
+                    {t.effect}
+                  </li>
+                ))}
+                {view.negativeTraits.map((t) => (
+                  <li key={t.id} className="small">
+                    <span className="chip chip-danger">
+                      {t.name} Lv.{t.level}
+                    </span>{' '}
+                    {t.effect}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <button type="button" className="btn" onClick={onHome}>
+            처음 화면으로
+          </button>
+        </>
+      )}
+
+      {tab === 'record' && (
+        <>
+          <h2>인생 기록</h2>
+          <ol className="timeline">
+            {view.history.map((h, i) => (
+              <li key={`${h.age}-${h.month}-${i}`} className={h.kind === 'ENDING' ? 'tl-ending' : ''}>
+                <span className="tiny muted">
+                  {h.age}세 {h.month}월
+                </span>
+                <div>{h.summary}</div>
+              </li>
+            ))}
+          </ol>
+        </>
+      )}
+
+      <nav className="tabbar" aria-label="주 메뉴">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            className={`tab ${tab === t.id ? 'tab-on' : ''}`}
+            aria-current={tab === t.id ? 'page' : undefined}
+            onClick={() => setTab(t.id)}
+          >
+            <Icon name={t.icon} size={22} />
+            <span>{t.label}</span>
+          </button>
+        ))}
+      </nav>
     </section>
   );
 }

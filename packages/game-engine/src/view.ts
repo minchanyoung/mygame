@@ -15,6 +15,8 @@ import {
   type Npc,
   type PublicActiveEvent,
   type PublicBackgroundTrait,
+  type PublicCalendar,
+  type PublicHistoryEntry,
   type PublicCharacterCard,
   type PublicChoice,
   type PublicEnding,
@@ -188,6 +190,8 @@ function toMonthSummary(state: GameRunState, content: ContentIndex): PublicMonth
   const event = ev ? content.events.get(ev.eventId) : undefined;
   return {
     turnIndex: m.turnIndex,
+    grossSalary: m.settlement.grossSalary,
+    tax: m.settlement.tax,
     netSalary: m.settlement.netSalary,
     livingCost: m.settlement.livingCost,
     interest: m.settlement.interest,
@@ -247,9 +251,56 @@ export function toPublicActiveEvent(state: GameRunState, content: ContentIndex):
     eventId: event.id,
     title: event.title,
     description: event.description,
+    category: event.category,
+    categoryLabel: CATEGORY_LABELS[event.category] ?? event.category,
     participantName: participant?.name ?? null,
+    participant: participant ? (({ npcId: _id, ...rest }) => rest)(toPublicNpc(participant, content)) : null,
     choices,
   };
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  daily: '일상',
+  work: '업무',
+  company: '사내 공지',
+  social: '사내 관계',
+  economy: '경제',
+  life: '생활',
+  rare: '특별한 일',
+};
+
+/** 메인 1년 달력: 지난달·이번 달·12월 평가·예약 사건이 있는 달(내용은 숨김) */
+function toCalendar(state: GameRunState, content: ContentIndex): PublicCalendar {
+  const info = turnInfo(state.turnIndex, content.pack.rules.startAge);
+  const yearStart = info.yearIndex * 12;
+  const scheduledMonths = new Set(
+    state.scheduledEvents
+      .filter((s) => s.status === 'PENDING' && s.dueTurn >= yearStart && s.dueTurn < yearStart + 12)
+      .map((s) => (s.dueTurn % 12) + 1),
+  );
+  return {
+    age: info.age,
+    months: Array.from({ length: 12 }, (_, i) => {
+      const month = i + 1;
+      return {
+        month,
+        status: month < info.monthOfYear ? 'PAST' : month === info.monthOfYear ? 'CURRENT' : 'FUTURE',
+        review: month === 12,
+        scheduled: scheduledMonths.has(month),
+      };
+    }),
+  };
+}
+
+/** 최근 기록 (최신순). 내부 판정 데이터(roll, chance)는 내보내지 않는다. */
+function toHistory(state: GameRunState, content: ContentIndex): PublicHistoryEntry[] {
+  return state.eventHistory
+    .slice(-40)
+    .reverse()
+    .map((h) => {
+      const info = turnInfo(h.turnIndex, content.pack.rules.startAge);
+      return { age: info.age, month: info.monthOfYear, kind: h.kind, summary: h.summary };
+    });
 }
 
 /** 정본 상태 → 공개 뷰. 시드·RNG 상태·NPC 수치·정확한 사건 확률은 포함하지 않는다. */
@@ -309,6 +360,8 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
       rankLabel: job ? RANK_LABELS[job.rank] : null,
       annualSalary: job?.annualSalary ?? null,
       lastReviewGrade: state.annualReviews.at(-1)?.grade ?? null,
+      startedAge: job ? turnInfo(job.startedTurn, content.pack.rules.startAge).age : null,
+      startedMonth: job ? turnInfo(job.startedTurn, content.pack.rules.startAge).monthOfYear : null,
     },
     resources: { ...state.resources },
     cash: state.cash,
@@ -323,5 +376,7 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
     pendingEnding: toPublicEnding(state.pendingEnding),
     ending: toPublicEnding(state.ending),
     playtestModified: state.playtestModified,
+    calendar: toCalendar(state, content),
+    history: toHistory(state, content),
   };
 }

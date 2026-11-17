@@ -150,6 +150,8 @@ export const MonthLogSchema = z
     start: MoneySnapshot,
     settlement: z
       .object({
+        grossSalary: Krw.nonnegative(),
+        tax: Krw.nonnegative(),
         netSalary: Krw.nonnegative(),
         livingCost: Krw.nonnegative(),
         interest: Krw.nonnegative(),
