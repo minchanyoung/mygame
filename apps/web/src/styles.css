@@ -1881,3 +1881,209 @@ details summary {
     scroll-behavior: auto;
   }
 }
+
+/* ── 스펙 카드 v2: 이력서처럼 위→아래로 읽히게, 색은 막대와 강점/약점 기호에만 ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.spec {
+  gap: 0;
+  padding: 0;
+  border: 1.5px solid var(--line);
+  box-shadow: none;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.spec-on {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px var(--navy-soft);
+}
+.spec-hit {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 16px 12px;
+  cursor: pointer;
+  border-radius: inherit;
+}
+.spec-hit:focus-visible {
+  outline: 3px solid var(--navy);
+  outline-offset: -3px;
+}
+.spec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.spec-letter {
+  font-size: 1.15rem;
+  color: var(--navy);
+}
+.spec-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--line-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-navy);
+}
+.spec-check.on {
+  background: var(--navy);
+  border-color: var(--navy);
+}
+.spec-profile {
+  margin: -6px 0 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.spec-rec {
+  margin: -6px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--ink-2);
+}
+.spec-stats {
+  margin: 0;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.spec-stat {
+  display: grid;
+  grid-template-columns: 3.4em 1fr;
+  align-items: center;
+  gap: 8px;
+}
+.spec-stat dt {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.spec-stat dd {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 2.2em;
+  align-items: center;
+  gap: 8px;
+}
+.spec-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.spec-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+.spec-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.spec-num.is-best {
+  color: var(--ink);
+  font-weight: 800;
+}
+.spec-traits {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.spec-trait {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 8px;
+  align-items: start;
+}
+.spec-trait-sign {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #ffffff;
+}
+.spec-trait.is-good .spec-trait-sign {
+  background: var(--c-cash);
+}
+.spec-trait.is-bad .spec-trait-sign {
+  background: var(--stamp);
+}
+.spec-trait-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.spec-trait-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.spec-trait-fx {
+  font-size: 0.78rem;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+.spec-rare-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--trait);
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0 6px;
+}
+.spec-money {
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 0.85rem;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+}
+.spec-money strong {
+  color: var(--ink);
+}
+.spec-dot {
+  margin: 0 4px;
+}
+.spec-more {
+  padding: 0 16px 14px;
+}
+.spec-more summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+.spec-more-item {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
