@@ -1,6 +1,6 @@
 import { RESOURCE_KEYS, RESOURCE_LABELS, type PublicRunView } from '@company-life/shared';
 import { formatKrw } from '../api';
-import { Barcode, Icon, Silhouette } from './Icons';
+import { Barcode, Icon, IconBadge, Silhouette, STAT_STYLE } from './Icons';
 
 const DANGER = 20;
 
@@ -68,13 +68,20 @@ export function Gauges({ view }: { view: PublicRunView }) {
         return (
           <div key={k} className={`gauge ${danger ? 'gauge-danger' : ''}`}>
             <div className="gauge-head">
-              <span className="small" style={{ fontWeight: 500 }}>
-                {RESOURCE_LABELS[k]}
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <IconBadge
+                  name={STAT_STYLE[k].icon}
+                  color={danger ? 'var(--stamp)' : STAT_STYLE[k].color}
+                  size={30}
+                />
+                <span className="small" style={{ fontWeight: 700 }}>
+                  {RESOURCE_LABELS[k]}
+                </span>
               </span>
               <span className="gauge-value">{v}</span>
             </div>
             <div className="gauge-bar" aria-hidden="true">
-              <span style={{ width: `${v}%` }} />
+              <span style={{ width: `${v}%`, background: danger ? undefined : STAT_STYLE[k].color }} />
             </div>
             <span className="gauge-note">{danger ? '위험' : ' '}</span>
           </div>
@@ -86,19 +93,24 @@ export function Gauges({ view }: { view: PublicRunView }) {
 
 export function MoneyRow({ view }: { view: PublicRunView }) {
   return (
-    <div className="money-row">
-      <span>
-        현금 <strong className="num">{formatKrw(view.cash)}</strong>
-      </span>
-      <span>
-        빚 <strong className="num">{formatKrw(view.debt)}</strong>
-      </span>
-      <span>
-        순자산{' '}
+    <div className="money-tiles">
+      <div className="money-tile">
+        <IconBadge name="cash" color="var(--c-cash)" size={28} />
+        <span className="tiny muted">현금</span>
+        <strong className="num">{formatKrw(view.cash)}</strong>
+      </div>
+      <div className="money-tile">
+        <IconBadge name="debt" color="var(--c-debt)" size={28} />
+        <span className="tiny muted">빚</span>
+        <strong className="num">{formatKrw(view.debt)}</strong>
+      </div>
+      <div className="money-tile">
+        <IconBadge name="worth" color="var(--navy)" size={28} />
+        <span className="tiny muted">순자산</span>
         <strong className={`num ${view.netWorth < 0 ? 'neg' : ''}`}>
           {view.netWorth < 0 ? `−${formatKrw(-view.netWorth)}` : formatKrw(view.netWorth)}
         </strong>
-      </span>
+      </div>
     </div>
   );
 }

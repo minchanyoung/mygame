@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────
-   회사원 키우기 — "사원증·서류" 디자인 체계 (UI-1)
+   오늘도 출근 — "사원증·서류" 디자인 체계 (UI-1)
    남색(회사) · 종이(서류) · 도장 빨강. 제목/도장 Black Han Sans, 본문 Noto Sans KR.
    ───────────────────────────────────────────── */
 :root {
@@ -531,6 +531,43 @@ button.card {
 
 .pos {
   color: var(--good);
+}
+
+/* ── 능력치 아이콘 색·돈 타일 ── */
+:root {
+  --c-health: #d9485f;
+  --c-mental: #7b61ff;
+  --c-focus: #1f8fd6;
+  --c-reputation: #e0912b;
+  --c-cash: #2f8f5b;
+  --c-debt: #a3271d;
+}
+
+.icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 10px;
+}
+
+.money-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.money-tile {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  font-size: 0.85rem;
+  min-width: 0;
 }
 
 /* ── 1년 달력 ── */

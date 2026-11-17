@@ -18,7 +18,7 @@
     "id": "uni_national",
     "kind": "UNIVERSITY",
     "name": "지방 거점 국립대",
-    "description": "등록금 부담이 적었고 지역 인맥이 탄탄하다.",
+    "description": "등록금 부담이 적어 조금 여유 있게 시작한다.",
     "hireBonus": { "all": 0.02 },
     "cashDelta": 500000
   },

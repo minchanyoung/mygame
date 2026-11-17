@@ -1,5 +1,5 @@
 import type { Choice, Effect, EventDefinition, GameRunState, Npc, RiskLevel } from '@company-life/shared';
-import { calculateChoiceChance, riskLevel, type ChanceResult } from './chance';
+import { calculateChoiceChance, riskLevel, type ChanceBreakdownItem, type ChanceResult } from './chance';
 import { matchesConditions, npcMatches, type EvalContext } from './conditions';
 import { requireFrom, type ContentIndex } from './content-index';
 import { applyEffects, levelEffectsApplicable, type TraitChange } from './effects';
@@ -188,6 +188,8 @@ export interface ChoiceResolution {
   roll: number | null;
   traitChanges: TraitChange[];
   resultText: string | null;
+  /** 판정에 작용한 요인 (기본 확률 제외) */
+  factors: ChanceBreakdownItem[];
 }
 
 /**
@@ -304,6 +306,7 @@ export function resolveChoice(
       roll,
       traitChanges,
       resultText,
+      factors: (chance?.breakdown ?? []).filter((b) => b.source !== 'BASE'),
     },
   };
 }

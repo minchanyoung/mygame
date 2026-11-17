@@ -145,16 +145,42 @@ export function chooseInMonth(
 ): { state: GameRunState; result: ChoiceResolution } {
   const resolved = resolveChoice(state, choiceId, content);
   const r = resolved.result;
+  const after = resolved.state;
+
+  // 이 사건만으로 생긴 변화 (정산은 이미 startMonth에서 반영됨)
+  const resourceDelta: Record<string, number> = {};
+  for (const key of RESOURCE_KEYS) resourceDelta[key] = after.resources[key] - state.resources[key];
+  const npcChanges = after.npcs.flatMap((npc) => {
+    const before = state.npcs.find((n) => n.npcId === npc.npcId);
+    return npc.relationshipHistory
+      .slice(before?.relationshipHistory.length ?? 0)
+      .map((h) => ({ npcId: npc.npcId, stat: h.stat, delta: h.to - h.from }))
+      .filter((c) => c.delta !== 0);
+  });
+
   const withLog: GameRunState = {
-    ...resolved.state,
-    currentMonth: resolved.state.currentMonth && {
-      ...resolved.state.currentMonth,
+    ...after,
+    currentMonth: after.currentMonth && {
+      ...after.currentMonth,
       eventResult: {
         eventId: r.eventId,
         choiceId: r.choiceId,
         success: r.success,
         resultText: r.resultText,
         traitChanges: r.traitChanges.map(({ kind, id, from, to }) => ({ kind, id, from, to })),
+        resourceDelta,
+        cashDelta: after.cash - state.cash,
+        debtDelta: after.debt - state.debt,
+        factors: r.factors
+          .filter((f) => f.source !== 'BASE')
+          .map((f) => ({
+            source: f.source as 'SKILL' | 'NEGATIVE_TRAIT' | 'BACKGROUND' | 'NPC' | 'RESOURCE',
+            id: f.id ?? '',
+            level: f.level ?? null,
+            positive: f.bonus > 0,
+          })),
+        npcChanges,
+        followUpScheduled: after.scheduledEvents.some((s) => s.sourceOccurrenceId === r.occurrenceId),
       },
     },
   };

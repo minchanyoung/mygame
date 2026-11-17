@@ -71,7 +71,7 @@ export function App() {
 
   useEffect(() => {
     document.title =
-      screen.kind === 'run' ? `${screen.view.profile.displayName}의 인생 — 회사원 키우기` : '회사원 키우기';
+      screen.kind === 'run' ? `${screen.view.profile.displayName}의 인생 — 오늘도 출근` : '오늘도 출근';
   }, [screen]);
 
   // 화면 단계가 바뀌면 맨 위로 (모바일에서 이전 화면 스크롤 위치가 남지 않게)
@@ -253,7 +253,7 @@ export function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <span className="logo">회사원 키우기</span>
+        <span className="logo">오늘도 출근</span>
         {screen.kind === 'run' && (
           <span className="header-meta">
             {screen.view.profile.displayName} · {screen.view.turn.age}세 {screen.view.turn.monthOfYear}월

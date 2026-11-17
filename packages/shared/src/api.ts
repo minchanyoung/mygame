@@ -77,11 +77,21 @@ export interface ApiErrorBody {
 
 // ───────── 공개 뷰 (서버 정본 상태에서 공개 가능한 정보만 투영) ─────────
 
+/** 게임 데이터에서 자동 계산한 실제 효과 한 줄 (카드 문구 = 실제 규칙) */
+export interface PublicEffect {
+  text: string;
+  tone: 'good' | 'bad' | 'neutral';
+  /** 관련 사건 이름 등 근거 */
+  detail?: string;
+}
+
 export interface PublicBackgroundTrait {
   id: string;
   kind: 'UNIVERSITY' | 'MAJOR' | 'FAMILY' | 'STRENGTH' | 'WEAKNESS';
   name: string;
   description: string;
+  rare: boolean;
+  effects: PublicEffect[];
 }
 
 export interface PublicCharacterCard {
@@ -100,6 +110,8 @@ export interface PublicCharacterCard {
   debt: number;
   /** 항상 0 — 영구 능력/부정 특성은 시작 시 비어 있다. */
   permanentTraitCount: number;
+  /** 전공·강점·약점의 합격률 보정 합이 가장 큰 직무 (근거 있는 추천) */
+  recommendedJob: { jobId: JobId; label: string; bonusPercent: number };
 }
 
 export interface PublicJobOffer {
@@ -182,12 +194,26 @@ export interface PublicMonthSummary {
   resourceDelta: Resources;
   cashDelta: number;
   debtDelta: number;
+  /** 이달의 이야기: 상황 → 선택 → 판정(요인) → 결과 → 영향 */
   event: {
     title: string;
+    categoryLabel: string;
+    /** 상황 설명 */
+    situation: string;
+    participantName: string | null;
     choiceLabel: string;
     success: boolean | null;
-    resultText: string | null;
+    verdictLabel: '성공' | '실패' | '확정';
+    /** 결과 문장 (콘텐츠 문장이 없으면 판정에 맞는 기본 문장) */
+    resultText: string;
+    /** 판정에 작용한 요인 — 수치 없이 이름과 유불리만 (§22.1) */
+    factors: Array<{ label: string; positive: boolean }>;
+    /** 이 사건으로 생긴 변화 */
+    effects: PublicEffect[];
+    /** NPC 관계 변화 — 방향만 */
+    relationChanges: string[];
     traitChanges: string[];
+    followUpHint: string | null;
   } | null;
 }
 

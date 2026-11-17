@@ -14,14 +14,34 @@
         "id": "rest",
         "label": "평범하게 한 달을 보낸다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "mental", "amount": 3 },
-          { "type": "RESOURCE_DELTA", "key": "health", "amount": 6 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 6
+          }
         ],
         "conditionalEffects": [
           {
             "on": "ALWAYS",
-            "when": { "negativeTraitLevels": { "burnout": { "min": 1 } } },
-            "effects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -5 }]
+            "when": {
+              "negativeTraitLevels": {
+                "burnout": {
+                  "min": 1
+                }
+              }
+            },
+            "effects": [
+              {
+                "type": "RESOURCE_DELTA",
+                "key": "health",
+                "amount": -5
+              }
+            ]
           }
         ],
         "resultText": "조용히 숨을 고르며 한 달을 보냈다."
@@ -38,24 +58,60 @@
     "rarity": "common",
     "weight": 20,
     "tags": ["회식"],
-    "conditions": { "employment": "EMPLOYED" },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
     "choices": [
       {
         "id": "mediate",
         "label": "분위기를 수습한다",
         "outcome": {
           "baseChance": 0.4,
-          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.12 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.12
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_empathy",
+              "bonus": 0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_shy",
+              "bonus": -0.1
+            }
+          ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 },
-            { "type": "NPC_RELATION_DELTA", "target": "BOSS", "stat": "favor", "amount": 3 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 5
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "BOSS",
+              "stat": "favor",
+              "amount": 3
+            }
           ],
           "resultText": "농담 한마디로 공기가 풀렸다. 팀장이 고개를 끄덕인다."
         },
         "onFailure": {
-          "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -5 }],
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -5
+            }
+          ],
           "resultText": "괜히 끼어들었다가 둘 모두에게 눈총을 받았다."
         }
       },
@@ -63,8 +119,16 @@
         "id": "leave_early",
         "label": "조용히 먼저 일어난다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -2 },
-          { "type": "RESOURCE_DELTA", "key": "health", "amount": 2 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 2
+          }
         ],
         "resultText": "집에 일찍 들어와 푹 잤다. 다음 날 분위기는 조금 어색했다."
       }
@@ -79,40 +143,124 @@
     "category": "company",
     "rarity": "uncommon",
     "weight": 6,
-    "conditions": { "employment": "EMPLOYED" },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
     "choices": [
       {
         "id": "negotiate",
         "label": "양쪽을 설득해 절충안을 낸다",
         "outcome": {
           "baseChance": 0.25,
-          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "2": 0.2 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "2": 0.2
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_eloquence",
+              "bonus": 0.05
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_stubborn",
+              "bonus": -0.05
+            }
+          ]
         },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 }] },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 8
+            }
+          ]
+        },
         "onFailure": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -4 },
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -6 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -4
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -6
+            }
           ]
         }
       },
       {
         "id": "side_with_power",
         "label": "힘 있는 쪽 편을 든다",
-        "outcome": { "baseChance": 0.5 },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 4 }] },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -6 }] }
+        "outcome": {
+          "baseChance": 0.5
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -6
+            }
+          ]
+        }
       },
       {
         "id": "backroom_deal",
         "label": "물밑에서 두 임원의 이해관계를 조율한다",
-        "enabledIf": { "skillLevels": { "socialSkill": { "min": 2 } } },
+        "enabledIf": {
+          "skillLevels": {
+            "socialSkill": {
+              "min": 2
+            }
+          }
+        },
         "outcome": {
           "baseChance": 0.55,
-          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "2": 0.2 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "2": 0.2
+              }
+            }
+          ]
         },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 12 }] },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }] }
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 12
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            }
+          ]
+        }
       }
     ]
   },
@@ -128,28 +276,61 @@
     "weight": 8,
     "cooldownMonths": 6,
     "maxOccurrencesPerRun": 2,
-    "conditions": { "employment": "EMPLOYED", "skillAbsent": ["socialSkill"] },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "skillAbsent": ["socialSkill"]
+    },
     "choices": [
       {
         "id": "resolve_conflict",
         "label": "직접 두 사람을 불러 오해를 푼다",
-        "outcome": { "baseChance": 0.4 },
+        "outcome": {
+          "baseChance": 0.4,
+          "modifiers": [
+            {
+              "source": "BACKGROUND",
+              "id": "str_empathy",
+              "bonus": 0.1
+            }
+          ]
+        },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 },
-            { "type": "SKILL_SET_LEVEL", "id": "socialSkill", "from": 0, "to": 1 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 5
+            },
+            {
+              "type": "SKILL_SET_LEVEL",
+              "id": "socialSkill",
+              "from": 0,
+              "to": 1
+            }
           ],
           "resultText": "두 사람이 악수했다. 사람 사이의 공기를 다루는 법을 조금 알 것 같다."
         },
         "onFailure": {
-          "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -5 }],
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -5
+            }
+          ],
           "resultText": "오히려 불똥이 튀었다."
         }
       },
       {
         "id": "stay_out",
         "label": "모른 척한다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -1 }]
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -1
+          }
+        ]
       }
     ]
   },
@@ -165,26 +346,69 @@
     "weight": 6,
     "cooldownMonths": 6,
     "maxOccurrencesPerRun": 2,
-    "conditions": { "employment": "EMPLOYED", "skillLevels": { "socialSkill": { "min": 1, "max": 1 } } },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "skillLevels": {
+        "socialSkill": {
+          "min": 1,
+          "max": 1
+        }
+      }
+    },
     "choices": [
       {
         "id": "mediate",
         "label": "중재 테이블을 직접 꾸린다",
         "outcome": {
           "baseChance": 0.35,
-          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_empathy",
+              "bonus": 0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_stubborn",
+              "bonus": -0.1
+            }
+          ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 },
-            { "type": "SKILL_SET_LEVEL", "id": "socialSkill", "from": 1, "to": 2 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 8
+            },
+            {
+              "type": "SKILL_SET_LEVEL",
+              "id": "socialSkill",
+              "from": 1,
+              "to": 2
+            }
           ],
           "resultText": "통합은 무사히 끝났다. 이제 당신을 찾는 사람이 많아졌다."
         },
         "onFailure": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -6 },
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -2 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -6
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -2
+            }
           ]
         }
       },
@@ -207,61 +431,181 @@
     "weight": 12,
     "highRisk": true,
     "cooldownMonths": 4,
-    "conditions": { "employment": "EMPLOYED" },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
     "choices": [
       {
         "id": "first_response",
         "label": "직접 원인을 추적한다",
-        "visibleIf": { "skillAbsent": ["crisis"] },
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -5 }],
-        "outcome": { "baseChance": 0.4 },
+        "visibleIf": {
+          "skillAbsent": ["crisis"]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -5
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.4,
+          "modifiers": [
+            {
+              "source": "BACKGROUND",
+              "id": "str_prodigy",
+              "bonus": 0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_pressure",
+              "bonus": -0.1
+            }
+          ]
+        },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 },
-            { "type": "SKILL_SET_LEVEL", "id": "crisis", "from": 0, "to": 1 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            },
+            {
+              "type": "SKILL_SET_LEVEL",
+              "id": "crisis",
+              "from": 0,
+              "to": 1
+            }
           ],
           "resultText": "로그 한 줄에서 원인을 찾았다. 손이 떨렸지만 결국 해냈다."
         },
         "onFailure": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -8 },
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -8
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            }
           ]
         }
       },
       {
         "id": "lead_recovery",
         "label": "복구 작전을 지휘한다",
-        "visibleIf": { "skillLevels": { "crisis": { "min": 1, "max": 1 } } },
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -5 }],
+        "visibleIf": {
+          "skillLevels": {
+            "crisis": {
+              "min": 1,
+              "max": 1
+            }
+          }
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -5
+          }
+        ],
         "outcome": {
           "baseChance": 0.35,
-          "modifiers": [{ "source": "SKILL", "id": "crisis", "levels": { "1": 0.1 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_pressure",
+              "bonus": -0.1
+            }
+          ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 10 },
-            { "type": "SKILL_SET_LEVEL", "id": "crisis", "from": 1, "to": 2 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 10
+            },
+            {
+              "type": "SKILL_SET_LEVEL",
+              "id": "crisis",
+              "from": 1,
+              "to": 2
+            }
           ],
           "resultText": "회사 전체 장애를 두 시간 만에 수습했다."
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -6 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -6
+            }
+          ]
+        }
       },
       {
         "id": "routine_fix",
         "label": "매뉴얼대로 침착하게 처리한다",
-        "visibleIf": { "skillLevels": { "crisis": { "min": 2 } } },
+        "visibleIf": {
+          "skillLevels": {
+            "crisis": {
+              "min": 2
+            }
+          }
+        },
         "outcome": {
           "baseChance": 0.6,
-          "modifiers": [{ "source": "SKILL", "id": "crisis", "levels": { "2": 0.25 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "2": 0.25
+              }
+            }
+          ]
         },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 }] },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -3 }] }
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 5
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -3
+            }
+          ]
+        }
       },
       {
         "id": "report_up",
         "label": "상부에 보고하고 기다린다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -2 }]
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -2
+          }
+        ]
       }
     ]
   },
@@ -276,40 +620,122 @@
     "rarity": "rare",
     "weight": 8,
     "cooldownMonths": 6,
-    "conditions": { "employment": "EMPLOYED" },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
     "choices": [
       {
         "id": "dig_in",
         "label": "끝까지 파고든다",
-        "visibleIf": { "skillAbsent": ["observation"] },
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": -5 }],
-        "outcome": { "baseChance": 0.4 },
+        "visibleIf": {
+          "skillAbsent": ["observation"]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -5
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.4,
+          "modifiers": [
+            {
+              "source": "BACKGROUND",
+              "id": "str_logic",
+              "bonus": 0.05
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_detail",
+              "bonus": 0.1
+            }
+          ]
+        },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 },
-            { "type": "SKILL_SET_LEVEL", "id": "observation", "from": 0, "to": 1 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 5
+            },
+            {
+              "type": "SKILL_SET_LEVEL",
+              "id": "observation",
+              "from": 0,
+              "to": 1
+            }
           ],
           "resultText": "작은 입력 오류가 큰 손실로 번지기 직전에 잡아냈다."
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": -5 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "focus",
+              "amount": -5
+            }
+          ]
+        }
       },
       {
         "id": "confirm_pattern",
         "label": "과거 장부까지 대조해 정황을 확증한다",
-        "visibleIf": { "skillLevels": { "observation": { "min": 1, "max": 1 } } },
+        "visibleIf": {
+          "skillLevels": {
+            "observation": {
+              "min": 1,
+              "max": 1
+            }
+          }
+        },
         "outcome": {
           "baseChance": 0.3,
-          "modifiers": [{ "source": "SKILL", "id": "observation", "levels": { "1": 0.1 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_detail",
+              "bonus": 0.1
+            }
+          ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 },
-            { "type": "SKILL_SET_LEVEL", "id": "observation", "from": 1, "to": 2 },
-            { "type": "FLAG_SET", "key": "found_irregularity", "scope": "COMPANY" }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 8
+            },
+            {
+              "type": "SKILL_SET_LEVEL",
+              "id": "observation",
+              "from": 1,
+              "to": 2
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "found_irregularity",
+              "scope": "COMPANY"
+            }
           ],
           "resultText": "반복되는 패턴을 찾아냈다. 이건 단순 실수가 아니다."
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -5 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -5
+            }
+          ]
+        }
       },
       {
         "id": "ignore",
@@ -330,19 +756,65 @@
     "weight": 10,
     "highRisk": true,
     "cooldownMonths": 6,
-    "conditions": { "employment": "EMPLOYED" },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
     "choices": [
       {
         "id": "all_nighter",
         "label": "밤샘으로 혼자 메운다",
-        "visibleIf": { "negativeTraitAbsent": ["burnout"] },
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -10 }],
-        "outcome": { "baseChance": 0.5 },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 }] },
+        "visibleIf": {
+          "negativeTraitAbsent": ["burnout"]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -10
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "BACKGROUND",
+              "id": "str_stamina",
+              "bonus": 0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_pressure",
+              "bonus": -0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_frail",
+              "bonus": -0.1
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 8
+            }
+          ]
+        },
         "onFailure": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -10 },
-            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "burnout", "from": 0, "to": 1 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -10
+            },
+            {
+              "type": "NEGATIVE_TRAIT_SET_LEVEL",
+              "id": "burnout",
+              "from": 0,
+              "to": 1
+            }
           ],
           "resultText": "결국 마감은 놓쳤고, 몸과 마음이 텅 빈 느낌이다."
         }
@@ -350,14 +822,46 @@
       {
         "id": "all_nighter_again",
         "label": "이번에도 밤샘으로 버틴다",
-        "visibleIf": { "negativeTraitLevels": { "burnout": { "min": 1, "max": 1 } } },
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -10 }],
-        "outcome": { "baseChance": 0.45 },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 }] },
+        "visibleIf": {
+          "negativeTraitLevels": {
+            "burnout": {
+              "min": 1,
+              "max": 1
+            }
+          }
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -10
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.45
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            }
+          ]
+        },
         "onFailure": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -10 },
-            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "burnout", "from": 1, "to": 2 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -10
+            },
+            {
+              "type": "NEGATIVE_TRAIT_SET_LEVEL",
+              "id": "burnout",
+              "from": 1,
+              "to": 2
+            }
           ],
           "resultText": "아침에 일어나는 것조차 버거워졌다."
         }
@@ -365,24 +869,85 @@
       {
         "id": "push_through",
         "label": "지친 몸을 끌고 버틴다",
-        "visibleIf": { "negativeTraitLevels": { "burnout": { "min": 2 } } },
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -10 }],
+        "visibleIf": {
+          "negativeTraitLevels": {
+            "burnout": {
+              "min": 2
+            }
+          }
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -10
+          }
+        ],
         "outcome": {
           "baseChance": 0.45,
-          "modifiers": [{ "source": "NEGATIVE_TRAIT", "id": "burnout", "levels": { "2": -0.1 } }]
+          "modifiers": [
+            {
+              "source": "NEGATIVE_TRAIT",
+              "id": "burnout",
+              "levels": {
+                "2": -0.1
+              }
+            }
+          ]
         },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 }] },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -8 }] }
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -8
+            }
+          ]
+        }
       },
       {
         "id": "ask_help",
         "label": "팀에 도움을 요청하고 일정을 조정한다",
         "outcome": {
           "baseChance": 0.6,
-          "modifiers": [{ "source": "SKILL", "id": "crisis", "levels": { "1": 0.05, "2": 0.1 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.05,
+                "2": 0.1
+              }
+            }
+          ]
         },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 2 }] },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -4 }] }
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 2
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -4
+            }
+          ]
+        }
       }
     ]
   },
@@ -397,44 +962,120 @@
     "rarity": "uncommon",
     "weight": 12,
     "cooldownMonths": 4,
-    "conditions": { "negativeTraitLevels": { "burnout": { "min": 1 } } },
+    "conditions": {
+      "negativeTraitLevels": {
+        "burnout": {
+          "min": 1
+        }
+      }
+    },
     "choices": [
       {
         "id": "paid_leave_reset",
         "label": "유급 휴가를 내고 재정비한다",
-        "visibleIf": { "negativeTraitLevels": { "burnout": { "min": 2, "max": 2 } } },
-        "guaranteedEffects": [{ "type": "CASH_DELTA", "amount": -300000 }],
-        "outcome": { "baseChance": 0.6 },
+        "visibleIf": {
+          "negativeTraitLevels": {
+            "burnout": {
+              "min": 2,
+              "max": 2
+            }
+          }
+        },
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -300000
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.6
+        },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": 10 },
-            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "burnout", "from": 2, "to": 1 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": 10
+            },
+            {
+              "type": "NEGATIVE_TRAIT_SET_LEVEL",
+              "id": "burnout",
+              "from": 2,
+              "to": 1
+            }
           ],
           "resultText": "오랜만에 아무 생각 없이 바다를 봤다. 조금 숨이 쉬어진다."
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": 3 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": 3
+            }
+          ]
+        }
       },
       {
         "id": "rebuild_rhythm",
         "label": "생활 리듬을 다시 세운다",
-        "visibleIf": { "negativeTraitLevels": { "burnout": { "min": 1, "max": 1 } } },
+        "visibleIf": {
+          "negativeTraitLevels": {
+            "burnout": {
+              "min": 1,
+              "max": 1
+            }
+          }
+        },
         "outcome": {
           "baseChance": 0.5,
-          "modifiers": [{ "source": "RESOURCE", "key": "health", "range": { "min": 60 }, "bonus": 0.1 }]
+          "modifiers": [
+            {
+              "source": "RESOURCE",
+              "key": "health",
+              "range": {
+                "min": 60
+              },
+              "bonus": 0.1
+            }
+          ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": 8 },
-            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "burnout", "from": 1, "to": 0 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": 8
+            },
+            {
+              "type": "NEGATIVE_TRAIT_SET_LEVEL",
+              "id": "burnout",
+              "from": 1,
+              "to": 0
+            }
           ],
           "resultText": "일찍 자고 일찍 일어나는 한 달. 예전의 리듬이 돌아왔다."
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": 2 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": 2
+            }
+          ]
+        }
       },
       {
         "id": "endure",
         "label": "그냥 버틴다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -3 }]
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -3
+          }
+        ]
       }
     ]
   },
@@ -452,34 +1093,98 @@
     "cooldownMonths": 6,
     "conditions": {
       "employment": "EMPLOYED",
-      "npc": { "role": "BOSS", "personalityAny": ["AUTHORITARIAN", "CREDIT_STEALER", "BLAME_SHIFTER"] }
+      "npc": {
+        "role": "BOSS",
+        "personalityAny": ["AUTHORITARIAN", "CREDIT_STEALER", "BLAME_SHIFTER"]
+      }
     },
-    "npcWeightModifiers": [{ "role": "BOSS", "personalityAny": ["AUTHORITARIAN"], "add": 10 }],
+    "npcWeightModifiers": [
+      {
+        "role": "BOSS",
+        "personalityAny": ["AUTHORITARIAN"],
+        "add": 10
+      }
+    ],
     "choices": [
       {
         "id": "confront",
         "label": "근거를 들어 정면으로 반박한다",
-        "visibleIf": { "negativeTraitAbsent": ["officeStigma"] },
+        "visibleIf": {
+          "negativeTraitAbsent": ["officeStigma"]
+        },
         "outcome": {
           "baseChance": 0.4,
           "modifiers": [
-            { "source": "SKILL", "id": "socialSkill", "levels": { "2": 0.2 } },
-            { "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } },
-            { "source": "NPC", "relation": { "trust": { "min": 60 } }, "bonus": 0.1 }
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "2": 0.2
+              }
+            },
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "NPC",
+              "relation": {
+                "trust": {
+                  "min": 60
+                }
+              },
+              "bonus": 0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_pressure",
+              "bonus": -0.1
+            }
           ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 },
-            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "trust", "amount": 5 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "trust",
+              "amount": 5
+            }
           ]
         },
         "onFailure": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -6 },
-            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "favor", "amount": -10 },
-            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "officeStigma", "from": 0, "to": 1 },
-            { "type": "FLAG_SET", "key": "blamed_by_boss", "scope": "NPC" }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -6
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "favor",
+              "amount": -10
+            },
+            {
+              "type": "NEGATIVE_TRAIT_SET_LEVEL",
+              "id": "officeStigma",
+              "from": 0,
+              "to": 1
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "blamed_by_boss",
+              "scope": "NPC"
+            }
           ],
           "resultText": "반박은 변명으로 받아들여졌다. 사내에 이상한 소문이 돌기 시작했다."
         }
@@ -487,19 +1192,56 @@
       {
         "id": "confront_again",
         "label": "이번에는 물러서지 않는다",
-        "visibleIf": { "negativeTraitLevels": { "officeStigma": { "min": 1, "max": 1 } } },
+        "visibleIf": {
+          "negativeTraitLevels": {
+            "officeStigma": {
+              "min": 1,
+              "max": 1
+            }
+          }
+        },
         "outcome": {
           "baseChance": 0.35,
           "modifiers": [
-            { "source": "SKILL", "id": "socialSkill", "levels": { "2": 0.2 } },
-            { "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } }
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "2": 0.2
+              }
+            },
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
           ]
         },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 4 }] },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            }
+          ]
+        },
         "onFailure": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -6 },
-            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "officeStigma", "from": 1, "to": 2 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -6
+            },
+            {
+              "type": "NEGATIVE_TRAIT_SET_LEVEL",
+              "id": "officeStigma",
+              "from": 1,
+              "to": 2
+            }
           ]
         }
       },
@@ -507,8 +1249,17 @@
         "id": "accept",
         "label": "일단 참고 넘어간다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "mental", "amount": -6 },
-          { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "favor", "amount": 3 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": 3
+          }
         ]
       }
     ]
@@ -524,44 +1275,123 @@
     "rarity": "uncommon",
     "weight": 12,
     "cooldownMonths": 4,
-    "conditions": { "employment": "EMPLOYED", "negativeTraitLevels": { "officeStigma": { "min": 1 } } },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "negativeTraitLevels": {
+        "officeStigma": {
+          "min": 1
+        }
+      }
+    },
     "choices": [
       {
         "id": "present_evidence",
         "label": "증거를 모아 진상 규명을 요청한다",
-        "visibleIf": { "negativeTraitLevels": { "officeStigma": { "min": 2, "max": 2 } } },
+        "visibleIf": {
+          "negativeTraitLevels": {
+            "officeStigma": {
+              "min": 2,
+              "max": 2
+            }
+          }
+        },
         "outcome": {
           "baseChance": 0.5,
-          "modifiers": [{ "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 },
-            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "officeStigma", "from": 2, "to": 1 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            },
+            {
+              "type": "NEGATIVE_TRAIT_SET_LEVEL",
+              "id": "officeStigma",
+              "from": 2,
+              "to": 1
+            }
           ]
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -4 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -4
+            }
+          ]
+        }
       },
       {
         "id": "official_restoration",
         "label": "공식 석상에서 명예를 회복한다",
-        "visibleIf": { "negativeTraitLevels": { "officeStigma": { "min": 1, "max": 1 } } },
+        "visibleIf": {
+          "negativeTraitLevels": {
+            "officeStigma": {
+              "min": 1,
+              "max": 1
+            }
+          }
+        },
         "outcome": {
           "baseChance": 0.45,
-          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.15 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 },
-            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "officeStigma", "from": 1, "to": 0 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 8
+            },
+            {
+              "type": "NEGATIVE_TRAIT_SET_LEVEL",
+              "id": "officeStigma",
+              "from": 1,
+              "to": 0
+            }
           ]
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -4 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -4
+            }
+          ]
+        }
       },
       {
         "id": "wait",
         "label": "시간이 해결해 주길 기다린다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -2 }]
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          }
+        ]
       }
     ]
   },
@@ -576,31 +1406,77 @@
     "weight": 12,
     "conditions": {
       "employment": "EMPLOYED",
-      "npc": { "role": "BOSS", "personalityAny": ["MENTOR", "SUPPORTIVE", "FAIR"] }
+      "npc": {
+        "role": "BOSS",
+        "personalityAny": ["MENTOR", "SUPPORTIVE", "FAIR"]
+      }
     },
-    "npcWeightModifiers": [{ "role": "BOSS", "personalityAny": ["MENTOR"], "add": 10 }],
+    "npcWeightModifiers": [
+      {
+        "role": "BOSS",
+        "personalityAny": ["MENTOR"],
+        "add": 10
+      }
+    ],
     "choices": [
       {
         "id": "accept_feedback",
         "label": "피드백을 받아들이고 고친다",
         "outcome": {
           "baseChance": 0.7,
-          "modifiers": [{ "source": "NPC", "personalityAny": ["MENTOR"], "bonus": 0.1 }]
+          "modifiers": [
+            {
+              "source": "NPC",
+              "personalityAny": ["MENTOR"],
+              "bonus": 0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_charm",
+              "bonus": 0.05
+            }
+          ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "focus", "amount": 5 },
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 3 },
-            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "trust", "amount": 5 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "focus",
+              "amount": 5
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 3
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "trust",
+              "amount": 5
+            }
           ]
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -3 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -3
+            }
+          ]
+        }
       },
       {
         "id": "politely_decline",
         "label": "바쁘다며 정중히 사양한다",
         "guaranteedEffects": [
-          { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "favor", "amount": -3 }
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": -3
+          }
         ]
       }
     ]
@@ -614,47 +1490,109 @@
     "category": "social",
     "rarity": "common",
     "weight": 14,
-    "conditions": { "employment": "EMPLOYED", "npc": { "role": "PEER" } },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "npc": {
+        "role": "PEER"
+      }
+    },
     "choices": [
       {
         "id": "help",
         "label": "내 일을 미루고 돕는다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -3 }],
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -3
+          }
+        ],
         "outcome": {
           "baseChance": 0.7,
           "modifiers": [
-            { "source": "NPC", "personalityAny": ["FREE_RIDER"], "bonus": -0.2, "label": "무임승차" }
+            {
+              "source": "NPC",
+              "personalityAny": ["FREE_RIDER"],
+              "bonus": -0.2,
+              "label": "무임승차"
+            }
           ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "trust", "amount": 8 },
-            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "favor", "amount": 5 },
-            { "type": "FLAG_SET", "key": "helped_peer", "scope": "NPC" }
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "trust",
+              "amount": 8
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "favor",
+              "amount": 5
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "helped_peer",
+              "scope": "NPC"
+            }
           ]
         },
         "onFailure": {
           "effects": [
-            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "favor", "amount": 2 },
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -3 }
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "favor",
+              "amount": 2
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -3
+            }
           ]
         }
       },
       {
         "id": "swap_tasks",
         "label": "서로의 업무를 맞바꿔 함께 끝낸다",
-        "enabledIf": { "npc": { "role": "PEER", "relation": { "trust": { "min": 70 } } } },
+        "enabledIf": {
+          "npc": {
+            "role": "PEER",
+            "relation": {
+              "trust": {
+                "min": 70
+              }
+            }
+          }
+        },
         "requirementHint": "신뢰가 두터운 동료일 때 가능",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "focus", "amount": 3 },
-          { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "trust", "amount": 3 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": 3
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "trust",
+            "amount": 3
+          }
         ]
       },
       {
         "id": "refuse",
         "label": "미안하지만 거절한다",
         "guaranteedEffects": [
-          { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "favor", "amount": -5 }
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": -5
+          }
         ]
       }
     ]
@@ -670,9 +1608,18 @@
     "weight": 10,
     "conditions": {
       "employment": "EMPLOYED",
-      "npc": { "role": "PEER", "personalityAny": ["COMPETITIVE", "FREE_RIDER", "GOSSIPER"] }
+      "npc": {
+        "role": "PEER",
+        "personalityAny": ["COMPETITIVE", "FREE_RIDER", "GOSSIPER"]
+      }
     },
-    "npcWeightModifiers": [{ "role": "PEER", "personalityAny": ["COMPETITIVE"], "add": 6 }],
+    "npcWeightModifiers": [
+      {
+        "role": "PEER",
+        "personalityAny": ["COMPETITIVE"],
+        "add": 6
+      }
+    ],
     "choices": [
       {
         "id": "defend",
@@ -680,27 +1627,77 @@
         "outcome": {
           "baseChance": 0.45,
           "modifiers": [
-            { "source": "SKILL", "id": "crisis", "levels": { "1": 0.1, "2": 0.12 } },
-            { "source": "NPC", "relation": { "rivalry": { "min": 70 } }, "bonus": -0.1, "label": "강한 견제" }
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.12
+              }
+            },
+            {
+              "source": "NPC",
+              "relation": {
+                "rivalry": {
+                  "min": 70
+                }
+              },
+              "bonus": -0.1,
+              "label": "강한 견제"
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_eloquence",
+              "bonus": 0.1
+            }
           ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 4 },
-            { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "rivalry", "amount": 5 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "rivalry",
+              "amount": 5
+            }
           ]
         },
         "onFailure": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -4 },
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -10 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -4
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -10
+            }
           ]
         },
         "conditionalEffects": [
           {
             "on": "FAILURE",
-            "when": { "skillLevels": { "crisis": { "min": 1 } } },
-            "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": 5 }]
+            "when": {
+              "skillLevels": {
+                "crisis": {
+                  "min": 1
+                }
+              }
+            },
+            "effects": [
+              {
+                "type": "RESOURCE_DELTA",
+                "key": "mental",
+                "amount": 5
+              }
+            ]
           }
         ]
       },
@@ -708,8 +1705,17 @@
         "id": "let_it_go",
         "label": "말다툼하지 않고 넘어간다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "mental", "amount": -4 },
-          { "type": "NPC_RELATION_DELTA", "target": "PARTICIPANT", "stat": "rivalry", "amount": -5 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "rivalry",
+            "amount": -5
+          }
         ]
       }
     ]
@@ -724,30 +1730,55 @@
     "rarity": "common",
     "weight": 10,
     "tags": ["recovery"],
-    "conditions": { "employment": "EMPLOYED" },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
     "choices": [
       {
         "id": "sleep",
         "label": "이틀 내내 푹 잔다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "health", "amount": 8 },
-          { "type": "RESOURCE_DELTA", "key": "mental", "amount": 3 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 3
+          }
         ]
       },
       {
         "id": "meet_friends",
         "label": "오랜 친구들을 만난다",
         "guaranteedEffects": [
-          { "type": "CASH_DELTA", "amount": -100000 },
-          { "type": "RESOURCE_DELTA", "key": "mental", "amount": 8 }
+          {
+            "type": "CASH_DELTA",
+            "amount": -100000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 8
+          }
         ]
       },
       {
         "id": "study",
         "label": "업무 공부를 해 둔다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "focus", "amount": 6 },
-          { "type": "RESOURCE_DELTA", "key": "mental", "amount": -2 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": 6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          }
         ]
       }
     ]
@@ -763,27 +1794,56 @@
     "weight": 15,
     "tags": ["recovery"],
     "cooldownMonths": 2,
-    "conditions": { "employment": "EMPLOYED", "resources": { "focus": { "max": 30 } } },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "resources": {
+        "focus": {
+          "max": 30
+        }
+      }
+    },
     "choices": [
       {
         "id": "take_leave",
         "label": "연차를 내고 머리를 식힌다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "focus", "amount": 12 },
-          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -1 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": 12
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -1
+          }
         ]
       },
       {
         "id": "checklist",
         "label": "체크리스트를 만들어 하나씩 확인한다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": 6 }]
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": 6
+          }
+        ]
       },
       {
         "id": "coffee",
         "label": "커피 세 잔으로 버틴다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "focus", "amount": 3 },
-          { "type": "RESOURCE_DELTA", "key": "health", "amount": -3 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": 3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -3
+          }
         ]
       }
     ]
@@ -799,22 +1859,67 @@
     "weight": 12,
     "tags": ["recovery"],
     "cooldownMonths": 2,
-    "conditions": { "employment": "EMPLOYED", "resources": { "reputation": { "max": 30 } } },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "resources": {
+        "reputation": {
+          "max": 30
+        }
+      }
+    },
     "choices": [
       {
         "id": "volunteer",
         "label": "아무도 맡지 않으려는 일을 자원한다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "health", "amount": -4 }],
-        "outcome": { "baseChance": 0.65 },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 10 }] },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 3 }] }
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -4
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.65,
+          "modifiers": [
+            {
+              "source": "BACKGROUND",
+              "id": "str_charm",
+              "bonus": 0.1
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 10
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 3
+            }
+          ]
+        }
       },
       {
         "id": "small_talk",
         "label": "점심을 돌리며 관계를 다진다",
         "guaranteedEffects": [
-          { "type": "CASH_DELTA", "amount": -150000 },
-          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 }
+          {
+            "type": "CASH_DELTA",
+            "amount": -150000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 5
+          }
         ]
       }
     ]
@@ -831,24 +1936,49 @@
     "cooldownMonths": 24,
     "conditions": {
       "employment": "EMPLOYED",
-      "tenureMonths": { "min": 12 },
-      "flagsNone": [{ "key": "layoff_rumor", "scope": "COMPANY" }]
+      "tenureMonths": {
+        "min": 12
+      },
+      "flagsNone": [
+        {
+          "key": "layoff_rumor",
+          "scope": "COMPANY"
+        }
+      ]
     },
     "choices": [
       {
         "id": "prepare",
         "label": "성과 자료를 미리 정리해 둔다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -3 },
-          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 3 },
-          { "type": "FLAG_SET", "key": "layoff_rumor", "scope": "COMPANY", "expiresInMonths": 6 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 3
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "layoff_rumor",
+            "scope": "COMPANY",
+            "expiresInMonths": 6
+          }
         ]
       },
       {
         "id": "ignore",
         "label": "소문일 뿐이라며 넘긴다",
         "guaranteedEffects": [
-          { "type": "FLAG_SET", "key": "layoff_rumor", "scope": "COMPANY", "expiresInMonths": 6 }
+          {
+            "type": "FLAG_SET",
+            "key": "layoff_rumor",
+            "scope": "COMPANY",
+            "expiresInMonths": 6
+          }
         ]
       }
     ]
@@ -866,7 +1996,12 @@
     "maxOccurrencesPerRun": 2,
     "conditions": {
       "employment": "EMPLOYED",
-      "flagsAll": [{ "key": "layoff_rumor", "scope": "COMPANY" }]
+      "flagsAll": [
+        {
+          "key": "layoff_rumor",
+          "scope": "COMPANY"
+        }
+      ]
     },
     "choices": [
       {
@@ -875,19 +2010,52 @@
         "outcome": {
           "baseChance": 0.7,
           "modifiers": [
-            { "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.15 } },
-            { "source": "RESOURCE", "key": "reputation", "range": { "min": 60 }, "bonus": 0.15 }
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "RESOURCE",
+              "key": "reputation",
+              "range": {
+                "min": 60
+              },
+              "bonus": 0.15
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_pressure",
+              "bonus": -0.1
+            }
           ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 },
-            { "type": "FLAG_CLEAR", "key": "layoff_rumor", "scope": "COMPANY" }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 5
+            },
+            {
+              "type": "FLAG_CLEAR",
+              "key": "layoff_rumor",
+              "scope": "COMPANY"
+            }
           ],
           "resultText": "면담관이 고개를 끄덕였다. 이번 명단에서는 빠졌다."
         },
         "onFailure": {
-          "effects": [{ "type": "EMPLOYMENT_CHANGE", "status": "UNEMPLOYED", "reason": "RESTRUCTURING" }],
+          "effects": [
+            {
+              "type": "EMPLOYMENT_CHANGE",
+              "status": "UNEMPLOYED",
+              "reason": "RESTRUCTURING"
+            }
+          ],
           "resultText": "면담은 10분 만에 끝났다."
         }
       },
@@ -895,9 +2063,21 @@
         "id": "accept_transfer",
         "label": "한직 발령을 받아들이고 버틴다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -8 },
-          { "type": "RESOURCE_DELTA", "key": "mental", "amount": -6 },
-          { "type": "FLAG_CLEAR", "key": "layoff_rumor", "scope": "COMPANY" }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          },
+          {
+            "type": "FLAG_CLEAR",
+            "key": "layoff_rumor",
+            "scope": "COMPANY"
+          }
         ],
         "resultText": "창가 끝자리로 옮겼다. 그래도 아직 회사원이다."
       }
@@ -914,43 +2094,110 @@
     "weight": 14,
     "cooldownMonths": 6,
     "tags": ["job"],
-    "conditions": { "employment": "EMPLOYED", "jobs": ["DEV"] },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "jobs": ["DEV"]
+    },
     "choices": [
       {
         "id": "proper_fix",
         "label": "원인을 끝까지 찾아 제대로 고친다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -8 },
-          { "type": "RESOURCE_DELTA", "key": "health", "amount": -3 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -3
+          }
         ],
         "outcome": {
           "baseChance": 0.6,
           "modifiers": [
-            { "source": "SKILL", "id": "crisis", "levels": { "1": 0.1, "2": 0.15 } },
-            { "source": "SKILL", "id": "observation", "levels": { "1": 0.05, "2": 0.1 } }
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.05,
+                "2": 0.1
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_logic",
+              "bonus": 0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_prodigy",
+              "bonus": 0.15
+            }
           ]
         },
         "onSuccess": {
-          "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 }],
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            }
+          ],
           "resultText": "근본 원인을 찾아 고쳤다. 다시는 같은 문제로 깨지지 않을 것이다."
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -4 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -4
+            }
+          ]
+        }
       },
       {
         "id": "quick_patch",
         "label": "임시 패치로 일단 막는다",
         "description": "당장은 조용해지겠지만…",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -2 },
-          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 2 },
-          { "type": "SCHEDULE_EVENT", "eventId": "evt_tech_debt_return", "delayMonths": 4 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_tech_debt_return",
+            "delayMonths": 4
+          }
         ],
         "resultText": "급한 불은 껐다. 주석에 'TODO: 나중에 고치기'를 남겼다."
       },
       {
         "id": "rollback",
         "label": "이전 버전으로 롤백한다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }]
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -3
+          }
+        ]
       }
     ]
   },
@@ -965,28 +2212,82 @@
     "rarity": "uncommon",
     "weight": 1,
     "highRisk": true,
-    "conditions": { "employment": "EMPLOYED" },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
     "choices": [
       {
         "id": "all_night",
         "label": "밤을 새워 제대로 갈아엎는다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "health", "amount": -8 },
-          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -10 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -10
+          }
         ],
         "outcome": {
           "baseChance": 0.5,
-          "modifiers": [{ "source": "SKILL", "id": "crisis", "levels": { "1": 0.1, "2": 0.2 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.2
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_stamina",
+              "bonus": 0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_frail",
+              "bonus": -0.1
+            }
+          ]
         },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 4 }] },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -8 }] }
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -8
+            }
+          ]
+        }
       },
       {
         "id": "confess",
         "label": "임시 패치였다고 솔직히 보고한다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -6 },
-          { "type": "NPC_RELATION_DELTA", "target": "BOSS", "stat": "trust", "amount": 3 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -6
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "BOSS",
+            "stat": "trust",
+            "amount": 3
+          }
         ],
         "resultText": "한숨 소리가 들렸지만, 팀장은 솔직하게 말해 줘서 고맙다고 했다."
       }
@@ -1003,32 +2304,90 @@
     "weight": 14,
     "cooldownMonths": 6,
     "tags": ["job"],
-    "conditions": { "employment": "EMPLOYED", "jobs": ["HR"] },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "jobs": ["HR"]
+    },
     "choices": [
       {
         "id": "thorough",
         "label": "지원자 한 명 한 명 꼼꼼히 평가한다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": -7 }],
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -7
+          }
+        ],
         "outcome": {
           "baseChance": 0.65,
           "modifiers": [
-            { "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } },
-            { "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.05, "2": 0.1 } }
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.05,
+                "2": 0.1
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_empathy",
+              "bonus": 0.1
+            }
           ]
         },
         "onSuccess": {
-          "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 }],
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 5
+            }
+          ],
           "resultText": "당신이 뽑은 신입이 첫 달부터 일을 잘한다는 소문이 돈다."
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            }
+          ]
+        }
       },
       {
         "id": "skim",
         "label": "첫인상과 분위기로 빠르게 판단한다",
-        "outcome": { "baseChance": 0.4 },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 1 }] },
+        "outcome": {
+          "baseChance": 0.4
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 1
+            }
+          ]
+        },
         "onFailure": {
-          "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -8 }],
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -8
+            }
+          ],
           "resultText": "당신이 강력 추천한 신입이 사흘 만에 퇴사했다."
         }
       }
@@ -1046,47 +2405,132 @@
     "cooldownMonths": 6,
     "highRisk": true,
     "tags": ["job"],
-    "conditions": { "employment": "EMPLOYED", "jobs": ["SALES"] },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "jobs": ["SALES"]
+    },
     "choices": [
       {
         "id": "entertain",
         "label": "접대 자리를 마련한다",
         "guaranteedEffects": [
-          { "type": "CASH_DELTA", "amount": -400000 },
-          { "type": "RESOURCE_DELTA", "key": "health", "amount": -5 }
+          {
+            "type": "CASH_DELTA",
+            "amount": -400000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -5
+          }
         ],
         "outcome": {
           "baseChance": 0.6,
-          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.15 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_eloquence",
+              "bonus": 0.05
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_shy",
+              "bonus": -0.1
+            }
+          ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 },
-            { "type": "CASH_DELTA", "amount": 600000 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 8
+            },
+            {
+              "type": "CASH_DELTA",
+              "amount": 600000
+            }
           ],
           "resultText": "3차 노래방에서 계약서에 사인을 받았다. 성과급이 나왔다."
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -5 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -5
+            }
+          ]
+        }
       },
       {
         "id": "honest_pitch",
         "label": "정직한 숫자로 정면 승부한다",
         "outcome": {
           "baseChance": 0.45,
-          "modifiers": [{ "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_eloquence",
+              "bonus": 0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_pressure",
+              "bonus": -0.1
+            }
+          ]
         },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 10 }] },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 10
+            }
+          ]
+        },
         "onFailure": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -6 },
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -4 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -6
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -4
+            }
           ]
         }
       },
       {
         "id": "pass",
         "label": "선배에게 넘긴다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }]
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -3
+          }
+        ]
       }
     ]
   },
@@ -1101,26 +2545,86 @@
     "weight": 14,
     "cooldownMonths": 6,
     "tags": ["job"],
-    "conditions": { "employment": "EMPLOYED", "jobs": ["FINANCE"] },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "jobs": ["FINANCE"]
+    },
     "choices": [
       {
         "id": "recheck_all",
         "label": "전표를 처음부터 다시 맞춰 본다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": -10 }],
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -10
+          }
+        ],
         "outcome": {
           "baseChance": 0.7,
-          "modifiers": [{ "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_logic",
+              "bonus": 0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_detail",
+              "bonus": 0.1
+            }
+          ]
         },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 }] },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -4 }] }
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -4
+            }
+          ]
+        }
       },
       {
         "id": "adjust_quietly",
         "label": "차액을 조용히 맞춰 넣는다",
-        "outcome": { "baseChance": 0.5 },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 1 }] },
+        "outcome": {
+          "baseChance": 0.5
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 1
+            }
+          ]
+        },
         "onFailure": {
-          "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -10 }],
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -10
+            }
+          ],
           "resultText": "감사팀이 그 한 줄을 찾아냈다."
         }
       },
@@ -1128,8 +2632,17 @@
         "id": "report",
         "label": "팀장에게 바로 보고한다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -2 },
-          { "type": "NPC_RELATION_DELTA", "target": "BOSS", "stat": "trust", "amount": 3 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -2
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "BOSS",
+            "stat": "trust",
+            "amount": 3
+          }
         ]
       }
     ]
@@ -1145,39 +2658,111 @@
     "weight": 14,
     "cooldownMonths": 6,
     "tags": ["job"],
-    "conditions": { "employment": "EMPLOYED", "jobs": ["PLANNING"] },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "jobs": ["PLANNING"]
+    },
     "choices": [
       {
         "id": "solid_data",
         "label": "밤새 근거 자료를 탄탄히 채운다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": -6 }],
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -6
+          }
+        ],
         "outcome": {
           "baseChance": 0.55,
-          "modifiers": [{ "source": "SKILL", "id": "observation", "levels": { "1": 0.1, "2": 0.15 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_creative",
+              "bonus": 0.1
+            }
+          ]
         },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 8 }] },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }] }
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 8
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            }
+          ]
+        }
       },
       {
         "id": "inflate",
         "label": "숫자를 조금 부풀려 화려하게 발표한다",
         "description": "박수는 확실하다. 그 다음은…",
-        "outcome": { "baseChance": 0.7 },
+        "outcome": {
+          "baseChance": 0.7,
+          "modifiers": [
+            {
+              "source": "BACKGROUND",
+              "id": "str_creative",
+              "bonus": 0.05
+            }
+          ]
+        },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 10 },
-            { "type": "SCHEDULE_EVENT", "eventId": "evt_numbers_audit", "delayMonths": 3 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 10
+            },
+            {
+              "type": "SCHEDULE_EVENT",
+              "eventId": "evt_numbers_audit",
+              "delayMonths": 3
+            }
           ],
           "resultText": "임원들이 박수를 쳤다. 숫자를 다시 보는 사람은 없었다. 아직은."
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -5 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -5
+            }
+          ]
+        }
       },
       {
         "id": "modest",
         "label": "있는 자료로 무난하게 발표한다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 1 },
-          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -2 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 1
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -2
+          }
         ]
       }
     ]
@@ -1193,25 +2778,58 @@
     "rarity": "uncommon",
     "weight": 1,
     "highRisk": true,
-    "conditions": { "employment": "EMPLOYED" },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
     "choices": [
       {
         "id": "own_up",
         "label": "과장이 있었다고 먼저 인정한다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -8 }]
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -8
+          }
+        ]
       },
       {
         "id": "defend",
         "label": "해석의 차이라고 끝까지 방어한다",
         "outcome": {
           "baseChance": 0.4,
-          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.2 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.2
+              }
+            }
+          ]
         },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 2 }] },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 2
+            }
+          ]
+        },
         "onFailure": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -15 },
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": -6 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -15
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -6
+            }
           ],
           "resultText": "감사 보고서 첫 장에 당신의 슬라이드가 실렸다."
         }
@@ -1227,23 +2845,56 @@
     "category": "daily",
     "rarity": "common",
     "weight": 12,
-    "conditions": { "employment": "EMPLOYED" },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
     "choices": [
       {
         "id": "endure",
         "label": "끝까지 다 들어간다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -6 },
-          { "type": "RESOURCE_DELTA", "key": "mental", "amount": -2 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          }
         ]
       },
       {
         "id": "skip_one",
         "label": "하나쯤은 빠지고 내 일을 한다",
-        "outcome": { "baseChance": 0.6 },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "focus", "amount": 3 }] },
+        "outcome": {
+          "baseChance": 0.6,
+          "modifiers": [
+            {
+              "source": "BACKGROUND",
+              "id": "wk_morning",
+              "bonus": -0.1
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "focus",
+              "amount": 3
+            }
+          ]
+        },
         "onFailure": {
-          "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -5 }],
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -5
+            }
+          ],
           "resultText": "하필 그 회의에서 내 업무가 다른 사람에게 넘어갔다."
         }
       }
@@ -1258,24 +2909,69 @@
     "category": "social",
     "rarity": "common",
     "weight": 10,
-    "conditions": { "employment": "EMPLOYED" },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
     "choices": [
       {
         "id": "confront",
         "label": "누가 그런 말을 했는지 직접 묻는다",
         "outcome": {
           "baseChance": 0.5,
-          "modifiers": [{ "source": "SKILL", "id": "socialSkill", "levels": { "1": 0.1, "2": 0.15 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "str_eloquence",
+              "bonus": 0.1
+            },
+            {
+              "source": "BACKGROUND",
+              "id": "wk_shy",
+              "bonus": -0.1
+            }
+          ]
         },
-        "onSuccess": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": 3 }] },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -6 }] }
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 3
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -6
+            }
+          ]
+        }
       },
       {
         "id": "ignore",
         "label": "못 들은 척한다",
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 },
-          { "type": "RESOURCE_DELTA", "key": "mental", "amount": -2 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          }
         ]
       }
     ]
@@ -1292,44 +2988,125 @@
     "weight": 10,
     "cooldownMonths": 6,
     "tags": ["recovery"],
-    "conditions": { "negativeTraitLevels": { "burnout": { "min": 1 } } },
+    "conditions": {
+      "negativeTraitLevels": {
+        "burnout": {
+          "min": 1
+        }
+      }
+    },
     "choices": [
       {
         "id": "commit_hobby",
         "label": "주말마다 꾸준히 다녀 본다",
-        "visibleIf": { "negativeTraitLevels": { "burnout": { "min": 1, "max": 1 } } },
-        "guaranteedEffects": [{ "type": "CASH_DELTA", "amount": -200000 }],
+        "visibleIf": {
+          "negativeTraitLevels": {
+            "burnout": {
+              "min": 1,
+              "max": 1
+            }
+          }
+        },
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -200000
+          }
+        ],
         "outcome": {
           "baseChance": 0.55,
-          "modifiers": [{ "source": "RESOURCE", "key": "mental", "range": { "min": 40 }, "bonus": 0.1 }]
+          "modifiers": [
+            {
+              "source": "RESOURCE",
+              "key": "mental",
+              "range": {
+                "min": 40
+              },
+              "bonus": 0.1
+            }
+          ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": 6 },
-            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "burnout", "from": 1, "to": 0 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": 6
+            },
+            {
+              "type": "NEGATIVE_TRAIT_SET_LEVEL",
+              "id": "burnout",
+              "from": 1,
+              "to": 0
+            }
           ],
           "resultText": "일 말고도 내가 잘하는 게 있다는 걸 알았다. 월요일이 조금 덜 무섭다."
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": 2 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": 2
+            }
+          ]
+        }
       },
       {
         "id": "retreat",
         "label": "2박 3일 템플스테이를 다녀온다",
-        "visibleIf": { "negativeTraitLevels": { "burnout": { "min": 2, "max": 2 } } },
-        "guaranteedEffects": [{ "type": "CASH_DELTA", "amount": -500000 }],
-        "outcome": { "baseChance": 0.5 },
+        "visibleIf": {
+          "negativeTraitLevels": {
+            "burnout": {
+              "min": 2,
+              "max": 2
+            }
+          }
+        },
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -500000
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.5
+        },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "mental", "amount": 6 },
-            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "burnout", "from": 2, "to": 1 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": 6
+            },
+            {
+              "type": "NEGATIVE_TRAIT_SET_LEVEL",
+              "id": "burnout",
+              "from": 2,
+              "to": 1
+            }
           ]
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": 2 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": 2
+            }
+          ]
+        }
       },
       {
         "id": "no_time",
         "label": "그럴 여유가 없다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -2 }]
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          }
+        ]
       }
     ]
   },
@@ -1344,56 +3121,156 @@
     "rarity": "uncommon",
     "weight": 10,
     "cooldownMonths": 6,
-    "conditions": { "employment": "EMPLOYED", "negativeTraitLevels": { "officeStigma": { "min": 1 } } },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "negativeTraitLevels": {
+        "officeStigma": {
+          "min": 1
+        }
+      }
+    },
     "choices": [
       {
         "id": "deliver",
         "label": "실력으로 끝까지 해낸다",
-        "visibleIf": { "negativeTraitLevels": { "officeStigma": { "min": 1, "max": 1 } } },
+        "visibleIf": {
+          "negativeTraitLevels": {
+            "officeStigma": {
+              "min": 1,
+              "max": 1
+            }
+          }
+        },
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "health", "amount": -5 },
-          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -4 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -4
+          }
         ],
         "outcome": {
           "baseChance": 0.5,
-          "modifiers": [{ "source": "SKILL", "id": "crisis", "levels": { "1": 0.1, "2": 0.15 } }]
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 6 },
-            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "officeStigma", "from": 1, "to": 0 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            },
+            {
+              "type": "NEGATIVE_TRAIT_SET_LEVEL",
+              "id": "officeStigma",
+              "from": 1,
+              "to": 0
+            }
           ],
           "resultText": "결과물이 말해 줬다. 더는 아무도 그 일을 입에 올리지 않는다."
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -3 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            }
+          ]
+        }
       },
       {
         "id": "big_win",
         "label": "모두가 놀랄 성과를 노린다",
-        "visibleIf": { "negativeTraitLevels": { "officeStigma": { "min": 2, "max": 2 } } },
+        "visibleIf": {
+          "negativeTraitLevels": {
+            "officeStigma": {
+              "min": 2,
+              "max": 2
+            }
+          }
+        },
         "guaranteedEffects": [
-          { "type": "RESOURCE_DELTA", "key": "health", "amount": -6 },
-          { "type": "RESOURCE_DELTA", "key": "focus", "amount": -6 }
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -6
+          }
         ],
         "outcome": {
           "baseChance": 0.4,
           "modifiers": [
-            { "source": "SKILL", "id": "crisis", "levels": { "1": 0.1, "2": 0.15 } },
-            { "source": "SKILL", "id": "observation", "levels": { "1": 0.05, "2": 0.1 } }
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.05,
+                "2": 0.1
+              }
+            }
           ]
         },
         "onSuccess": {
           "effects": [
-            { "type": "RESOURCE_DELTA", "key": "reputation", "amount": 5 },
-            { "type": "NEGATIVE_TRAIT_SET_LEVEL", "id": "officeStigma", "from": 2, "to": 1 }
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 5
+            },
+            {
+              "type": "NEGATIVE_TRAIT_SET_LEVEL",
+              "id": "officeStigma",
+              "from": 2,
+              "to": 1
+            }
           ]
         },
-        "onFailure": { "effects": [{ "type": "RESOURCE_DELTA", "key": "reputation", "amount": -4 }] }
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -4
+            }
+          ]
+        }
       },
       {
         "id": "decline",
         "label": "정중히 거절한다",
-        "guaranteedEffects": [{ "type": "RESOURCE_DELTA", "key": "mental", "amount": -2 }]
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          }
+        ]
       }
     ]
   }

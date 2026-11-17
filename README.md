@@ -1,4 +1,4 @@
-# 회사원 키우기 (코드명 company-life)
+# 오늘도 출근 (코드명 company-life)
 
 모바일 우선 선택지형 직장 로그라이크. 기준 명세: [`docs/DEVELOPMENT_PLAN.md`](docs/DEVELOPMENT_PLAN.md) (v1.4), 진행 현황: [`docs/IMPLEMENTATION_BACKLOG.md`](docs/IMPLEMENTATION_BACKLOG.md).
 

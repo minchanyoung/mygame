@@ -19,6 +19,7 @@ import {
   type PublicHistoryEntry,
   type PublicCharacterCard,
   type PublicChoice,
+  type PublicEffect,
   type PublicEnding,
   type PublicMonthSummary,
   type PublicNpc,
@@ -28,6 +29,7 @@ import {
   type ResourceKey,
   type TraitLevels,
 } from '@company-life/shared';
+import { backgroundEffects, recommendedJob } from './background-effects';
 import { matchesConditions } from './conditions';
 import { requireFrom, type ContentIndex } from './content-index';
 import { applyEffects } from './effects';
@@ -40,7 +42,14 @@ const krw = (n: number) => `${n.toLocaleString('ko-KR')}원`;
 
 function bg(id: string, content: ContentIndex): PublicBackgroundTrait {
   const def = requireFrom(content.backgrounds, id, 'background');
-  return { id: def.id, kind: def.kind, name: def.name, description: def.description };
+  return {
+    id: def.id,
+    kind: def.kind,
+    name: def.name,
+    description: def.description,
+    rare: def.rarity === 'rare',
+    effects: backgroundEffects(def, content),
+  };
 }
 
 export function toPublicCard(card: CharacterCard, content: ContentIndex): PublicCharacterCard {
@@ -59,6 +68,7 @@ export function toPublicCard(card: CharacterCard, content: ContentIndex): Public
     cash: card.cash,
     debt: card.debt,
     permanentTraitCount: Object.keys(card.skills).length + Object.keys(card.negativeTraits).length,
+    recommendedJob: recommendedJob(card, content),
   };
 }
 
@@ -202,20 +212,81 @@ function toMonthSummary(state: GameRunState, content: ContentIndex): PublicMonth
     resourceDelta,
     cashDelta: state.cash - m.start.cash,
     debtDelta: state.debt - m.start.debt,
-    event:
-      ev && event
-        ? {
-            title: event.title,
-            choiceLabel: event.choices.find((c) => c.id === ev.choiceId)?.label ?? ev.choiceId,
-            success: ev.success,
-            resultText: ev.resultText,
-            traitChanges: ev.traitChanges.map((t) => {
-              const name = content.traits.get(t.id)?.name ?? t.id;
-              if (t.to === 0) return `${name} 극복`;
-              return t.from === 0 ? `${name} Lv.${t.to} 획득` : `${name} Lv.${t.from} → Lv.${t.to}`;
-            }),
-          }
-        : null,
+    event: ev && event ? toStory(state, ev, event, content) : null,
+  };
+}
+
+const STAT_LABELS: Record<string, string> = { favor: '호감', trust: '신뢰', rivalry: '경쟁심' };
+const manwonSigned = (n: number) =>
+  `${n > 0 ? '+' : '−'}${Math.abs(n) >= 10_000 ? `${Math.round(Math.abs(n) / 10_000).toLocaleString('ko-KR')}만원` : `${Math.abs(n).toLocaleString('ko-KR')}원`}`;
+
+/** 이달의 이야기: 상황 → 선택 → 판정 요인 → 결과 → 영향. 정확한 확률·NPC 수치는 내보내지 않는다. */
+function toStory(
+  state: GameRunState,
+  ev: NonNullable<NonNullable<GameRunState['currentMonth']>['eventResult']>,
+  event: NonNullable<ReturnType<ContentIndex['events']['get']>>,
+  content: ContentIndex,
+): NonNullable<PublicMonthSummary['event']> {
+  const occurrence = [...state.eventOccurrences].reverse().find((o) => o.eventId === ev.eventId);
+  const participant = occurrence?.participantNpcId
+    ? state.npcs.find((n) => n.npcId === occurrence.participantNpcId)
+    : undefined;
+  const verdictLabel = ev.success === true ? '성공' : ev.success === false ? '실패' : '확정';
+  const fallback =
+    ev.success === true
+      ? '일이 잘 풀렸다.'
+      : ev.success === false
+        ? '뜻대로 되지 않았다.'
+        : '선택한 대로 일이 흘러갔다.';
+
+  const factors = ev.factors.map((f) => {
+    let name = f.id;
+    if (f.source === 'SKILL' || f.source === 'NEGATIVE_TRAIT')
+      name = `${content.traits.get(f.id)?.name ?? f.id} Lv.${f.level}`;
+    else if (f.source === 'BACKGROUND') name = content.backgrounds.get(f.id)?.name ?? f.id;
+    else if (f.source === 'NPC') name = participant ? `${participant.name}의 성향·관계` : '상대의 성향';
+    else if (f.source === 'RESOURCE') name = `현재 ${RESOURCE_LABELS[f.id as ResourceKey] ?? f.id}`;
+    return { label: `${name} — ${f.positive ? '유리하게 작용' : '불리하게 작용'}`, positive: f.positive };
+  });
+
+  const effects: PublicEffect[] = [];
+  for (const key of RESOURCE_KEYS) {
+    const d = ev.resourceDelta[key] ?? 0;
+    if (d !== 0)
+      effects.push({
+        text: `${RESOURCE_LABELS[key]} ${d > 0 ? '+' : '−'}${Math.abs(d)}`,
+        tone: d > 0 ? 'good' : 'bad',
+      });
+  }
+  if (ev.cashDelta !== 0)
+    effects.push({ text: `현금 ${manwonSigned(ev.cashDelta)}`, tone: ev.cashDelta > 0 ? 'good' : 'bad' });
+  if (ev.debtDelta !== 0)
+    effects.push({ text: `빚 ${manwonSigned(ev.debtDelta)}`, tone: ev.debtDelta > 0 ? 'bad' : 'good' });
+
+  const relationChanges = ev.npcChanges.map((c) => {
+    const npc = state.npcs.find((n) => n.npcId === c.npcId);
+    // 경쟁심이 오르는 것은 나쁜 변화
+    return `${npc?.name ?? '동료'} · ${STAT_LABELS[c.stat] ?? c.stat} ${c.delta > 0 ? '▲' : '▼'}`;
+  });
+
+  return {
+    title: event.title,
+    categoryLabel: CATEGORY_LABELS[event.category] ?? event.category,
+    situation: event.description,
+    participantName: participant?.name ?? null,
+    choiceLabel: event.choices.find((c) => c.id === ev.choiceId)?.label ?? ev.choiceId,
+    success: ev.success,
+    verdictLabel,
+    resultText: ev.resultText ?? fallback,
+    factors,
+    effects,
+    relationChanges,
+    traitChanges: ev.traitChanges.map((t) => {
+      const name = content.traits.get(t.id)?.name ?? t.id;
+      if (t.to === 0) return `${name} 극복`;
+      return t.from === 0 ? `${name} Lv.${t.to} 획득` : `${name} Lv.${t.from} → Lv.${t.to}`;
+    }),
+    followUpHint: ev.followUpScheduled ? '이 선택은 몇 달 뒤 다시 돌아올 것 같다.' : null,
   };
 }
 

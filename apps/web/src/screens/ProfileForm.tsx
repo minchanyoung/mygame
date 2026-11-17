@@ -71,7 +71,7 @@ export function ProfileForm({ busy, onSubmit, onBack }: Props) {
           뒤로
         </button>
         <button type="submit" className="btn btn-primary" disabled={busy || !nameOk || !gender}>
-          {busy ? '카드 뽑는 중…' : '카드 3장 뽑기'}
+          {busy ? '진행 중…' : '진행하기'}
         </button>
       </div>
     </form>

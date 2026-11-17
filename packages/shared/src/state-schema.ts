@@ -183,6 +183,25 @@ export const MonthLogSchema = z
             })
             .strict(),
         ),
+        /** 이 사건만으로 생긴 변화 (월 정산과 분리) */
+        resourceDelta: z.record(z.string(), z.number().int()),
+        cashDelta: Krw,
+        debtDelta: Krw,
+        /** 판정에 작용한 요인 (공개 시 수치 없이 이름만) */
+        factors: z.array(
+          z
+            .object({
+              source: z.enum(['SKILL', 'NEGATIVE_TRAIT', 'BACKGROUND', 'NPC', 'RESOURCE']),
+              id: z.string(),
+              level: TraitLevelSchema.nullable(),
+              positive: z.boolean(),
+            })
+            .strict(),
+        ),
+        npcChanges: z.array(
+          z.object({ npcId: z.string(), stat: NpcRelationStatSchema, delta: z.number().int() }).strict(),
+        ),
+        followUpScheduled: z.boolean(),
       })
       .strict()
       .nullable(),
