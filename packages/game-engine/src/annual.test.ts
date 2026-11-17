@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { GameRunStateSchema, NPC_RANKS, type GameRunState } from '@company-life/shared';
 import { computeAnnualReview, processAnnualReview, processSalaryAdjustment } from './annual';
+import { backgroundEffects } from './background-effects';
+import { calculateChoiceChance } from './chance';
+import { indexContent } from './content-index';
+import { createRun } from './run';
 import { getEligibleEvents } from './events';
 import { chooseInMonth, nextMonth, startMonth } from './month';
 import { currentTeamNpcs, reassignBossIfNeeded } from './npcs';
@@ -193,6 +197,54 @@ describe('UI-1 public view additions', () => {
     expect(ev.participant?.name).toBe(peer.name);
     expect(ev.categoryLabel).toBe('사내 관계');
     expect(JSON.stringify(ev.participant)).not.toMatch(/"trust"|"favor"/);
+  });
+});
+
+describe('스펙 카드 근거와 이달의 이야기', () => {
+  it('카드의 강점·약점 효과는 데이터에서 계산되고, 사건 보정은 관련 사건 이름을 근거로 단다', () => {
+    const run = createRun(
+      {
+        runId: 'r',
+        guestOwnerId: 'g',
+        seed: 'spec-seed',
+        profile: { displayName: '김하늘', gender: 'FEMALE' },
+        now: NOW,
+      },
+      content,
+    );
+    for (const card of toPublicView(run, content).characterCards) {
+      for (const t of [card.strength, card.weakness, card.university, card.major, card.family]) {
+        expect(t.effects.length).toBeGreaterThan(0);
+      }
+      expect(card.recommendedJob.label).toBeTruthy();
+    }
+    const empathy = indexContent(content.pack).backgrounds.get('str_empathy')!;
+    const fx = backgroundEffects(empathy, content).map((e) => e.text);
+    expect(fx).toContain('인사 지원 시 합격률 +10%p');
+    const eventFx = backgroundEffects(empathy, content).find((e) => e.text.startsWith('관련 사건'))!;
+    expect(eventFx.detail).toContain('회식 자리의 불화');
+  });
+
+  it('강점이 실제로 판정 확률을 바꾼다 (공감능력 → 회식 중재 +10%p)', () => {
+    const c = content.events.get('evt_office_dinner_crisis')!.choices.find((x) => x.id === 'mediate')!;
+    const plain = { ...base, backgroundTraits: [] };
+    const empath = { ...base, backgroundTraits: ['str_empathy'] };
+    expect(calculateChoiceChance(plain, c, { participant: null }, content)!.chance).toBe(0.4);
+    expect(calculateChoiceChance(empath, c, { participant: null }, content)!.chance).toBe(0.5);
+  });
+
+  it('이달의 이야기: 상황·선택·판정 요인·사건만의 변화·결과 문장을 준다 (수치 비공개)', () => {
+    const s = { ...base, backgroundTraits: ['str_empathy'] };
+    // 결산 기록(currentMonth)이 있어야 하므로 실제 월 시작 경로로 사건을 연다
+    const started = playtestStartMonthWithEvent(s, 'evt_office_dinner_crisis', content);
+    const summary = chooseInMonth({ ...started, rngState: ALWAYS_SUCCEED }, 'mediate', content).state;
+    const ev = toPublicView(summary, content).monthSummary!.event!;
+    expect(ev.situation).toContain('말다툼');
+    expect(ev.verdictLabel).toBe('성공');
+    expect(ev.factors).toEqual([{ label: '공감능력 — 유리하게 작용', positive: true }]);
+    expect(ev.effects.map((e) => e.text)).toEqual(['평판 +5']);
+    expect(ev.relationChanges[0]).toMatch(/호감 ▲$/);
+    expect(JSON.stringify(ev)).not.toMatch(/0\.5|chance|roll/);
   });
 });
 

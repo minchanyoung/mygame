@@ -570,6 +570,174 @@ button.card {
   min-width: 0;
 }
 
+/* ── 스펙 카드 ── */
+.spec {
+  gap: 12px;
+}
+
+.spec-rare {
+  border: 2px solid var(--trait-line);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--trait) 10%, transparent);
+}
+
+.spec-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.spec-letter {
+  font-size: 1.3rem;
+  color: var(--navy);
+}
+
+.mini-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.mini-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 2px;
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.mini-stat strong {
+  font-size: 1.15rem;
+}
+
+.bg-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.bg-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.trait-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
+.trait-good {
+  background: color-mix(in srgb, var(--c-cash) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--c-cash) 30%, transparent);
+}
+
+.trait-bad {
+  background: color-mix(in srgb, var(--stamp) 7%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--stamp) 28%, transparent);
+}
+
+.trait-block-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.fx-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fx-list li {
+  display: flex;
+  flex-direction: column;
+}
+
+.fx {
+  align-self: flex-start;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.fx-good {
+  color: var(--good);
+  background: color-mix(in srgb, var(--c-cash) 12%, transparent);
+}
+
+.fx-bad {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.fx-neutral {
+  color: var(--ink-2);
+  background: var(--paper);
+}
+
+.fx-detail {
+  padding-left: 8px;
+}
+
+.spec-more summary {
+  color: var(--ink-2);
+}
+
+/* ── 이달의 이야기 ── */
+.story {
+  gap: 10px;
+}
+
+.story-step {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+
+.story-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.story-result {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.factor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.last-story {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
 /* ── 1년 달력 ── */
 .calendar {
   display: grid;

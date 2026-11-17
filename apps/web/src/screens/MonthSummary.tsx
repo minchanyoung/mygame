@@ -53,25 +53,81 @@ export function MonthSummary({ view, busy, onNext }: Props) {
       </h2>
 
       {ev && (
-        <article className="card result-card">
-          <span className={`stamp stamp-small ${verdict === '확정' ? 'stamp-navy' : ''}`} aria-hidden="true">
-            {verdict}
-          </span>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-            <span className="tiny muted" style={{ fontWeight: 700 }}>
-              이달의 사건 · {ev.title}
+        <article className="card story" aria-label="이달의 이야기">
+          <div className="result-card" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span
+              className={`stamp stamp-small ${verdict === '확정' ? 'stamp-navy' : ''}`}
+              aria-hidden="true"
+            >
+              {verdict}
             </span>
-            <strong>
-              {ev.choiceLabel}
-              {ev.success === true && ' — 성공'}
-              {ev.success === false && ' — 실패'}
-            </strong>
-            {ev.resultText && (
-              <span className="small" style={{ color: 'var(--ink-2)' }}>
-                {ev.resultText}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+              <span
+                className="tiny muted"
+                style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}
+              >
+                <Icon name="story" size={14} /> 이달의 이야기 · {ev.categoryLabel}
               </span>
+              <strong className="display" style={{ fontSize: '1.2rem' }}>
+                {ev.title}
+              </strong>
+            </div>
+          </div>
+
+          <div className="story-step">
+            <span className="story-label">상황{ev.participantName && ` · ${ev.participantName}`}</span>
+            <p className="small" style={{ color: 'var(--ink-2)' }}>
+              {ev.situation}
+            </p>
+          </div>
+
+          <div className="story-step">
+            <span className="story-label">나의 선택</span>
+            <strong>{ev.choiceLabel}</strong>
+          </div>
+
+          <div className="story-step">
+            <span className="story-label">결과 · {ev.verdictLabel}</span>
+            <p className="story-result">{ev.resultText}</p>
+            {ev.factors.length > 0 && (
+              <ul className="fx-list" aria-label="판정에 작용한 요인">
+                {ev.factors.map((f) => (
+                  <li key={f.label} className="factor" style={{ flexDirection: 'row' }}>
+                    <span style={{ color: f.positive ? 'var(--good)' : 'var(--danger)' }}>
+                      <Icon name={f.positive ? 'thumbUp' : 'thumbDown'} size={14} />
+                    </span>
+                    {f.label}
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
+
+          {(ev.effects.length > 0 || ev.relationChanges.length > 0 || ev.followUpHint) && (
+            <div className="story-step">
+              <span className="story-label">이 일로 달라진 것</span>
+              <div className="choice-meta">
+                {ev.effects.map((e) => (
+                  <span key={e.text} className={`fx fx-${e.tone}`}>
+                    {e.text}
+                  </span>
+                ))}
+                {ev.relationChanges.map((r) => (
+                  <span key={r} className="fx fx-neutral">
+                    {r}
+                  </span>
+                ))}
+              </div>
+              {ev.followUpHint && (
+                <p
+                  className="small"
+                  style={{ color: 'var(--ink-2)', display: 'flex', alignItems: 'center', gap: 6 }}
+                >
+                  <Icon name="warning" size={14} /> {ev.followUpHint}
+                </p>
+              )}
+            </div>
+          )}
         </article>
       )}
 
@@ -220,6 +276,7 @@ export function MonthSummary({ view, busy, onNext }: Props) {
         </div>
       )}
 
+      {m && <span className="story-label">이달 전체 변화 (정산·자연 회복 포함)</span>}
       {m && (
         <div className="deltas">
           {RESOURCE_KEYS.map((k, i) => {

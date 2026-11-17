@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { PublicRunView } from '@company-life/shared';
-import { Icon, type IconName } from '../components/Icons';
+import { Icon, IconBadge, type IconName } from '../components/Icons';
 import { EmployeeBadge, Gauges, MoneyRow, Warnings, YearCalendar } from '../components/StatusPanel';
 
 interface Props {
@@ -22,6 +22,8 @@ const TABS: Array<{ id: Tab; label: string; icon: IconName }> = [
 export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
   const [tab, setTab] = useState<Tab>('company');
 
+  const lastStory = view.history.find((h) => h.kind === 'EVENT_RESOLVED');
+
   return (
     <section className="screen">
       {tab === 'company' && (
@@ -30,6 +32,17 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
           <Warnings view={view} />
           <Gauges view={view} />
           <MoneyRow view={view} />
+          {lastStory && (
+            <button type="button" className="card last-story" onClick={() => setTab('record')}>
+              <IconBadge name="story" color="var(--navy)" size={32} />
+              <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                <span className="tiny muted" style={{ fontWeight: 700 }}>
+                  지난 이야기 · {lastStory.age}세 {lastStory.month}월
+                </span>
+                <span className="small">{lastStory.summary}</span>
+              </span>
+            </button>
+          )}
           <YearCalendar view={view} />
           <div className="cta-wrap">
             <button type="button" className="btn btn-primary" onClick={onStartMonth} disabled={busy}>

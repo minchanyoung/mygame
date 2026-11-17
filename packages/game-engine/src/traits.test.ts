@@ -9,7 +9,7 @@ import { ALWAYS_FAIL, ALWAYS_SUCCEED, content, employedRun, open, withTraits } f
 import { toPublicActiveEvent } from './view';
 
 // 배경 특성(강점·약점)의 사건 보정은 따로 검증하므로, 여기서는 영구 특성 효과만 보도록 비운다
-const base = { ...employedRun(), backgroundTraits: [] };
+const base: GameRunState = { ...employedRun(), backgroundTraits: [] };
 const event = (id: string) => requireFrom(content.events, id, 'event');
 const choice = (eventId: string, choiceId: string) => event(eventId).choices.find((c) => c.id === choiceId)!;
 const chanceOf = (state: GameRunState, eventId: string, choiceId: string) =>
