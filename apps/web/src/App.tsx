@@ -10,6 +10,7 @@ import {
   type Session,
 } from './api';
 import { PlaytestPanel } from './components/PlaytestPanel';
+import { CollectionScreen } from './screens/CollectionScreen';
 import { CharacterSelect } from './screens/CharacterSelect';
 import { EndingScreen } from './screens/EndingScreen';
 import { EventScreen } from './screens/EventScreen';
@@ -22,7 +23,10 @@ import { StoryResult } from './screens/StoryResult';
 import { Workplace } from './screens/Workplace';
 
 type Screen =
-  { kind: 'start' } | { kind: 'profile' } | { kind: 'run'; session: Session; view: PublicRunView };
+  | { kind: 'start' }
+  | { kind: 'profile' }
+  | { kind: 'collection' }
+  | { kind: 'run'; session: Session; view: PublicRunView };
 
 export function App() {
   const [screen, setScreen] = useState<Screen>({ kind: 'start' });
@@ -128,11 +132,15 @@ export function App() {
     );
   }, []);
 
-  const createRun = async (displayName: string, gender: Parameters<typeof api.createRun>[1]) => {
+  const createRun = async (
+    displayName: string,
+    gender: Parameters<typeof api.createRun>[1],
+    difficulty: Parameters<typeof api.createRun>[2],
+  ) => {
     setBusy(true);
     setError(null);
     try {
-      const res = await api.createRun(displayName, gender);
+      const res = await api.createRun(displayName, gender, difficulty);
       const session = { runId: res.runId, guestToken: res.guestToken };
       saveSession(session);
       setSavedSession(session);
@@ -174,9 +182,12 @@ export function App() {
         canResume={savedSession !== null}
         busy={busy}
         onNew={() => setScreen({ kind: 'profile' })}
+        onCollection={() => setScreen({ kind: 'collection' })}
         onResume={() => savedSession && resume(savedSession)}
       />
     );
+  } else if (screen.kind === 'collection') {
+    body = <CollectionScreen onBack={() => setScreen({ kind: 'start' })} />;
   } else if (screen.kind === 'profile') {
     body = <ProfileForm busy={busy} onSubmit={createRun} onBack={() => setScreen({ kind: 'start' })} />;
   } else {
@@ -306,6 +317,7 @@ export function App() {
             <EndingScreen
               view={view}
               onHome={() => setScreen({ kind: 'start' })}
+              onCollection={() => setScreen({ kind: 'collection' })}
               onNewGame={() => {
                 saveSession(null);
                 setSavedSession(null);

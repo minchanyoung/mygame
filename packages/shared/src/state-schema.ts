@@ -3,6 +3,7 @@ import {
   CompanyGradeSchema,
   CompanyIdSchema,
   ContentIdSchema,
+  DifficultySchema,
   EmploymentStatusSchema,
   EndingCauseSchema,
   EndingTypeSchema,
@@ -544,6 +545,10 @@ export const GameRunStateSchema = z
     /** MONTH_SUMMARY에서 판정된 엔딩. nextMonth에서 ending으로 확정된다 (§26.2). */
     pendingEnding: EndingSchema.nullable(),
     ending: EndingSchema.nullable(),
+    /** S10 난이도 (판 생성 때 고정) */
+    difficulty: DifficultySchema,
+    /** S10 도감을 쌓는 플레이어 (없으면 기록하지 않음) */
+    playerId: z.string().nullable(),
     /** 플레이테스트 도구로 조작된 적이 있는 run (기록·랭킹 제외 대상) */
     playtestModified: z.boolean(),
     createdAt: z.string(),

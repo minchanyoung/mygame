@@ -4,6 +4,7 @@ import {
   CompanyGradeSchema,
   CompanyIdSchema,
   ContentIdSchema,
+  DIFFICULTIES,
   ENDING_CAUSES,
   EndingCauseSchema,
   EndingTypeSchema,
@@ -128,6 +129,21 @@ const resourceRecord = <T extends z.ZodType>(schema: T) =>
   z.object(
     Object.fromEntries(RESOURCE_KEYS.map((k) => [k, schema])) as Record<(typeof RESOURCE_KEYS)[number], T>,
   );
+
+/** S10 난이도 손잡이 하나 */
+export const DifficultyKnobsSchema = z
+  .object({
+    /** 선택지 성공 확률에 더함 (clamp 전) */
+    chanceShift: z.number().min(-0.5).max(0.5),
+    /** 사건으로 잃는 자원 배율 (‰). 얻는 쪽은 그대로 */
+    lossPermille: z.number().int().min(100).max(3000),
+    /** 월 생활비 배율 (‰) */
+    livingCostPermille: z.number().int().min(100).max(3000),
+    /** 카드 시작 현금에 더함 */
+    startCashBonus: z.number().int().min(0),
+  })
+  .strict();
+export type DifficultyKnobs = z.infer<typeof DifficultyKnobsSchema>;
 
 /** 밸런스 수치는 코드가 아니라 이 규칙 데이터에서만 관리한다 (§17.2). 모든 값은 가설이다. */
 export const GameRulesSchema = z
@@ -360,6 +376,10 @@ export const GameRulesSchema = z
         })
         .strict(),
     ),
+    /** S10 난이도 손잡이 (판 생성 때 고정) */
+    difficulty: z
+      .object({ EASY: DifficultyKnobsSchema, NORMAL: DifficultyKnobsSchema, REAL: DifficultyKnobsSchema })
+      .strict(),
     /** S7 노후 등급: 정상 엔딩 순자산이 (첫해 물가 기준 금액 × 물가 지수) 이상이면 */
     retirement: z
       .object({ comfortable: z.number().int().positive(), modest: z.number().int().positive() })
@@ -540,6 +560,49 @@ export const TitleDefinitionSchema = z
   .strict();
 export type TitleDefinition = z.infer<typeof TitleDefinitionSchema>;
 
+/** S10 업적: 여러 판의 도감 기록으로 판정. 조건은 모두 AND */
+export const AchievementRuleSchema = z
+  .object({
+    /** 끝까지 마친 판 수 */
+    runs: z.number().int().min(1).optional(),
+    /** 이 엔딩(들) 중 하나를 본 적 있음 */
+    endingTypes: z.array(EndingTypeSchema).min(1).optional(),
+    /** 이 분류의 엔딩을 본 적 있음 */
+    endingCategory: z.enum(['FAILURE', 'NORMAL']).optional(),
+    /** 위 엔딩 조건을 이 난이도에서 */
+    difficulty: z.enum(DIFFICULTIES).optional(),
+    /** 서로 다른 실패 엔딩 수 */
+    failureEndings: z.number().int().min(1).optional(),
+    /** 모은 별명 수 */
+    titles: z.number().int().min(1).optional(),
+    /** 이 희귀도의 별명을 받은 적 있음 */
+    titleRarity: TitleRaritySchema.optional(),
+    /** 모든 연재를 한 번 이상 완결 */
+    allSeries: z.literal(true).optional(),
+    /** 한 연재에서 본 서로 다른 결말 수 */
+    seriesEndingsInOne: z.number().int().min(1).optional(),
+    /** 다녀 본 회사 수 */
+    companies: z.number().int().min(1).optional(),
+    /** 이 등급 회사에 다녀 본 적 있음 */
+    companyGrade: CompanyGradeSchema.optional(),
+    /** 달성한 인생 목표 수 */
+    goals: z.number().int().min(1).optional(),
+  })
+  .strict()
+  .refine((r) => Object.keys(r).length > 0, '빈 업적 조건');
+export type AchievementRule = z.infer<typeof AchievementRuleSchema>;
+
+export const AchievementDefinitionSchema = z
+  .object({
+    id: ContentIdSchema,
+    name: z.string().min(1).max(14),
+    emoji: z.string().min(1).max(4),
+    description: z.string().min(1).max(60),
+    rule: AchievementRuleSchema,
+  })
+  .strict();
+export type AchievementDefinition = z.infer<typeof AchievementDefinitionSchema>;
+
 export const ContentPackSchema = z
   .object({
     contentVersion: z.string().min(1),
@@ -558,6 +621,7 @@ export const ContentPackSchema = z
     endings: EndingsSchema,
     lifeGoals: z.array(LifeGoalDefinitionSchema).min(3),
     titles: z.array(TitleDefinitionSchema).min(1),
+    achievements: z.array(AchievementDefinitionSchema).min(1),
   })
   .strict();
 export type ContentPack = z.infer<typeof ContentPackSchema>;

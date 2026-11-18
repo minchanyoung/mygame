@@ -1,8 +1,11 @@
 import {
   GUEST_TOKEN_HEADER,
+  PLAYER_TOKEN_HEADER,
   type ApiErrorBody,
   type CreateRunResponse,
+  type Difficulty,
   type Gender,
+  type PublicCollection,
   type PlaytestCatalog,
   type PlaytestDebugView,
   type PublicRunView,
@@ -16,6 +19,24 @@ export interface Session {
 }
 
 const SESSION_KEY = 'company-life.session';
+/** S10 여러 판을 잇는 플레이어 토큰 (도감·업적). 판 세션과 따로 보관하고 지우지 않는다 */
+const PLAYER_KEY = 'company-life.player';
+
+export function loadPlayerToken(): string | null {
+  try {
+    return localStorage.getItem(PLAYER_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function savePlayerToken(token: string): void {
+  try {
+    localStorage.setItem(PLAYER_KEY, token);
+  } catch {
+    // 저장할 수 없으면 이번 판만 도감에 쌓이고 다음 판은 새 플레이어가 된다
+  }
+}
 
 export function loadSession(): Session | null {
   try {
@@ -44,9 +65,14 @@ export class ApiRequestError extends Error {
   }
 }
 
-async function request<T>(path: string, init: RequestInit & { token?: string } = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  init: RequestInit & { token?: string; player?: boolean } = {},
+): Promise<T> {
   const headers: Record<string, string> = { 'content-type': 'application/json' };
   if (init.token) headers[GUEST_TOKEN_HEADER] = init.token;
+  const player = init.player ? loadPlayerToken() : null;
+  if (player) headers[PLAYER_TOKEN_HEADER] = player;
   const res = await fetch(path, { ...init, headers });
   const body = (await res.json().catch(() => null)) as unknown;
   if (!res.ok) throw new ApiRequestError(res.status, body as ApiErrorBody | null);
@@ -54,10 +80,20 @@ async function request<T>(path: string, init: RequestInit & { token?: string } =
 }
 
 export const api = {
-  createRun: (displayName: string, gender: Gender) =>
-    request<CreateRunResponse>('/api/runs', {
+  createRun: async (displayName: string, gender: Gender, difficulty: Difficulty) => {
+    const res = await request<CreateRunResponse>('/api/runs', {
       method: 'POST',
-      body: JSON.stringify({ displayName, gender }),
+      player: true,
+      body: JSON.stringify({ displayName, gender, difficulty }),
+    });
+    savePlayerToken(res.playerToken);
+    return res;
+  },
+
+  /** S10 도감·업적 (runId를 주면 그 판의 새 발견 포함) */
+  getPlayer: (runId?: string) =>
+    request<PublicCollection>(`/api/player${runId ? `?run=${encodeURIComponent(runId)}` : ''}`, {
+      player: true,
     }),
 
   getRun: (s: Session) => request<PublicRunView>(`/api/runs/${s.runId}`, { token: s.guestToken }),

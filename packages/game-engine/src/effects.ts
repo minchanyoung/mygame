@@ -6,7 +6,7 @@ import type {
   TraitHistoryEntry,
   TraitLevel,
 } from '@company-life/shared';
-import { inflate } from './economy';
+import { inflate, scaleLoss } from './economy';
 import { EngineError } from './errors';
 import { clampStat } from './numbers';
 import { currentTeamNpcs } from './npcs';
@@ -17,6 +17,8 @@ export interface EffectContext {
   participantNpcId: string | null;
   /** 물가 지수 (생략 시 1). CASH_DELTA는 첫해 물가 기준 금액이라 이 지수를 곱해 적용한다. */
   priceIndex?: number;
+  /** S10 난이도: 사건으로 잃는 자원 배율 (‰, 생략 시 1000) */
+  lossPermille?: number;
 }
 
 export interface TraitChange {
@@ -62,7 +64,9 @@ export function applyEffects(
   effects.forEach((effect, index) => {
     switch (effect.type) {
       case 'RESOURCE_DELTA':
-        draft.resources[effect.key] = clampStat(draft.resources[effect.key] + effect.amount);
+        draft.resources[effect.key] = clampStat(
+          draft.resources[effect.key] + scaleLoss(effect.amount, ctx.lossPermille ?? 1000),
+        );
         break;
 
       case 'CASH_DELTA':

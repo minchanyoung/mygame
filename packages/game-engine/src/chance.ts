@@ -80,7 +80,9 @@ export function calculateChoiceChance(
     }
   }
 
-  const rawChance = roundChance(breakdown.reduce((sum, b) => sum + b.bonus, 0));
+  // S10 난이도: 판정 내역(공개 요인)에는 넣지 않고 합계에만 더한다
+  const shift = content.pack.rules.difficulty[state.difficulty].chanceShift;
+  const rawChance = roundChance(breakdown.reduce((sum, b) => sum + b.bonus, 0) + shift);
   return { chance: roundChance(clamp(rawChance, chanceMin, chanceMax)), rawChance, breakdown };
 }
 

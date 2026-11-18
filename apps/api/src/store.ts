@@ -1,6 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { GameRunState } from '@company-life/shared';
+import { PlayerCollectionSchema, type GameRunState, type PlayerCollection } from '@company-life/shared';
 import { migrateRunState } from '@company-life/game-engine';
 
 /** 저장된 명령 결과 (같은 idempotencyKey 재요청 시 그대로 반환) */
@@ -133,6 +133,99 @@ export class FileRunStore implements RunStore {
       const { record, value } = await mutator(current);
       if (record) await this.#write(record);
       return value;
+    });
+  }
+}
+
+// ───────── S10 플레이어 (도감·업적) ─────────
+
+export interface PlayerRecord {
+  playerId: string;
+  /** 플레이어 토큰의 SHA-256 해시. 원문 토큰은 저장하지 않는다. */
+  tokenHash: string;
+  collection: PlayerCollection;
+  createdAt: string;
+}
+
+/** 플레이어 저장소 계약 (나중에 PostgreSQL players 테이블로 교체). update는 플레이어 단위로 직렬화. */
+export interface PlayerStore {
+  create(record: PlayerRecord): Promise<void>;
+  get(playerId: string): Promise<PlayerRecord | undefined>;
+  update(playerId: string, mutator: (record: PlayerRecord) => PlayerRecord): Promise<PlayerRecord>;
+}
+
+const parsePlayer = (raw: string): PlayerRecord => {
+  const p = JSON.parse(raw) as PlayerRecord;
+  return { ...p, collection: PlayerCollectionSchema.parse(p.collection) };
+};
+
+export class MemoryPlayerStore implements PlayerStore {
+  #records = new Map<string, string>();
+  #mutex = new KeyedMutex();
+
+  async create(record: PlayerRecord): Promise<void> {
+    if (this.#records.has(record.playerId)) throw new Error('player already exists');
+    this.#records.set(record.playerId, JSON.stringify(record));
+  }
+
+  async get(playerId: string): Promise<PlayerRecord | undefined> {
+    const raw = this.#records.get(playerId);
+    return raw === undefined ? undefined : parsePlayer(raw);
+  }
+
+  update(playerId: string, mutator: (record: PlayerRecord) => PlayerRecord): Promise<PlayerRecord> {
+    return this.#mutex.run(playerId, async () => {
+      const current = await this.get(playerId);
+      if (!current) throw new NotFoundError(playerId);
+      const next = mutator(current);
+      this.#records.set(playerId, JSON.stringify(next));
+      return next;
+    });
+  }
+}
+
+/** 로컬 개발용 JSON 파일 플레이어 저장소 */
+export class FilePlayerStore implements PlayerStore {
+  #dir: string;
+  #mutex = new KeyedMutex();
+
+  constructor(dir: string) {
+    this.#dir = dir;
+  }
+
+  #file(playerId: string): string {
+    if (!RUN_ID_PATTERN.test(playerId)) throw new NotFoundError(playerId);
+    return path.join(this.#dir, `${playerId}.json`);
+  }
+
+  async #write(record: PlayerRecord): Promise<void> {
+    await mkdir(this.#dir, { recursive: true });
+    const file = this.#file(record.playerId);
+    const tmp = `${file}.${process.pid}.tmp`;
+    await writeFile(tmp, JSON.stringify(record), 'utf8');
+    await rename(tmp, file);
+  }
+
+  async create(record: PlayerRecord): Promise<void> {
+    await this.#mutex.run(record.playerId, () => this.#write(record));
+  }
+
+  async get(playerId: string): Promise<PlayerRecord | undefined> {
+    try {
+      return parsePlayer(await readFile(this.#file(playerId), 'utf8'));
+    } catch (err) {
+      if (err instanceof NotFoundError || (err as NodeJS.ErrnoException).code === 'ENOENT') return undefined;
+      throw err;
+    }
+  }
+
+  update(playerId: string, mutator: (record: PlayerRecord) => PlayerRecord): Promise<PlayerRecord> {
+    return this.#mutex.run(playerId, async () => {
+      const current = await this.get(playerId);
+      if (!current) throw new NotFoundError(playerId);
+      const next = mutator(current);
+      await this.#write(next);
+      return next;
     });
   }
 }

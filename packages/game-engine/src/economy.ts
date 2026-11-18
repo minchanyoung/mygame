@@ -15,3 +15,14 @@ export function inflate(amount: number, index: number): number {
   if (index === 1) return amount;
   return Math.sign(amount) * Math.round((Math.abs(amount) * index) / 1000) * 1000;
 }
+
+/** S10 이 판의 난이도 손잡이 */
+export function difficultyKnobs(state: Pick<GameRunState, 'difficulty'>, content: ContentIndex) {
+  return content.pack.rules.difficulty[state.difficulty];
+}
+
+/** S10 사건으로 잃는 자원에 난이도 배율 (얻는 쪽은 그대로). 0이 되지 않게 최소 1은 잃는다 */
+export function scaleLoss(amount: number, lossPermille: number): number {
+  if (amount >= 0 || lossPermille === 1000) return amount;
+  return Math.min(-1, Math.round((amount * lossPermille) / 1000));
+}

@@ -1,4 +1,5 @@
 import type { ContentPack } from '@company-life/shared';
+import achievements from '../data/achievements.json' with { type: 'json' };
 import backgrounds from '../data/backgrounds.json' with { type: 'json' };
 import companies from '../data/companies.json' with { type: 'json' };
 import endings from '../data/endings.json' with { type: 'json' };
@@ -14,7 +15,7 @@ import { validateContentPack } from './validate';
 export * from './validate';
 
 /** 콘텐츠 버전. 데이터가 바뀌면 올린다. 새 run은 생성 시 이 버전에 고정된다 (§23.1). */
-export const CONTENT_VERSION = '2026.11.18-p2.0';
+export const CONTENT_VERSION = '2026.11.18-p2.1';
 
 const jsonClone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
 
@@ -35,6 +36,7 @@ export function rawContentPack(): unknown {
     endings,
     lifeGoals,
     titles,
+    achievements,
   });
 }
 

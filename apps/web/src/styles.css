@@ -2440,3 +2440,130 @@ details summary {
 .bond:last-child {
   border-bottom: 0;
 }
+
+/* ── S10 난이도·도감 ── */
+.segmented-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.difficulty-EASY {
+  border-color: var(--good);
+  color: var(--good);
+}
+.difficulty-REAL {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.collection-entry {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+.collection-entry-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.col-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--line);
+  overflow: hidden;
+}
+.col-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--navy);
+}
+
+.col-tabs {
+  /* 가로 스크롤 탭: 안쪽 절대 위치 요소가 화면을 넓히지 않게 기준점 */
+  position: relative;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin: 0 -16px;
+  padding: 2px 16px 4px;
+  scrollbar-width: none;
+}
+.col-tabs::-webkit-scrollbar {
+  display: none;
+}
+.col-tab {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-height: 48px;
+  min-width: 64px;
+  padding: 4px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--line-2);
+  background: var(--surface);
+  color: var(--ink-2);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.col-tab-on {
+  border: 2px solid var(--navy);
+  background: var(--navy-soft);
+  color: var(--navy);
+}
+
+.col-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+.col-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.col-hidden {
+  background: var(--paper);
+  border-style: dashed;
+}
+.col-hidden strong {
+  color: var(--muted);
+}
+.col-item-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+}
+.col-emoji {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.discovery {
+  border: 2px solid var(--navy);
+}
+.discovery-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.discovery-list li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.discovery .btn {
+  align-self: flex-start;
+}

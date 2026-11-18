@@ -51,6 +51,12 @@ export const RUN_COMMANDS = [
 export type RunCommand = (typeof RUN_COMMANDS)[number];
 
 /** 높은 등급부터. 인덱스가 작을수록 좋은 회사 */
+/** S10 난이도. 판 생성 때 고정 */
+export const DIFFICULTIES = ['EASY', 'NORMAL', 'REAL'] as const;
+export const DifficultySchema = z.enum(DIFFICULTIES);
+export type Difficulty = z.infer<typeof DifficultySchema>;
+export const DIFFICULTY_LABELS: Record<Difficulty, string> = { EASY: '쉬움', NORMAL: '보통', REAL: '현실' };
+
 export const COMPANY_GRADES = ['S', 'A', 'B', 'C', 'D', 'F'] as const;
 export const CompanyGradeSchema = z.enum(COMPANY_GRADES);
 export type CompanyGrade = z.infer<typeof CompanyGradeSchema>;

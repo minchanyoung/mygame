@@ -496,3 +496,114 @@ describe('playtest tools over HTTP', () => {
     );
   });
 });
+
+describe('S10 플레이어 도감·난이도 over HTTP', () => {
+  /** 플레이어 토큰으로 판을 만들고, 체력을 1로 눌러 과로 실직 엔딩까지 진행 */
+  async function finishRun(app: ReturnType<typeof makeApp>, store: MemoryRunStore, playerToken?: string) {
+    const created = await app.inject({
+      method: 'POST',
+      url: '/api/runs',
+      headers: playerToken ? { 'x-player-token': playerToken } : {},
+      payload: { displayName: '김하늘', gender: 'FEMALE', difficulty: 'REAL' },
+    });
+    const body = created.json() as CreateRunResponse;
+    const headers = auth(body.guestToken);
+    let revision = 0;
+    let key = 0;
+    const post = async (url: string, payload: Record<string, unknown>) =>
+      (
+        await app.inject({
+          method: 'POST',
+          url: `/api/runs/${body.runId}/${url}`,
+          headers,
+          payload: { ...payload, idempotencyKey: `s10-${body.runId}-${key++}`, expectedRevision: revision++ },
+        })
+      ).json().view as PublicRunView;
+    let view = await post('character', { cardId: 'card_1' });
+    view = await post('goal', { goalId: view.lifeGoalOffers[0]!.id });
+    view = await post('apply-job', { offerId: view.jobOffers[0]!.offerId });
+    const lowHealth = () =>
+      store.update(body.runId, async (record) => ({
+        record: {
+          ...record,
+          state: { ...record.state, resources: { ...record.state.resources, health: 1 } },
+        },
+        value: null,
+      }));
+    for (let month = 0; month < 40 && view.phase !== 'GAME_OVER'; month++) {
+      await lowHealth();
+      view = await post('start-month', {});
+      while (view.phase === 'EVENT_PENDING' && !view.pendingEnding) {
+        const choices: PublicChoice[] = view.activeEvent!.choices;
+        const pick = choices.find((c) => c.enabled && c.fatalWarning) ?? choices.find((c) => c.enabled)!;
+        view = await post('choose', { occurrenceId: view.activeEvent!.occurrenceId, choiceId: pick.id });
+      }
+      view = await post('next-month', {});
+    }
+    return { body, view };
+  }
+
+  it('판 생성: 플레이어 토큰을 주고, 같은 토큰이면 같은 플레이어. 난이도는 검증·고정된다', async () => {
+    const app = makeApp();
+    const first = (await createRun(app)).body;
+    expect(first.playerToken).toMatch(/^[0-9a-f-]{36}\./);
+    expect(first.view.difficulty).toBe('NORMAL');
+    const again = await app.inject({
+      method: 'POST',
+      url: '/api/runs',
+      headers: { 'x-player-token': first.playerToken },
+      payload: { displayName: '김하늘', gender: 'FEMALE', difficulty: 'EASY' },
+    });
+    const body = again.json() as CreateRunResponse;
+    expect(body.playerToken).toBe(first.playerToken);
+    expect(body.view.difficulty).toBe('EASY');
+    expect(body.view.difficultyLabel).toBe('쉬움');
+    // 쉬움은 시작 현금 보너스가 카드에 바로 보인다
+    expect(body.view.characterCards[0]!.cash).toBeGreaterThan(first.view.characterCards[0]!.cash);
+    // 위조 토큰은 새 플레이어
+    const forged = await app.inject({
+      method: 'POST',
+      url: '/api/runs',
+      headers: { 'x-player-token': `${first.playerToken.split('.')[0]}.forged` },
+      payload: { displayName: '김하늘', gender: 'FEMALE' },
+    });
+    expect((forged.json() as CreateRunResponse).playerToken).not.toBe(first.playerToken);
+    const bad = await app.inject({
+      method: 'POST',
+      url: '/api/runs',
+      payload: { displayName: '김하늘', gender: 'FEMALE', difficulty: 'NIGHTMARE' },
+    });
+    expect(bad.statusCode).toBe(400);
+  });
+
+  it('엔딩이 확정되면 서버가 도감·업적을 기록하고, 같은 판은 두 번 세지 않는다', async () => {
+    const store = new MemoryRunStore();
+    const app = makeApp(store);
+    const { body, view } = await finishRun(app, store);
+    expect(view.phase).toBe('GAME_OVER');
+    const get = async () =>
+      (
+        await app.inject({
+          url: `/api/player?run=${body.runId}`,
+          headers: { 'x-player-token': body.playerToken },
+        })
+      ).json();
+    const col = await get();
+    expect(col.runsFinished).toBe(1);
+    const endings = col.categories.find((c: { key: string }) => c.key === 'endings');
+    expect(endings.found).toBe(1);
+    const seen = endings.items.find((i: { found: boolean }) => i.found);
+    expect(seen.difficulties).toEqual(['현실']);
+    expect(col.achievements.find((a: { id: string }) => a.id === 'ach_first_run').done).toBe(true);
+    // 이번 판의 새 발견: 엔딩·업적
+    expect(col.discovery.items.some((i: { category: string }) => i.category === '엔딩')).toBe(true);
+    expect(col.discovery.achievements.map((a: { id: string }) => a.id)).toContain('ach_first_run');
+    // 재조회는 그대로, 끝난 판에 쓰기는 409
+    expect((await get()).runsFinished).toBe(1);
+    // 토큰 없이 조회하면 빈 도감 (남의 도감은 볼 수 없음)
+    const anon = (await app.inject({ url: '/api/player' })).json();
+    expect(anon.runsFinished).toBe(0);
+    expect(anon.found).toBe(0);
+    expect(anon.total).toBe(81);
+  }, 30_000);
+});

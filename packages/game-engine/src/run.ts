@@ -1,4 +1,4 @@
-import { ENGINE_VERSION, type GameRunState, type PlayerProfile } from '@company-life/shared';
+import { ENGINE_VERSION, type Difficulty, type GameRunState, type PlayerProfile } from '@company-life/shared';
 import { generateCharacterCards } from './characters';
 import type { ContentIndex } from './content-index';
 import { EngineError } from './errors';
@@ -14,6 +14,10 @@ export interface CreateRunInput {
   profile: PlayerProfile;
   /** ISO 시각. 엔진은 시계를 직접 읽지 않는다. */
   now: string;
+  /** S10 난이도 (생략 시 보통) */
+  difficulty?: Difficulty;
+  /** S10 도감을 쌓을 플레이어 */
+  playerId?: string | null;
 }
 
 /**
@@ -24,7 +28,12 @@ export interface CreateRunInput {
 export function createRun(input: CreateRunInput, content: ContentIndex): GameRunState {
   assertTransition('PROFILE_INPUT', 'createCards', 'CHARACTER_SELECTION');
   const { rules } = content.pack;
-  const cards = generateCharacterCards(input.profile, input.seed, content);
+  const difficulty = input.difficulty ?? 'NORMAL';
+  // S10 난이도 시작 현금 보너스는 카드에 바로 반영해 화면과 실제가 같게 한다
+  const bonus = rules.difficulty[difficulty].startCashBonus;
+  const cards = generateCharacterCards(input.profile, input.seed, content).map((c) =>
+    bonus ? { ...c, cash: c.cash + bonus } : c,
+  );
   return {
     schemaVersion: 1,
     runId: input.runId,
@@ -80,6 +89,8 @@ export function createRun(input: CreateRunInput, content: ContentIndex): GameRun
     currentMonth: null,
     pendingEnding: null,
     ending: null,
+    difficulty,
+    playerId: input.playerId ?? null,
     playtestModified: false,
     createdAt: input.now,
     finishedAt: null,

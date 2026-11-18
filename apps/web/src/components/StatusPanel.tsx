@@ -40,6 +40,11 @@ export function EmployeeBadge({ view }: { view: PublicRunView }) {
           )}
           <div className="badge-chips">
             {e.grade && <span className={`chip chip-pill grade-chip-${e.grade}`}>{e.grade}등급 회사</span>}
+            {view.difficulty !== 'NORMAL' && (
+              <span className={`chip chip-pill difficulty-${view.difficulty}`}>
+                난이도 {view.difficultyLabel}
+              </span>
+            )}
             {e.probationMonthsLeft !== null && (
               <span className="chip chip-pill chip-accent">수습 {e.probationMonthsLeft}개월 남음</span>
             )}

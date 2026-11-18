@@ -3,7 +3,7 @@
  * 밸런스 판단용 개발 도구이며 서버에서 쓰지 않는다.
  */
 import { loadContentPack } from '@company-life/content';
-import { RANK_LABELS } from '@company-life/shared';
+import { DIFFICULTIES, DIFFICULTY_LABELS, RANK_LABELS, type Difficulty } from '@company-life/shared';
 import { indexContent } from './content-index';
 import { autoPlay, type AutoPlayPolicy } from './simulation';
 
@@ -15,6 +15,8 @@ const host = globalThis as unknown as {
 const argv = host.process?.argv ?? [];
 const console = host.console;
 const runs = Number(argv[2] ?? 1000);
+/** 상세 리포트를 낼 난이도 (기본 보통). 마지막에 세 난이도 요약을 함께 낸다 */
+const difficulty = (argv[3] ?? 'NORMAL') as Difficulty;
 const content = indexContent(loadContentPack());
 
 /** 밸런스 목표 (봇별). 무작위 봇은 아무렇게나 해도 이 정도로 실패, 신중 봇은 정확한 확률을 아는 상한선. */
@@ -26,7 +28,9 @@ const TARGET = {
 const mark = (ok: boolean) => (ok ? '✅' : '❌');
 
 for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
-  const results = Array.from({ length: runs }, (_, i) => autoPlay(`sim-${i}`, policy, content));
+  const results = Array.from({ length: runs }, (_, i) =>
+    autoPlay(`sim-${i}`, policy, content, undefined, difficulty),
+  );
   const stuck = results.filter((r) => r.stuck);
   const failures = results.filter((r) => r.category === 'FAILURE');
   const byType = new Map<string, number>();
@@ -47,7 +51,7 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
   const topCause = [...failByCause.entries()].sort((a, b) => b[1] - a[1])[0];
   const topShare = topCause ? topCause[1] / runs : 0;
 
-  console.log(`\n=== policy: ${policy} (${runs} runs) ===`);
+  console.log(`\n=== policy: ${policy} · ${DIFFICULTY_LABELS[difficulty]} (${runs} runs) ===`);
   console.log(
     `${mark(stuck.length === 0)} 진행 불능: ${stuck.length}건${stuck[0] ? ` (예: ${stuck[0].seed} ${stuck[0].stuck})` : ''}`,
   );
@@ -137,4 +141,29 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
       `    ${mark(rate >= 0.2 && rate <= 0.45)} ${id.padEnd(24)} ${(rate * 100).toFixed(1)}% (${g.ok}/${g.n})`,
     );
   }
+}
+
+// S10 난이도 요약: 50세 전 실패율 (신중 봇이 목표 기준, 무작위 봇은 참고)
+const DIFFICULTY_TARGET: Record<Difficulty, { min: number; max: number }> = {
+  EASY: { min: 0.03, max: 0.08 },
+  NORMAL: { min: 0.1, max: 0.25 },
+  REAL: { min: 0.4, max: 0.55 },
+};
+console.log('\n=== 난이도 요약 (50세 전 실패율 · 정상 엔딩 중 정년 · 평균 엔딩 나이) ===');
+for (const d of DIFFICULTIES) {
+  const row = (['cautious', 'random'] as AutoPlayPolicy[]).map((policy) => {
+    const rs = Array.from({ length: runs }, (_, i) => autoPlay(`sim-${i}`, policy, content, undefined, d));
+    const fail = rs.filter((r) => r.category === 'FAILURE').length / runs;
+    const normal = rs.filter((r) => r.category === 'NORMAL');
+    const retired = normal.filter((r) => r.endingType === 'RETIREMENT').length / Math.max(1, normal.length);
+    const avgAge = rs.reduce((s, r) => s + (r.age ?? 0), 0) / runs;
+    const stuck = rs.filter((r) => r.stuck).length;
+    return { fail, retired, avgAge, stuck };
+  });
+  const t = DIFFICULTY_TARGET[d];
+  const c = row[0]!;
+  const r = row[1]!;
+  console.log(
+    `  ${mark(c.fail >= t.min && c.fail <= t.max)} ${DIFFICULTY_LABELS[d]}: 신중 ${(c.fail * 100).toFixed(1)}% (목표 ${Math.round(t.min * 100)}~${Math.round(t.max * 100)}%) · 정년 ${(c.retired * 100).toFixed(0)}% · ${c.avgAge.toFixed(1)}세 · 진행 불능 ${c.stuck + r.stuck} | 무작위 ${(r.fail * 100).toFixed(1)}% · ${r.avgAge.toFixed(1)}세`,
+  );
 }

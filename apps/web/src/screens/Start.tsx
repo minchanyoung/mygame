@@ -3,9 +3,10 @@ interface Props {
   busy: boolean;
   onNew: () => void;
   onResume: () => void;
+  onCollection: () => void;
 }
 
-export function Start({ canResume, busy, onNew, onResume }: Props) {
+export function Start({ canResume, busy, onNew, onResume, onCollection }: Props) {
   return (
     <section className="screen start">
       <div className="hero">
@@ -27,6 +28,17 @@ export function Start({ canResume, busy, onNew, onResume }: Props) {
           사원증을 받고, 사내 메신저로 오는 사건에 답하고, 매달 급여명세서를 받으세요.
         </p>
       </div>
+      <button type="button" className="card collection-entry" onClick={onCollection}>
+        <span className="collection-entry-icon" aria-hidden="true">
+          📔
+        </span>
+        <span>
+          <strong>도감 · 업적</strong>
+          <span className="small muted" style={{ display: 'block' }}>
+            지난 인생들에서 모은 별명·엔딩·회사·연재 결말
+          </span>
+        </span>
+      </button>
       <div className="action-bar">
         {canResume && (
           <button type="button" className="btn" onClick={onResume} disabled={busy}>

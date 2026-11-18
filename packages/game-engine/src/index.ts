@@ -14,6 +14,7 @@ export * from './events';
 export * from './ending';
 export * from './chronicle';
 export * from './titles';
+export * from './collection';
 export * from './annual';
 export * from './promotion';
 export * from './goals';

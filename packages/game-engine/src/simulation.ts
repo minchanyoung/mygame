@@ -2,6 +2,7 @@ import {
   turnInfo,
   type Effect,
   type EndingType,
+  type Difficulty,
   type GameRunState,
   type PlayerRank,
 } from '@company-life/shared';
@@ -153,6 +154,8 @@ export function autoPlay(
   content: ContentIndex,
   /** 테스트용: 끝난 판의 최종 상태를 받아 본다 */
   onFinish?: (state: GameRunState) => void,
+  /** S10 난이도 */
+  difficulty: Difficulty = 'NORMAL',
 ): AutoPlayResult {
   const policyRng = SeededRng.derive(seed, 'policy');
   const now = '2026-11-17T00:00:00.000Z';
@@ -163,6 +166,7 @@ export function autoPlay(
       seed,
       profile: { displayName: '시뮬', gender: 'UNSPECIFIED' },
       now,
+      difficulty,
     },
     content,
   );

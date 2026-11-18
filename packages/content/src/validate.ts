@@ -325,6 +325,23 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
     }
   }
 
+  // S10 업적: id 중복 없음, 목표 수·별명 수가 실제 콘텐츠보다 크지 않음
+  checkUnique(
+    pack.achievements.map((a) => a.id),
+    'achievements',
+  );
+  for (const a of pack.achievements) {
+    if (a.rule.titles !== undefined && a.rule.titles > pack.titles.length)
+      add(`achievements.${a.id}`, `별명이 ${pack.titles.length}종뿐인데 ${a.rule.titles}종 요구`);
+    if (a.rule.goals !== undefined && a.rule.goals > pack.lifeGoals.length)
+      add(`achievements.${a.id}`, `인생 목표가 ${pack.lifeGoals.length}종뿐인데 ${a.rule.goals}종 요구`);
+    if (a.rule.companies !== undefined && a.rule.companies > pack.companies.length)
+      add(`achievements.${a.id}`, `회사가 ${pack.companies.length}곳뿐인데 ${a.rule.companies}곳 요구`);
+  }
+  const d = pack.rules.difficulty;
+  if (!(d.EASY.chanceShift >= d.NORMAL.chanceShift && d.NORMAL.chanceShift >= d.REAL.chanceShift))
+    add('rules.difficulty', '성공 확률 보정은 쉬움 ≥ 보통 ≥ 현실 순이어야 함');
+
   // 예약 전용 사건은 반드시 어떤 사건(또는 승진 누락 규칙)이 예약해야 한다 (고아 콘텐츠 방지)
   const scheduledTargets = new Set([...scheduleEdges.values()].flat());
   scheduledTargets.add(promo.consecutiveMissEvent.eventId);

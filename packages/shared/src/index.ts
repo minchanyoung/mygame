@@ -5,3 +5,4 @@ export * from './content-schema';
 export * from './state-schema';
 export * from './api';
 export * from './turn';
+export * from './player-schema';

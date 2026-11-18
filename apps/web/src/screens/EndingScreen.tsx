@@ -1,18 +1,32 @@
-import type { PublicRunView } from '@company-life/shared';
-import { formatKrw } from '../api';
+import { useEffect, useState } from 'react';
+import type { PublicCollection, PublicRunView } from '@company-life/shared';
+import { api, formatKrw } from '../api';
 import { Bonds, CareerBand, EraTimeline, LifeChart, TitleCard } from '../components/Chronicle';
 
 interface Props {
   view: PublicRunView;
   onNewGame: () => void;
   onHome: () => void;
+  onCollection: () => void;
 }
 
 const MILESTONE_KINDS = new Set(['JOB_APPLICATION', 'GOAL_SELECTED', 'PROMOTION', 'TRANSFER', 'ENDING']);
 // 사내 소식(NEWS)은 연대기에서 제외 — 내 인생의 굵직한 사건만
 
 /** GAME_OVER — 퇴직 통지서(실패) / 퇴직 증명서(정상) + 별명 + 인생 연대기 (S9) */
-export function EndingScreen({ view, onNewGame, onHome }: Props) {
+export function EndingScreen({ view, onNewGame, onHome, onCollection }: Props) {
+  // S10 이번 판으로 도감에 새로 들어간 것 (서버가 엔딩 확정 때 기록)
+  const [discovery, setDiscovery] = useState<PublicCollection['discovery']>(null);
+  useEffect(() => {
+    let alive = true;
+    api
+      .getPlayer(view.runId)
+      .then((c) => alive && setDiscovery(c.discovery))
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [view.runId]);
   const e = view.ending;
   if (!e) return null;
   const fail = e.category === 'FAILURE';
@@ -49,6 +63,42 @@ export function EndingScreen({ view, onNewGame, onHome }: Props) {
       </div>
 
       {e.titles && <TitleCard titles={e.titles} />}
+
+      {discovery && (discovery.items.length > 0 || discovery.achievements.length > 0) && (
+        <div className="card discovery">
+          {discovery.achievements.length > 0 && (
+            <>
+              <strong>🏅 업적 달성!</strong>
+              <ul className="discovery-list">
+                {discovery.achievements.map((a) => (
+                  <li key={a.id}>
+                    <span className="chip chip-pill chip-accent">
+                      <span aria-hidden="true">{a.emoji}</span> {a.name}
+                    </span>
+                    <span className="tiny muted">{a.description}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {discovery.items.length > 0 && (
+            <>
+              <strong>📔 도감에 새로 {discovery.items.length}개</strong>
+              <div className="chip-row">
+                {discovery.items.map((it, i) => (
+                  <span key={i} className="chip chip-pill">
+                    <span className="muted">{it.category}</span> {it.emoji ? `${it.emoji} ` : ''}
+                    {it.name}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
+          <button type="button" className="btn btn-small" onClick={onCollection}>
+            도감 보기
+          </button>
+        </div>
+      )}
 
       {chronicle && (
         <div className="card">

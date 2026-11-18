@@ -9,13 +9,17 @@ import {
   TransferDecisionRequestSchema,
   ChooseRequestSchema,
   CommandRequestSchema,
+  DifficultySchema,
+  emptyCollection,
   GameRunStateSchema,
   GUEST_TOKEN_HEADER,
+  PLAYER_TOKEN_HEADER,
   validateProfileInput,
   type ApiErrorBody,
   type ContentPack,
   type CreateRunResponse,
   type GameRunState,
+  type PublicCollection,
   type PublicRunView,
 } from '@company-life/shared';
 import {
@@ -26,7 +30,10 @@ import {
   declineTransfer,
   rebindContentVersion,
   chooseInMonth,
+  collectRun,
   createRun,
+  mergeRun,
+  toPublicCollection,
   EngineError,
   indexContent,
   nextMonth,
@@ -38,10 +45,19 @@ import {
   toPublicView,
   type ContentIndex,
 } from '@company-life/game-engine';
-import { NotFoundError, type RunRecord, type RunStore } from './store';
+import {
+  MemoryPlayerStore,
+  NotFoundError,
+  type PlayerRecord,
+  type PlayerStore,
+  type RunRecord,
+  type RunStore,
+} from './store';
 
 export interface AppOptions {
   store: RunStore;
+  /** S10 플레이어(도감·업적) 저장소. 생략 시 메모리 */
+  players?: PlayerStore;
   /** 버전별 콘텐츠. 진행 중 run은 생성 시 고정된 버전으로만 처리한다 (§23.1). */
   contents: ContentPack[];
   logger?: boolean;
@@ -92,6 +108,7 @@ function engineErrorStatus(err: EngineError): number {
 
 export function buildApp(options: AppOptions): FastifyInstance {
   const { store } = options;
+  const players = options.players ?? new MemoryPlayerStore();
   const now = options.now ?? (() => new Date());
   const contents = new Map<string, ContentIndex>(
     options.contents.map((c) => [c.contentVersion, indexContent(c)]),
@@ -147,6 +164,39 @@ export function buildApp(options: AppOptions): FastifyInstance {
     return { state: rebound, content: latestContent };
   };
 
+  /**
+   * S10 플레이어 토큰 = `${playerId}.${비밀}`. 서버에는 해시만 저장한다.
+   * 없거나 맞지 않으면 null (새 플레이어로 취급).
+   */
+  const findPlayer = async (req: FastifyRequest): Promise<PlayerRecord | null> => {
+    const token = req.headers[PLAYER_TOKEN_HEADER];
+    if (typeof token !== 'string') return null;
+    const playerId = token.split('.')[0] ?? '';
+    const record = await players.get(playerId).catch(() => undefined);
+    return record && tokenMatches(token, record.tokenHash) ? record : null;
+  };
+
+  /** S10 엔딩이 확정된 판을 플레이어 도감에 반영 (서버가 직접 판정, 조작된 판 제외, 중복 반영 없음) */
+  const recordFinishedRun = async (state: GameRunState, content: ContentIndex, req: FastifyRequest) => {
+    if (!state.playerId || state.playtestModified || !state.ending) return;
+    try {
+      await players.update(state.playerId, (p) => ({
+        ...p,
+        collection: mergeRun(
+          p.collection,
+          state.runId,
+          collectRun(state, content),
+          state.difficulty,
+          now().toISOString(),
+          content,
+        ).collection,
+      }));
+    } catch (err) {
+      // 도감 반영 실패가 게임 진행을 막지는 않는다 (다음 조회 때 다시 시도하지 않음 — 로그로 추적)
+      req.log.error({ err, runId: state.runId }, 'collection update failed');
+    }
+  };
+
   /** 소유권 검증: 게스트 토큰이 없으면 401, 다르면 403 (§11.4) */
   const authorize = (req: FastifyRequest, record: RunRecord | undefined): RunRecord => {
     if (!record) throw new ApiError(404, 'NOT_FOUND', 'run not found');
@@ -176,7 +226,8 @@ export function buildApp(options: AppOptions): FastifyInstance {
   ): Promise<{ statusCode: number; body: unknown }> => {
     const { idempotencyKey, expectedRevision, ...payload } = body;
     const requestHash = hashRequest({ command, payload });
-    return store.update(req.params.id, async (record) => {
+    let finished: { state: GameRunState; content: ContentIndex } | null = null;
+    const value = await store.update(req.params.id, async (record) => {
       authorize(req, record);
       const previous = record.idempotency[idempotencyKey];
       if (previous) {
@@ -198,6 +249,8 @@ export function buildApp(options: AppOptions): FastifyInstance {
         stateRevision: record.state.stateRevision + 1,
       });
       const responseBody = { view: toPublicView(nextState, content), result: out.result ?? null };
+      if (record.state.phase !== 'GAME_OVER' && nextState.phase === 'GAME_OVER')
+        finished = { state: nextState, content };
 
       const entries = Object.entries(record.idempotency)
         .sort((a, b) => a[1].createdAt.localeCompare(b[1].createdAt))
@@ -221,6 +274,10 @@ export function buildApp(options: AppOptions): FastifyInstance {
         value: { statusCode: 200, body: responseBody },
       };
     });
+    // 판 저장이 끝난 뒤 도감에 반영 (응답 전에 끝내 엔딩 화면이 바로 새 발견을 볼 수 있게)
+    const done = finished as { state: GameRunState; content: ContentIndex } | null;
+    if (done) await recordFinishedRun(done.state, done.content, req);
+    return value;
   };
 
   const parseBody = <T>(
@@ -243,6 +300,24 @@ export function buildApp(options: AppOptions): FastifyInstance {
   app.post('/api/runs', async (req, reply) => {
     const profile = validateProfileInput(req.body, latest.policy.bannedWords);
     if (!profile.ok) throw new ApiError(400, 'VALIDATION_FAILED', 'invalid profile', profile.issues);
+    // S10 난이도 (생략 시 보통)
+    const rawDifficulty = (req.body as Record<string, unknown> | null)?.['difficulty'] ?? 'NORMAL';
+    const difficulty = DifficultySchema.safeParse(rawDifficulty);
+    if (!difficulty.success) throw new ApiError(400, 'VALIDATION_FAILED', 'invalid difficulty');
+    // S10 플레이어: 받은 토큰이 유효하면 이어서, 아니면 새로 만든다
+    let player = await findPlayer(req);
+    let playerToken = req.headers[PLAYER_TOKEN_HEADER] as string;
+    if (!player) {
+      const playerId = randomUUID();
+      playerToken = `${playerId}.${randomBytes(24).toString('base64url')}`;
+      player = {
+        playerId,
+        tokenHash: hashToken(playerToken),
+        collection: emptyCollection(),
+        createdAt: now().toISOString(),
+      };
+      await players.create(player);
+    }
     const guestToken = randomBytes(32).toString('base64url');
     const state = createRun(
       {
@@ -251,6 +326,8 @@ export function buildApp(options: AppOptions): FastifyInstance {
         seed: randomBytes(16).toString('hex'),
         profile: profile.profile,
         now: now().toISOString(),
+        difficulty: difficulty.data,
+        playerId: player.playerId,
       },
       latestContent,
     );
@@ -260,12 +337,19 @@ export function buildApp(options: AppOptions): FastifyInstance {
     const body: CreateRunResponse = {
       runId: state.runId,
       guestToken,
+      playerToken,
       view: toPublicView(state, latestContent),
     };
     return reply.status(201).send(body);
   });
 
   app.get<{ Params: { id: string } }>('/api/runs/:id', async (req) => loadView(req));
+
+  // S10 도감·업적. 토큰이 없거나 맞지 않으면 빈 도감 (?run= 이 판의 새 발견 포함)
+  app.get<{ Querystring: { run?: string } }>('/api/player', async (req): Promise<PublicCollection> => {
+    const player = await findPlayer(req);
+    return toPublicCollection(player?.collection ?? emptyCollection(), latestContent, req.query.run);
+  });
 
   app.post<{ Params: { id: string } }>('/api/runs/:id/character', async (req, reply) => {
     const body = parseBody(ChooseCharacterRequestSchema, req.body);

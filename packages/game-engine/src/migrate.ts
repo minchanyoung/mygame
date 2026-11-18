@@ -64,6 +64,10 @@ export function migrateRunState(raw: unknown): GameRunState {
     }
   }
 
+  // S10 난이도·플레이어 (옛 판은 보통, 도감 기록 없음)
+  s.difficulty ??= 'NORMAL';
+  s.playerId ??= null;
+
   // S9 인생 연대기: 연간 기록은 업데이트 이후부터 쌓인다 (과거 추정치를 만들지 않음)
   s.yearlyRecords ??= [];
   if (isObj(s.statistics)) {

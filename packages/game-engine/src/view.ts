@@ -1,4 +1,5 @@
 import {
+  DIFFICULTY_LABELS,
   GENDER_LABELS,
   JOB_LABELS,
   JOB_LOSS_REASONS,
@@ -45,7 +46,7 @@ import {
   type TraitLevels,
 } from '@company-life/shared';
 import { backgroundEffects, recommendedJob } from './background-effects';
-import { inflate, priceIndex } from './economy';
+import { inflate, priceIndex, difficultyKnobs, scaleLoss } from './economy';
 import { goalDef, lifeGoalProgress } from './goals';
 import { promotionStatus } from './promotion';
 import { matchesConditions } from './conditions';
@@ -118,10 +119,11 @@ function toPublicNpc(npc: Npc, content: ContentIndex): PublicNpc {
 }
 
 /** §22.1 확정 비용만 표시 (확률은 비공개) */
-function costLabels(effects: readonly Effect[], index: number): string[] {
+function costLabels(effects: readonly Effect[], index: number, lossPermille: number): string[] {
   const out: string[] = [];
   for (const e of effects) {
-    if (e.type === 'RESOURCE_DELTA' && e.amount < 0) out.push(`${RESOURCE_LABELS[e.key]} ${e.amount}`);
+    if (e.type === 'RESOURCE_DELTA' && e.amount < 0)
+      out.push(`${RESOURCE_LABELS[e.key]} ${scaleLoss(e.amount, lossPermille)}`);
     if (e.type === 'CASH_DELTA' && e.amount < 0) out.push(`현금 -${krw(-inflate(e.amount, index))}`);
   }
   return out;
@@ -164,6 +166,7 @@ function guaranteedEnding(
       occurrenceId,
       participantNpcId: participant?.npcId ?? null,
       priceIndex: priceIndex(state, content),
+      lossPermille: difficultyKnobs(state, content).lossPermille,
     });
   } catch {
     return null;
@@ -547,7 +550,11 @@ export function toPublicActiveEvent(state: GameRunState, content: ContentIndex):
         risk: c.risk,
         riskLabel: c.risk ? RISK_LABELS[c.risk] : null,
         appliedTraits,
-        costs: costLabels(c.choice.guaranteedEffects ?? [], priceIndex(state, content)),
+        costs: costLabels(
+          c.choice.guaranteedEffects ?? [],
+          priceIndex(state, content),
+          difficultyKnobs(state, content).lossPermille,
+        ),
         ...endingNotices(
           guaranteedEnding(state, c.choice, participant, active.occurrenceId, event.id, content),
         ),
@@ -637,6 +644,8 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
       gender: state.profile.gender,
       genderLabel: GENDER_LABELS[state.profile.gender],
     },
+    difficulty: state.difficulty,
+    difficultyLabel: DIFFICULTY_LABELS[state.difficulty],
     characterCards: state.characterCards.map((c) => toPublicCard(c, content)),
     selectedCardId: state.selectedCharacter?.cardId ?? null,
     jobOffers: state.jobOffers.map((o) => {

@@ -11,7 +11,7 @@ import { processAnnualReview, processSalaryAdjustment } from './annual';
 import type { ContentIndex } from './content-index';
 import { withYearlyRecord } from './chronicle';
 import { buildEnding, debtLimit, finalizeEnding, withPendingEnding } from './ending';
-import { inflate, priceIndex } from './economy';
+import { difficultyKnobs, inflate, priceIndex } from './economy';
 import { EngineError } from './errors';
 import { updateLifeGoalMilestone } from './goals';
 import { rollNpcLife } from './npc-life';
@@ -67,7 +67,9 @@ export function applyMonthlySettlement(
   const tax = Math.floor((gross * monthly.taxPermille) / 1000);
   const netSalary = gross - tax;
   // 물가 상승: 해마다 복리로 오른 생활비 (천 원 단위)
-  const index = priceIndex(state, content);
+  // S10 난이도는 생활비 배율로 물가 지수에 곱한다
+  const prices = priceIndex(state, content);
+  const index = (prices * difficultyKnobs(state, content).livingCostPermille) / 1000;
   const grow = (n: number) => inflate(n, index);
   const livingBreakdown = {
     housing: grow(monthly.livingCosts.housing),
@@ -83,7 +85,7 @@ export function applyMonthlySettlement(
   let debt = state.debt + interest;
   // 원금 상환은 실제로 낼 현금이 있을 때만 (빚으로 빚을 갚지 않는다)
   // 상환 상한도 물가를 따라 오른다 (고정이면 후반에 이자를 못 따라가 빚이 저절로 불어남)
-  const debtRepayment = Math.max(0, Math.min(debt, inflate(monthly.debtRepayment, index), cash));
+  const debtRepayment = Math.max(0, Math.min(debt, inflate(monthly.debtRepayment, prices), cash));
   cash -= debtRepayment;
   debt -= debtRepayment;
   if (cash < 0) {

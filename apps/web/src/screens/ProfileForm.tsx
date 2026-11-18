@@ -1,15 +1,25 @@
 import { useState, type FormEvent } from 'react';
 import {
+  DIFFICULTIES,
+  DIFFICULTY_LABELS,
   DISPLAY_NAME_MAX,
   DISPLAY_NAME_MIN,
   GENDER_LABELS,
   GENDERS,
+  type Difficulty,
   type Gender,
 } from '@company-life/shared';
 
+/** 난이도 한 줄 설명 (정확한 수치는 숨긴다) */
+const DIFFICULTY_HELP: Record<Difficulty, string> = {
+  EASY: '처음이라면. 일이 조금 더 잘 풀리고 덜 지친다.',
+  NORMAL: '기본. 신중하게 하면 대부분 50세를 넘긴다.',
+  REAL: '현실은 냉정하다. 신중해도 절반쯤은 50세 전에 회사를 떠난다.',
+};
+
 interface Props {
   busy: boolean;
-  onSubmit: (displayName: string, gender: Gender) => void;
+  onSubmit: (displayName: string, gender: Gender, difficulty: Difficulty) => void;
   onBack: () => void;
 }
 
@@ -17,12 +27,13 @@ interface Props {
 export function ProfileForm({ busy, onSubmit, onBack }: Props) {
   const [name, setName] = useState('');
   const [gender, setGender] = useState<Gender | null>(null);
+  const [difficulty, setDifficulty] = useState<Difficulty>('NORMAL');
   const length = Array.from(name.trim()).length;
   const nameOk = length >= DISPLAY_NAME_MIN && length <= DISPLAY_NAME_MAX;
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    if (nameOk && gender) onSubmit(name, gender);
+    if (nameOk && gender) onSubmit(name, gender, difficulty);
   };
 
   return (
@@ -64,6 +75,25 @@ export function ProfileForm({ busy, onSubmit, onBack }: Props) {
             </label>
           ))}
         </div>
+      </fieldset>
+
+      <fieldset className="field">
+        <legend className="field-label">난이도</legend>
+        <div className="segmented segmented-3">
+          {DIFFICULTIES.map((d) => (
+            <label key={d} className={`segment ${difficulty === d ? 'segment-on' : ''}`}>
+              <input
+                type="radio"
+                name="difficulty"
+                value={d}
+                checked={difficulty === d}
+                onChange={() => setDifficulty(d)}
+              />
+              {DIFFICULTY_LABELS[d]}
+            </label>
+          ))}
+        </div>
+        <span className="field-help">{DIFFICULTY_HELP[difficulty]} 시작한 뒤에는 바꿀 수 없어요.</span>
       </fieldset>
 
       <div className="action-bar">

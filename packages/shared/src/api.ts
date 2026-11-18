@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type {
   CompanyGrade,
+  Difficulty,
   EmploymentStatus,
   EndingType,
   Gender,
@@ -17,6 +18,8 @@ import type { Resources } from './state-schema';
 /** §23.3 API 계약. 쓰기 요청은 idempotencyKey + expectedRevision을 포함한다. */
 
 export const GUEST_TOKEN_HEADER = 'x-guest-token';
+/** S10 여러 판을 잇는 플레이어 토큰 (도감·업적) */
+export const PLAYER_TOKEN_HEADER = 'x-player-token';
 
 const IdempotencyKeySchema = z.string().min(8).max(100);
 const RevisionSchema = z.number().int().min(0);
@@ -423,6 +426,9 @@ export interface PublicRunView {
   contentVersion: string;
   turn: { turnIndex: number; age: number; yearIndex: number; monthOfYear: number };
   profile: { displayName: string; gender: Gender; genderLabel: string };
+  /** S10 난이도 */
+  difficulty: Difficulty;
+  difficultyLabel: string;
   characterCards: PublicCharacterCard[];
   selectedCardId: string | null;
   jobOffers: PublicJobOffer[];
@@ -481,7 +487,56 @@ export interface PublicRunView {
 export interface CreateRunResponse {
   runId: string;
   guestToken: string;
+  /** S10 플레이어 토큰 (새로 만들었거나 받은 것을 그대로). 브라우저에 따로 보관 */
+  playerToken: string;
   view: PublicRunView;
+}
+
+/** S10 도감 한 칸 */
+export interface PublicCollectionItem {
+  id: string;
+  found: boolean;
+  /** 못 본 항목은 '???' */
+  name: string;
+  emoji: string | null;
+  /** 본 항목: 설명 / 못 본 항목: 힌트 */
+  text: string;
+  /** 등급·희귀도·분류 같은 짧은 꼬리표 */
+  tag: string | null;
+  count: number;
+  firstAt: string | null;
+  difficulties: string[];
+}
+
+export interface PublicCollectionCategory {
+  key: 'titles' | 'endings' | 'goals' | 'companies' | 'seriesEndings' | 'traits';
+  label: string;
+  found: number;
+  total: number;
+  items: PublicCollectionItem[];
+}
+
+export interface PublicAchievement {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  done: boolean;
+  at: string | null;
+}
+
+/** S10 GET /api/player — 도감·업적 */
+export interface PublicCollection {
+  runsFinished: number;
+  found: number;
+  total: number;
+  categories: PublicCollectionCategory[];
+  achievements: PublicAchievement[];
+  /** 요청한 판(?run=)이 끝나며 새로 발견한 것 (없으면 null) */
+  discovery: {
+    items: { category: string; name: string; emoji: string | null }[];
+    achievements: PublicAchievement[];
+  } | null;
 }
 
 // ───────── 플레이테스트 도구 (서버 환경 변수 PLAYTEST_TOOLS=1일 때만 활성) ─────────
