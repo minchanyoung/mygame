@@ -49,6 +49,8 @@ export interface AutoPlayResult {
   news: number;
   seriesStarted: number;
   seriesFinished: number;
+  /** S9 별명 [대표, 보조…] */
+  titles: string[];
 }
 
 function pickChoice(
@@ -141,10 +143,17 @@ function careerStats(
       return s !== undefined && s.episode === s.total;
     }).length,
     retirementTier: state.ending?.retirementTier ?? null,
+    titles: state.ending?.titles ?? [],
   };
 }
 
-export function autoPlay(seed: string, policy: AutoPlayPolicy, content: ContentIndex): AutoPlayResult {
+export function autoPlay(
+  seed: string,
+  policy: AutoPlayPolicy,
+  content: ContentIndex,
+  /** 테스트용: 끝난 판의 최종 상태를 받아 본다 */
+  onFinish?: (state: GameRunState) => void,
+): AutoPlayResult {
   const policyRng = SeededRng.derive(seed, 'policy');
   const now = '2026-11-17T00:00:00.000Z';
   let state = createRun(
@@ -205,6 +214,7 @@ export function autoPlay(seed: string, policy: AutoPlayPolicy, content: ContentI
     }
   }
   const e = state.ending;
+  onFinish?.(state);
   return {
     ...careerStats(state, content),
     seed,

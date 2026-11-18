@@ -9,7 +9,8 @@ import {
 } from '@company-life/shared';
 import { processAnnualReview, processSalaryAdjustment } from './annual';
 import type { ContentIndex } from './content-index';
-import { buildEnding, finalizeEnding, withPendingEnding } from './ending';
+import { withYearlyRecord } from './chronicle';
+import { buildEnding, debtLimit, finalizeEnding, withPendingEnding } from './ending';
 import { inflate, priceIndex } from './economy';
 import { EngineError } from './errors';
 import { updateLifeGoalMilestone } from './goals';
@@ -31,6 +32,9 @@ import { assertCommand, assertTransition } from './state-machine';
 
 /** §20.1 예약 이벤트 최대 지연 */
 export const MAX_SCHEDULE_DELAY_MONTHS = 3;
+
+/** S9 '무너지기 직전'으로 세는 월말 체력·정신력 */
+export const NEAR_COLLAPSE = 10;
 
 /** 한 달에 열리는 사건 칸 순서: 업무 → 일상 */
 export const MONTH_SLOTS: readonly EventSlot[] = ['work', 'life'];
@@ -182,7 +186,11 @@ export function startMonth(
   const adjusted = processSalaryAdjustment(state, content);
   const promoted = processPromotion(adjusted.state, content);
   const settled = applyMonthlySettlement(promoted.state, content);
-  const annual = processAnnualReview(settled.state, content);
+  const reviewed0 = processAnnualReview(settled.state, content);
+  // S9 연간 기록: 인사평가가 처리된 달(12월)에 한 줄 남긴다
+  const annual = reviewed0.review
+    ? { ...reviewed0, state: withYearlyRecord(reviewed0.state, content, reviewed0.review.grade) }
+    : reviewed0;
   // S8 동료의 인생: 소식과 그에 따른 후속 사건 예약 (사건 선정 전)
   const life = rollNpcLife(annual.state, content);
   const reviewed = { state: life.state, review: annual.review };
@@ -292,18 +300,22 @@ export function chooseInMonth(
     ...goal.state,
     currentMonth: goal.state.currentMonth && { ...goal.state.currentMonth, goalMilestone: goal.milestone },
   };
+  const streak = thisMonthHighRisk ? state.statistics.consecutiveHighRiskMonths + 1 : 0;
+  const wellbeing = Math.min(closed.resources.health, closed.resources.mental);
+  const limit = debtLimit(closed, content);
+  const debtPermille = limit ? Math.floor((closed.debt * 1000) / limit) : 0;
   return {
     state: {
       ...closed,
       pendingEvents: [],
       statistics: {
         ...closed.statistics,
-        consecutiveHighRiskMonths: thisMonthHighRisk ? state.statistics.consecutiveHighRiskMonths + 1 : 0,
-        lowestWellbeing: Math.min(
-          closed.statistics.lowestWellbeing,
-          closed.resources.health,
-          closed.resources.mental,
-        ),
+        consecutiveHighRiskMonths: streak,
+        lowestWellbeing: Math.min(closed.statistics.lowestWellbeing, wellbeing),
+        // S9 별명 판정용 커리어 통계
+        nearCollapseMonths: closed.statistics.nearCollapseMonths + (wellbeing <= NEAR_COLLAPSE ? 1 : 0),
+        maxHighRiskStreak: Math.max(closed.statistics.maxHighRiskStreak, streak),
+        peakDebtPermille: Math.max(closed.statistics.peakDebtPermille, debtPermille),
       },
     },
     result: r,
@@ -318,7 +330,7 @@ export function nextMonth(state: GameRunState, content: ContentIndex, now: strin
   assertCommand(state.phase, 'nextMonth');
   if (state.pendingEnding) {
     assertTransition(state.phase, 'nextMonth', 'GAME_OVER');
-    return finalizeEnding(state, state.pendingEnding, now);
+    return finalizeEnding(withYearlyRecord(state, content, null), state.pendingEnding, now);
   }
   // 받지 않은 이직 제안서는 이달로 만료
   const advanced: GameRunState = {
@@ -329,7 +341,11 @@ export function nextMonth(state: GameRunState, content: ContentIndex, now: strin
   };
   if (turnInfo(advanced.turnIndex, content.pack.rules.startAge).age >= content.pack.rules.retireAge) {
     assertTransition(state.phase, 'nextMonth', 'GAME_OVER');
-    return finalizeEnding(advanced, buildEnding(advanced, 'RETIREMENT', null, content), now);
+    return finalizeEnding(
+      withYearlyRecord(advanced, content, null),
+      buildEnding(advanced, 'RETIREMENT', null, content),
+      now,
+    );
   }
   assertTransition(state.phase, 'nextMonth', 'MONTH_START');
   return { ...advanced, phase: 'MONTH_START' };

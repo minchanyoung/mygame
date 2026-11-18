@@ -116,6 +116,20 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
   console.log(
     `  ${mark(newsPerYear >= 1 && newsPerYear <= 2)} 사내 소식 연 ${newsPerYear.toFixed(2)}건 (목표 1~2) · 연재 시작 판당 ${(started / runs).toFixed(2)}편, 완결률 ${started ? ((finished / started) * 100).toFixed(0) : 0}%`,
   );
+  // S9 별명: 기본 별명 비율(목표 10% 이하), 별명별 대표·획득 비율
+  const defaults = results.filter((r) => r.titles[0] === 'title_default').length;
+  console.log(`  ${mark(defaults / runs <= 0.1)} 기본 별명만 받은 판 ${pct(defaults)} (목표 10% 이하)`);
+  const titleIds = new Set(results.flatMap((r) => r.titles));
+  const titleRows = [...titleIds]
+    .map((id) => ({
+      id,
+      main: results.filter((r) => r.titles[0] === id).length,
+      any: results.filter((r) => r.titles.includes(id)).length,
+    }))
+    .sort((a, b) => b.any - a.any);
+  console.log(
+    `  별명 (대표 / 획득): ${titleRows.map((t) => `${t.id.replace('title_', '')} ${share(t.main)}/${share(t.any)}`).join(' · ')}`,
+  );
   console.log('  인생 목표 달성률 (목표 20~45%):');
   for (const [id, g] of [...byGoal.entries()].sort()) {
     const rate = g.ok / g.n;

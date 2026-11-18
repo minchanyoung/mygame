@@ -405,7 +405,12 @@ describe('monthly loop and game over over HTTP (§26)', () => {
     expect(view!.pendingEnding).not.toBeNull();
     const over = (await post('next-month', {}, revision++)).json.view;
     expect(over.phase).toBe('GAME_OVER');
-    expect(over.ending).toEqual(view!.pendingEnding);
+    // 예고된 엔딩이 그대로 확정된다. 별명·연대기는 확정 후에만 공개 (S9)
+    expect(view!.pendingEnding!.titles).toBeNull();
+    expect(view!.pendingEnding!.chronicle).toBeNull();
+    expect({ ...over.ending, titles: null, chronicle: null }).toEqual(view!.pendingEnding);
+    expect(over.ending!.titles!.main.id).toMatch(/^title_/);
+    expect(over.ending!.chronicle!.eras.length).toBeGreaterThan(0);
 
     for (const url of ['start-month', 'next-month']) {
       const res = await post(url, {}, revision);

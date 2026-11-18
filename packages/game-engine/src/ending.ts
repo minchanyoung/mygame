@@ -13,6 +13,7 @@ import type { ContentIndex } from './content-index';
 import { priceIndex } from './economy';
 import { judgeLifeGoal } from './goals';
 import { currentTeamNpcs } from './npcs';
+import { judgeTitles } from './titles';
 
 /** 부채 한계선 = 연봉 × 배수 (§26.1). 재직 정보가 없으면 null. */
 export function debtLimit(state: GameRunState, content: ContentIndex): number | null {
@@ -67,10 +68,12 @@ export function buildEnding(
   const causeText = pickText(causeDef, state, content);
   const base = { cause, age, turnIndex: state.turnIndex, sourceEventId };
   // 인생 목표·노후 등급은 엔딩 종류가 정해진 뒤에 붙인다 (실패 엔딩은 목표 자동 미달성, 노후 등급 없음)
-  const withGoal = (e: Omit<Ending, 'goal' | 'retirementTier'>): Ending => ({
+  const withGoal = (e: Omit<Ending, 'goal' | 'retirementTier' | 'titles'>): Ending => ({
     ...e,
     goal: judgeLifeGoal(state, e, content),
     retirementTier: e.category === 'NORMAL' ? retirementTier(state, content) : null,
+    // S9 별명은 예고 단계에서도 판정해 두고, 확정 시 그대로 고정된다
+    titles: judgeTitles(state, e, content),
   });
 
   if (cause === 'RETIREMENT' || cause === 'EXECUTIVE_PROMOTION') {

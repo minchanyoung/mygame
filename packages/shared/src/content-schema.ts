@@ -5,6 +5,8 @@ import {
   CompanyIdSchema,
   ContentIdSchema,
   ENDING_CAUSES,
+  EndingCauseSchema,
+  EndingTypeSchema,
   EventIdSchema,
   JOB_IDS,
   JobIdSchema,
@@ -15,7 +17,7 @@ import {
   ResourceKeySchema,
   ReviewGradeSchema,
 } from './enums';
-import { ConditionsSchema, EventDefinitionSchema } from './event-schema';
+import { ConditionsSchema, EventDefinitionSchema, IntRangeSchema } from './event-schema';
 
 /** 사건으로만 획득하는 영구 특성(긍정 능력/부정 특성) 마스터 데이터 (§4.2, §4.2.2, §22.2). */
 export const TraitDefinitionSchema = z
@@ -466,6 +468,78 @@ export const LifeGoalDefinitionSchema = z
   }, '목표 종류에 필요한 수치(amount/rank/stat/count)가 없음');
 export type LifeGoalDefinition = z.infer<typeof LifeGoalDefinitionSchema>;
 
+/** S9 별명(칭호). 조건은 모두 AND, 엔딩 확정 시점에 판정한다. 빈 rule = 기본 별명. */
+export const TITLE_RARITIES = ['COMMON', 'RARE', 'LEGENDARY'] as const;
+export const TitleRaritySchema = z.enum(TITLE_RARITIES);
+export type TitleRarity = z.infer<typeof TitleRaritySchema>;
+
+const ChoicePickSchema = z.object({ eventId: EventIdSchema, choiceId: z.string().min(1) }).strict();
+
+export const TitleRuleSchema = z
+  .object({
+    category: z.enum(['FAILURE', 'NORMAL']).optional(),
+    endingTypes: z.array(EndingTypeSchema).min(1).optional(),
+    endingCauses: z.array(EndingCauseSchema).min(1).optional(),
+    endAge: IntRangeSchema.optional(),
+    transfers: IntRangeSchema.optional(),
+    /** 커리어 최고 직급이 이 중 하나 */
+    highestRanks: z.array(PlayerRankSchema).min(1).optional(),
+    /** 연간 기록(12월)에서 이 직급이었던 해의 수 */
+    rankYears: z
+      .object({ rank: PlayerRankSchema, min: z.number().int().min(1) })
+      .strict()
+      .optional(),
+    /** 이 나이 전에 이 직급 이상 승진 */
+    rankBeforeAge: z.object({ rank: PlayerRankSchema, age: z.number().int() }).strict().optional(),
+    /** 이 나이 이후에 승진한 적 있음 */
+    promotedFromAge: z.number().int().optional(),
+    reviewCount: z
+      .object({ grades: z.array(ReviewGradeSchema).min(1), min: z.number().int().min(1) })
+      .strict()
+      .optional(),
+    /** 평가를 minCount번 이상 받았고 모든 평가가 이 등급들 안 */
+    reviewsWithin: z
+      .object({ grades: z.array(ReviewGradeSchema).min(1), minCount: z.number().int().min(1) })
+      .strict()
+      .optional(),
+    /** from 등급을 받은 뒤 to 등급을 받은 적 있음 */
+    comeback: z
+      .object({ from: z.array(ReviewGradeSchema).min(1), to: z.array(ReviewGradeSchema).min(1) })
+      .strict()
+      .optional(),
+    /** 순자산 범위 (첫해 물가 기준, 물가 지수를 곱해 비교) */
+    netWorth: IntRangeSchema.optional(),
+    lowestWellbeing: IntRangeSchema.optional(),
+    nearCollapseMonths: IntRangeSchema.optional(),
+    maxHighRiskStreak: IntRangeSchema.optional(),
+    /** 커리어 중 부채가 한계선의 몇 ‰까지 갔나 */
+    peakDebtPermille: IntRangeSchema.optional(),
+    debtAtEnd: IntRangeSchema.optional(),
+    /** 이 선택 중 하나라도 한 적 있음 */
+    choicesAny: z.array(ChoicePickSchema).min(1).optional(),
+    /** 호감 높은 동료 수 (떠난 사람 포함) */
+    friends: IntRangeSchema.optional(),
+    /** 신뢰 높은 상사 수 */
+    trustedBosses: IntRangeSchema.optional(),
+  })
+  .strict();
+export type TitleRule = z.infer<typeof TitleRuleSchema>;
+
+export const TitleDefinitionSchema = z
+  .object({
+    id: ContentIdSchema,
+    name: z.string().min(1).max(12),
+    emoji: z.string().min(1).max(4),
+    rarity: TitleRaritySchema,
+    /** 높을수록 대표 별명으로 먼저 뽑힌다 */
+    priority: z.number().int().min(0).max(1000),
+    /** 붙은 이유 한 줄 */
+    reason: z.string().min(1).max(80),
+    rule: TitleRuleSchema,
+  })
+  .strict();
+export type TitleDefinition = z.infer<typeof TitleDefinitionSchema>;
+
 export const ContentPackSchema = z
   .object({
     contentVersion: z.string().min(1),
@@ -483,6 +557,7 @@ export const ContentPackSchema = z
     events: z.array(EventDefinitionSchema),
     endings: EndingsSchema,
     lifeGoals: z.array(LifeGoalDefinitionSchema).min(3),
+    titles: z.array(TitleDefinitionSchema).min(1),
   })
   .strict();
 export type ContentPack = z.infer<typeof ContentPackSchema>;

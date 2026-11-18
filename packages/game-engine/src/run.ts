@@ -62,6 +62,7 @@ export function createRun(input: CreateRunInput, content: ContentIndex): GameRun
     npcAssignments: [],
     eventHistory: [{ turnIndex: 0, kind: 'RUN_CREATED', summary: '새 인생 시작' }],
     annualReviews: [],
+    yearlyRecords: [],
     annualReviewProcessedYear: null,
     salaryAdjustedYear: null,
     statistics: {
@@ -72,6 +73,9 @@ export function createRun(input: CreateRunInput, content: ContentIndex): GameRun
       consecutiveHighRiskMonths: 0,
       lowestWellbeing: 100,
       transfers: 0,
+      nearCollapseMonths: 0,
+      maxHighRiskStreak: 0,
+      peakDebtPermille: 0,
     },
     currentMonth: null,
     pendingEnding: null,

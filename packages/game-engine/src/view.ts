@@ -35,6 +35,7 @@ import {
   type PublicChoice,
   type PublicEffect,
   type PublicEnding,
+  type PublicTitle,
   type PublicMonthSummary,
   type PublicNpc,
   type PublicRunView,
@@ -50,6 +51,7 @@ import { promotionStatus } from './promotion';
 import { matchesConditions } from './conditions';
 import { requireFrom, type ContentIndex } from './content-index';
 import { applyEffects } from './effects';
+import { buildChronicle } from './chronicle';
 import { buildEnding, debtLimit, detectJobLossCause } from './ending';
 import { evaluateChoices } from './events';
 import { currentTeamNpcs } from './npcs';
@@ -218,12 +220,20 @@ export function computeWarnings(state: GameRunState, content: ContentIndex): Pub
   return out;
 }
 
+function toPublicTitle(id: string, content: ContentIndex): PublicTitle | null {
+  const t = content.pack.titles.find((x) => x.id === id);
+  return t ? { id: t.id, name: t.name, emoji: t.emoji, rarity: t.rarity, reason: t.reason } : null;
+}
+
 function toPublicEnding(
   ending: Ending | null,
   state: GameRunState,
   content: ContentIndex,
+  final: boolean,
 ): PublicEnding | null {
   if (!ending) return null;
+  const titles = (ending.titles ?? []).map((id) => toPublicTitle(id, content)).filter((t) => t !== null);
+  const [main, ...subs] = titles;
   const best = state.statistics.highestRank;
   const def = ending.goal ? content.pack.lifeGoals.find((g) => g.id === ending.goal!.goalId) : undefined;
   return {
@@ -240,6 +250,9 @@ function toPublicEnding(
       ending.goal && def
         ? { title: def.title, emoji: def.emoji, achieved: ending.goal.achieved, text: ending.goal.text }
         : null,
+    // 별명·연대기는 확정된 엔딩에서만 공개 (예고 단계에서 미리 보이지 않게)
+    titles: final && main ? { main, subs } : null,
+    chronicle: final ? buildChronicle(state, content) : null,
   };
 }
 
@@ -723,8 +736,8 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
     activeEvent: toPublicActiveEvent(state, content),
     warnings: computeWarnings(state, content),
     monthSummary: toMonthSummary(state, content),
-    pendingEnding: toPublicEnding(state.pendingEnding, state, content),
-    ending: toPublicEnding(state.ending, state, content),
+    pendingEnding: toPublicEnding(state.pendingEnding, state, content, false),
+    ending: toPublicEnding(state.ending, state, content, true),
     playtestModified: state.playtestModified,
     calendar: toCalendar(state, content),
     history: toHistory(state, content),

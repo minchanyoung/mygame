@@ -7,13 +7,14 @@ import lifeGoals from '../data/life-goals.json' with { type: 'json' };
 import npc from '../data/npc.json' with { type: 'json' };
 import policy from '../data/policy.json' with { type: 'json' };
 import rules from '../data/rules.json' with { type: 'json' };
+import titles from '../data/titles.json' with { type: 'json' };
 import traits from '../data/traits.json' with { type: 'json' };
 import { validateContentPack } from './validate';
 
 export * from './validate';
 
 /** 콘텐츠 버전. 데이터가 바뀌면 올린다. 새 run은 생성 시 이 버전에 고정된다 (§23.1). */
-export const CONTENT_VERSION = '2026.11.18-p1.9';
+export const CONTENT_VERSION = '2026.11.18-p2.0';
 
 const jsonClone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
 
@@ -33,6 +34,7 @@ export function rawContentPack(): unknown {
     events,
     endings,
     lifeGoals,
+    titles,
   });
 }
 

@@ -1,0 +1,250 @@
+[
+  {
+    "id": "title_star",
+    "name": "별을 단 사람",
+    "emoji": "⭐",
+    "rarity": "LEGENDARY",
+    "priority": 1000,
+    "reason": "임원 발령장을 받았다. 회사원이 오를 수 있는 가장 높은 곳.",
+    "rule": { "endingTypes": ["EXECUTIVE_PROMOTION"] }
+  },
+  {
+    "id": "title_fast_track",
+    "name": "초고속 승진",
+    "emoji": "🚀",
+    "rarity": "RARE",
+    "priority": 650,
+    "reason": "마흔이 되기 전에 부장 명함을 받았다.",
+    "rule": { "rankBeforeAge": { "rank": "DEPARTMENT_HEAD", "age": 40 } }
+  },
+  {
+    "id": "title_ace",
+    "name": "사내 에이스",
+    "emoji": "🏆",
+    "rarity": "RARE",
+    "priority": 640,
+    "reason": "인사평가 S를 여섯 번 넘게 받았다.",
+    "rule": { "reviewCount": { "grades": ["S"], "min": 6 } }
+  },
+  {
+    "id": "title_rich",
+    "name": "자산가",
+    "emoji": "💰",
+    "rarity": "RARE",
+    "priority": 620,
+    "reason": "은퇴할 때 순자산이 8억 원(첫해 물가 기준)을 넘었다.",
+    "rule": { "netWorth": { "min": 800000000 } }
+  },
+  {
+    "id": "title_one_club",
+    "name": "원클럽맨",
+    "emoji": "🏢",
+    "rarity": "RARE",
+    "priority": 600,
+    "reason": "이직 한 번 없이 한 회사에서 정년을 맞았다.",
+    "rule": { "endingTypes": ["RETIREMENT"], "transfers": { "max": 0 } }
+  },
+  {
+    "id": "title_work_life",
+    "name": "칼퇴 장인",
+    "emoji": "🌿",
+    "rarity": "RARE",
+    "priority": 600,
+    "reason": "커리어 내내 체력·정신력이 절반 아래로 떨어진 적이 없다.",
+    "rule": { "category": "NORMAL", "lowestWellbeing": { "min": 50 } }
+  },
+  {
+    "id": "title_migrant",
+    "name": "철새",
+    "emoji": "🕊",
+    "rarity": "RARE",
+    "priority": 580,
+    "reason": "세 번 넘게 회사를 옮겼다. 더 나은 둥지를 찾아서.",
+    "rule": { "transfers": { "min": 3 } }
+  },
+  {
+    "id": "title_phoenix",
+    "name": "불사조",
+    "emoji": "🔥",
+    "rarity": "RARE",
+    "priority": 570,
+    "reason": "쓰러지기 직전까지 간 달이 세 번 넘었지만, 끝내 버텼다.",
+    "rule": { "category": "NORMAL", "nearCollapseMonths": { "min": 3 } }
+  },
+  {
+    "id": "title_comeback",
+    "name": "오뚝이",
+    "emoji": "🪀",
+    "rarity": "RARE",
+    "priority": 560,
+    "reason": "인사평가 D를 받고도 다시 S까지 올라섰다.",
+    "rule": { "comeback": { "from": ["D"], "to": ["S"] } }
+  },
+  {
+    "id": "title_debt_war",
+    "name": "빚과의 전쟁",
+    "emoji": "⚔️",
+    "rarity": "RARE",
+    "priority": 540,
+    "reason": "빚이 한계선 턱밑까지 갔다가 0원으로 끝냈다.",
+    "rule": { "category": "NORMAL", "peakDebtPermille": { "min": 700 }, "debtAtEnd": { "max": 0 } }
+  },
+  {
+    "id": "title_whistle",
+    "name": "내부고발자",
+    "emoji": "📢",
+    "rarity": "RARE",
+    "priority": 530,
+    "reason": "장부의 비밀을 끝내 세상에 꺼냈다.",
+    "rule": {
+      "choicesAny": [
+        { "eventId": "evt_arc_ledger_4", "choiceId": "submit_all" },
+        { "eventId": "evt_arc_ledger_farewell", "choiceId": "hand_over" }
+      ]
+    }
+  },
+  {
+    "id": "title_senior",
+    "name": "모두의 선배",
+    "emoji": "📚",
+    "rarity": "COMMON",
+    "priority": 240,
+    "reason": "키운 후배가 나를 넘어서는 날, 기꺼이 박수를 쳤다.",
+    "rule": { "choicesAny": [{ "eventId": "evt_arc_mentee_4", "choiceId": "proud" }] }
+  },
+  {
+    "id": "title_politician",
+    "name": "사내 정치 9단",
+    "emoji": "🎩",
+    "rarity": "RARE",
+    "priority": 510,
+    "reason": "세 명 넘는 상사에게 깊은 신뢰를 받았다.",
+    "rule": { "trustedBosses": { "min": 3 } }
+  },
+  {
+    "id": "title_unlucky",
+    "name": "운이 없었을 뿐",
+    "emoji": "🍀",
+    "rarity": "RARE",
+    "priority": 450,
+    "reason": "평가는 좋았다. 회사가 먼저 흔들렸을 뿐.",
+    "rule": {
+      "category": "FAILURE",
+      "endingCauses": ["LAYOFF", "RESTRUCTURING", "FORCED_RESIGNATION", "COMPANY_CLOSURE"],
+      "reviewCount": { "grades": ["S", "A"], "min": 3 }
+    }
+  },
+  {
+    "id": "title_spark",
+    "name": "불꽃처럼",
+    "emoji": "🎇",
+    "rarity": "COMMON",
+    "priority": 400,
+    "reason": "서른이 되기 전에 회사 생활이 끝났다. 짧고 뜨거웠다.",
+    "rule": { "category": "FAILURE", "endAge": { "max": 29 } }
+  },
+  {
+    "id": "title_burnout",
+    "name": "번아웃 전사",
+    "emoji": "🕯",
+    "rarity": "COMMON",
+    "priority": 380,
+    "reason": "몸이나 마음이 먼저 바닥났다. 그만큼 일했다.",
+    "rule": { "endingCauses": ["OVERWORK_DISMISSAL", "BURNOUT_DISMISSAL"] }
+  },
+  {
+    "id": "title_rival",
+    "name": "평생의 라이벌",
+    "emoji": "🥊",
+    "rarity": "COMMON",
+    "priority": 250,
+    "reason": "라이벌 동기와 끝까지 승부를 냈다.",
+    "rule": {
+      "choicesAny": [
+        { "eventId": "evt_arc_rival_4", "choiceId": "winner" },
+        { "eventId": "evt_arc_rival_4", "choiceId": "shake_hands" }
+      ]
+    }
+  },
+  {
+    "id": "title_duo",
+    "name": "환상의 콤비",
+    "emoji": "🤝",
+    "rarity": "COMMON",
+    "priority": 250,
+    "reason": "라이벌 동기와 손잡고 '저 둘'로 불렸다.",
+    "rule": { "choicesAny": [{ "eventId": "evt_arc_rival_4", "choiceId": "toast_together" }] }
+  },
+  {
+    "id": "title_plant",
+    "name": "팀장님의 화분",
+    "emoji": "🪴",
+    "rarity": "COMMON",
+    "priority": 230,
+    "reason": "멘토의 마지막 출근 날, 1층까지 짐을 들어 드렸다.",
+    "rule": { "choicesAny": [{ "eventId": "evt_arc_mentor_4", "choiceId": "see_off" }] }
+  },
+  {
+    "id": "title_frugal",
+    "name": "알뜰살뜰",
+    "emoji": "🐷",
+    "rarity": "COMMON",
+    "priority": 430,
+    "reason": "과장 이하 직급으로 순자산 3억 원(첫해 물가 기준)을 모았다.",
+    "rule": { "highestRanks": ["STAFF", "ASSISTANT_MANAGER", "MANAGER"], "netWorth": { "min": 300000000 } }
+  },
+  {
+    "id": "title_eternal_manager",
+    "name": "만년 과장",
+    "emoji": "📎",
+    "rarity": "COMMON",
+    "priority": 450,
+    "reason": "과장으로 10년 넘게 일했다. 과장 자리가 제일 편했다.",
+    "rule": { "highestRanks": ["MANAGER"], "rankYears": { "rank": "MANAGER", "min": 10 } }
+  },
+  {
+    "id": "title_insider",
+    "name": "인싸",
+    "emoji": "🎉",
+    "rarity": "COMMON",
+    "priority": 300,
+    "reason": "나를 좋아하는 동료가 네 명이 넘었다.",
+    "rule": { "friends": { "min": 4 } }
+  },
+  {
+    "id": "title_overtime",
+    "name": "야근의 화신",
+    "emoji": "🌙",
+    "rarity": "COMMON",
+    "priority": 280,
+    "reason": "위험한 일을 반년 넘게 연달아 떠안았다.",
+    "rule": { "maxHighRiskStreak": { "min": 6 } }
+  },
+  {
+    "id": "title_late_bloomer",
+    "name": "늦깎이",
+    "emoji": "🌱",
+    "rarity": "COMMON",
+    "priority": 270,
+    "reason": "쉰이 넘어서도 승진했다. 늦게 핀 꽃도 꽃이다.",
+    "rule": { "promotedFromAge": 50 }
+  },
+  {
+    "id": "title_steady",
+    "name": "무난함의 달인",
+    "emoji": "😐",
+    "rarity": "COMMON",
+    "priority": 400,
+    "reason": "10년 넘게 평가가 A 아니면 B였다. 튀지 않는 것도 재능이다.",
+    "rule": { "reviewsWithin": { "grades": ["A", "B"], "minCount": 10 } }
+  },
+  {
+    "id": "title_default",
+    "name": "오늘도 출근한 사람",
+    "emoji": "🏃",
+    "rarity": "COMMON",
+    "priority": 0,
+    "reason": "특별한 별명은 없었다. 그래도 매일 출근했다.",
+    "rule": {}
+  }
+]

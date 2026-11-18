@@ -308,6 +308,23 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
     );
   }
 
+  // S9 별명: id 중복 없음, 기본 별명(빈 규칙) 정확히 1개, 선택 참조가 실제 사건·선택지
+  checkUnique(
+    pack.titles.map((t) => t.id),
+    'titles',
+  );
+  const defaults = pack.titles.filter((t) => Object.keys(t.rule).length === 0);
+  if (defaults.length !== 1)
+    add('titles', `기본 별명(빈 rule)은 정확히 1개여야 함 (현재 ${defaults.length}개)`);
+  for (const t of pack.titles) {
+    for (const pick of t.rule.choicesAny ?? []) {
+      const ev = pack.events.find((e) => e.id === pick.eventId);
+      if (!ev) add(`titles.${t.id}`, `알 수 없는 사건: ${pick.eventId}`);
+      else if (!ev.choices.some((c) => c.id === pick.choiceId))
+        add(`titles.${t.id}`, `${pick.eventId}에 없는 선택지: ${pick.choiceId}`);
+    }
+  }
+
   // 예약 전용 사건은 반드시 어떤 사건(또는 승진 누락 규칙)이 예약해야 한다 (고아 콘텐츠 방지)
   const scheduledTargets = new Set([...scheduleEdges.values()].flat());
   scheduledTargets.add(promo.consecutiveMissEvent.eventId);

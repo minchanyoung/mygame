@@ -153,6 +153,8 @@ export const EndingSchema = z
     goal: z.object({ goalId: ContentIdSchema, achieved: z.boolean(), text: z.string() }).strict().nullable(),
     /** S7 노후 등급 (정상 엔딩만, 실패 엔딩은 null) */
     retirementTier: RetirementTierSchema.nullable(),
+    /** S9 별명: [대표, 보조…] id (엔딩 확정 시 고정). 옛 기록은 null */
+    titles: z.array(ContentIdSchema).nullable(),
   })
   .strict();
 export type Ending = z.infer<typeof EndingSchema>;
@@ -315,6 +317,22 @@ export const MonthLogSchema = z
   })
   .strict();
 export type MonthLog = z.infer<typeof MonthLogSchema>;
+
+/** S9 연간 기록 (12월 정산 직후 + 엔딩 시점). 인생 연대기 그래프용 */
+export const YearlyRecordSchema = z
+  .object({
+    yearIndex: z.number().int().min(0),
+    age: z.number().int(),
+    companyId: CompanyIdSchema.nullable(),
+    rank: PlayerRankSchema.nullable(),
+    annualSalary: Krw.positive().nullable(),
+    netWorth: Krw,
+    reviewGrade: ReviewGradeSchema.nullable(),
+    health: Stat100,
+    mental: Stat100,
+  })
+  .strict();
+export type YearlyRecord = z.infer<typeof YearlyRecordSchema>;
 
 /** 이번 달 아직 열리지 않은 사건 (업무 다음 일상) */
 export const PendingEventSchema = z
@@ -500,6 +518,7 @@ export const GameRunStateSchema = z
     npcAssignments: z.array(NpcAssignmentSchema),
     eventHistory: z.array(HistoryEntrySchema),
     annualReviews: z.array(AnnualReviewSchema),
+    yearlyRecords: z.array(YearlyRecordSchema),
     annualReviewProcessedYear: z.number().int().nullable(),
     salaryAdjustedYear: z.number().int().nullable(),
     statistics: z
@@ -513,6 +532,12 @@ export const GameRunStateSchema = z
         lowestWellbeing: z.number().int().min(0).max(100),
         /** S7 이직 횟수 */
         transfers: z.number().int().min(0),
+        /** S9 월말 체력·정신력 중 하나가 10 이하였던 달 수 */
+        nearCollapseMonths: z.number().int().min(0),
+        /** S9 연속 고위험 개월 최장 기록 */
+        maxHighRiskStreak: z.number().int().min(0),
+        /** S9 월말 부채 / 한계선 최고치 (‰) */
+        peakDebtPermille: z.number().int().min(0),
       })
       .strict(),
     currentMonth: MonthLogSchema.nullable(),

@@ -59,7 +59,17 @@ export function migrateRunState(raw: unknown): GameRunState {
     if (isObj(e)) {
       e.goal ??= null;
       e.retirementTier ??= null;
+      // S9 별명: 옛 엔딩은 판정하지 않는다
+      e.titles ??= null;
     }
+  }
+
+  // S9 인생 연대기: 연간 기록은 업데이트 이후부터 쌓인다 (과거 추정치를 만들지 않음)
+  s.yearlyRecords ??= [];
+  if (isObj(s.statistics)) {
+    s.statistics.nearCollapseMonths ??= 0;
+    s.statistics.maxHighRiskStreak ??= Number(s.statistics.consecutiveHighRiskMonths ?? 0);
+    s.statistics.peakDebtPermille ??= 0;
   }
 
   // S7: 이직·임원

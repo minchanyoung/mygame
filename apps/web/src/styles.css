@@ -2153,3 +2153,219 @@ details summary {
 .former {
   opacity: 0.8;
 }
+
+/* ── S9 별명·인생 연대기 ── */
+.cert-title {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--navy);
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.title-card {
+  border-width: 2px;
+}
+.title-LEGENDARY {
+  border-color: #e3b500;
+  background: color-mix(in srgb, #e3b500 10%, var(--surface));
+}
+.title-RARE {
+  border-color: var(--navy);
+}
+
+.title-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.title-main > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.title-emoji {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+.title-name {
+  font-family: var(--display);
+  font-size: 1.6rem;
+  font-weight: 400;
+}
+
+.rarity-LEGENDARY {
+  border-color: #e3b500;
+  background: #e3b500;
+  color: #2a2100;
+}
+.rarity-RARE {
+  border-color: var(--navy);
+  color: var(--navy);
+}
+
+.title-subs {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0 0;
+  border-top: 1px dashed var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.title-subs li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.life-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: manipulation;
+}
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 3px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+.swatch-salary {
+  background: var(--navy);
+}
+.swatch-net {
+  background: var(--c-cash);
+}
+.chart-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.chart-zero {
+  stroke: var(--danger-line);
+  stroke-dasharray: 3 3;
+}
+.chart-axis {
+  fill: var(--muted);
+  font-size: 9px;
+}
+.chart-salary,
+.chart-net {
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.chart-salary {
+  stroke: var(--navy);
+}
+.chart-net {
+  stroke: var(--c-cash);
+}
+.chart-mark {
+  fill: var(--surface);
+  stroke: var(--navy);
+  stroke-width: 2;
+}
+.chart-cursor {
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+.chart-hit {
+  fill: transparent;
+  cursor: pointer;
+}
+.chart-readout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-height: 1.6em;
+  margin: 4px 0 0;
+}
+
+.career-band-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.career-band {
+  display: flex;
+  gap: 2px;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.band-seg {
+  flex-basis: 0;
+  min-width: 4px;
+}
+.career-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.career-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.era {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.era-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.era-tab {
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1.5px solid var(--line-2);
+  background: var(--surface);
+  color: var(--ink-2);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.era-tab-on {
+  border: 2px solid var(--navy);
+  background: var(--navy-soft);
+  color: var(--navy);
+}
+
+.bonds,
+.series-done {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bond {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--line);
+}
+.bond:last-child {
+  border-bottom: 0;
+}

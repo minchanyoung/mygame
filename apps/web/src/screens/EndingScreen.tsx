@@ -1,5 +1,6 @@
 import type { PublicRunView } from '@company-life/shared';
 import { formatKrw } from '../api';
+import { Bonds, CareerBand, EraTimeline, LifeChart, TitleCard } from '../components/Chronicle';
 
 interface Props {
   view: PublicRunView;
@@ -10,7 +11,7 @@ interface Props {
 const MILESTONE_KINDS = new Set(['JOB_APPLICATION', 'GOAL_SELECTED', 'PROMOTION', 'TRANSFER', 'ENDING']);
 // 사내 소식(NEWS)은 연대기에서 제외 — 내 인생의 굵직한 사건만
 
-/** GAME_OVER — 퇴직 통지서(실패) / 퇴직 증명서(정상) + 인생 연대기 (정식 성적표는 Phase 2) */
+/** GAME_OVER — 퇴직 통지서(실패) / 퇴직 증명서(정상) + 별명 + 인생 연대기 (S9) */
 export function EndingScreen({ view, onNewGame, onHome }: Props) {
   const e = view.ending;
   if (!e) return null;
@@ -18,7 +19,8 @@ export function EndingScreen({ view, onNewGame, onHome }: Props) {
   const star = e.type === 'EXECUTIVE_PROMOTION';
   const years = Math.floor(view.turn.turnIndex / 12);
   const months = view.turn.turnIndex % 12;
-  // 연대기: 입사·엔딩 + 특성 변화/연봉 같은 굵직한 기록만 골라 오래된 순으로
+  const chronicle = e.chronicle;
+  // 옛 기록(연대기 없음): 입사·엔딩 + 특성 변화/연봉 같은 굵직한 기록만 골라 오래된 순으로
   const milestones = view.history
     .filter((h) => MILESTONE_KINDS.has(h.kind) || /획득|극복|Lv\.|연봉/.test(h.summary))
     .slice(0, 8)
@@ -32,6 +34,11 @@ export function EndingScreen({ view, onNewGame, onHome }: Props) {
         </span>
         <span className="tiny muted">{fail ? '실패 엔딩' : '정상 엔딩'}</span>
         <h1>{e.title}</h1>
+        {e.titles && (
+          <span className="cert-title">
+            별명 · <span aria-hidden="true">{e.titles.main.emoji}</span> {e.titles.main.name}
+          </span>
+        )}
         <p style={{ lineHeight: 1.7 }}>{e.text}</p>
         <p className="small muted">
           {view.profile.displayName} · {e.age}세 · 사회생활 {years}년 {months}개월
@@ -40,6 +47,47 @@ export function EndingScreen({ view, onNewGame, onHome }: Props) {
           {fail ? '퇴직' : star ? '★' : '수고'}
         </span>
       </div>
+
+      {e.titles && <TitleCard titles={e.titles} />}
+
+      {chronicle && (
+        <div className="card">
+          <strong>인생 그래프</strong>
+          <LifeChart yearly={chronicle.yearly} />
+          <CareerBand career={chronicle.career} />
+        </div>
+      )}
+
+      {chronicle && chronicle.eras.length > 0 && (
+        <div className="card">
+          <strong>인생 연대기</strong>
+          <EraTimeline eras={chronicle.eras} />
+        </div>
+      )}
+
+      {chronicle && (chronicle.bonds.length > 0 || chronicle.seriesDone.length > 0) && (
+        <div className="card">
+          {chronicle.bonds.length > 0 && (
+            <>
+              <strong>인연 깊은 사람들</strong>
+              <Bonds bonds={chronicle.bonds} />
+            </>
+          )}
+          {chronicle.seriesDone.length > 0 && (
+            <>
+              <strong>끝까지 본 이야기</strong>
+              <ul className="series-done small">
+                {chronicle.seriesDone.map((x, i) => (
+                  <li key={i}>
+                    <span aria-hidden="true">📖</span> {x.title} — {x.ending}{' '}
+                    <span className="tiny muted">{x.age}세</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      )}
 
       {e.retirement && (
         <div className={`card retire-tier retire-${e.retirement.tier}`}>
@@ -90,7 +138,7 @@ export function EndingScreen({ view, onNewGame, onHome }: Props) {
         {view.playtestModified && <p className="tiny muted">플레이테스트 도구로 조작된 기록입니다.</p>}
       </div>
 
-      {milestones.length > 0 && (
+      {!chronicle && milestones.length > 0 && (
         <div className="card">
           <strong>인생 연대기</strong>
           <ol className="timeline">

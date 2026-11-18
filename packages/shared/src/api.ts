@@ -205,7 +205,45 @@ export interface PublicEnding {
   retirement: { tier: 'COMFORTABLE' | 'MODEST' | 'TIGHT'; title: string; text: string } | null;
   /** 인생 목표 판정 (목표가 없으면 null). 실패 엔딩은 자동 미달성. */
   goal: { title: string; emoji: string; achieved: boolean; text: string } | null;
+  /** S9 별명 (옛 기록은 null) */
+  titles: { main: PublicTitle; subs: PublicTitle[] } | null;
+  /** S9 인생 연대기 (확정된 엔딩에만, 예고 단계에서는 null) */
+  chronicle: PublicChronicle | null;
 }
+
+export interface PublicTitle {
+  id: string;
+  name: string;
+  emoji: string;
+  rarity: 'COMMON' | 'RARE' | 'LEGENDARY';
+  reason: string;
+}
+
+/** S9 인생 연대기 */
+export interface PublicChronicle {
+  /** 연간 기록 (그래프용, 나이순) */
+  yearly: {
+    age: number;
+    salary: number | null;
+    netWorth: number;
+    companyName: string | null;
+    rankLabel: string | null;
+    reviewGrade: string | null;
+    /** 이 해에 생긴 커리어 변화 (점 찍기) */
+    mark: 'JOIN' | 'PROMOTION' | 'TRANSFER' | null;
+  }[];
+  /** 회사별 재직 구간 (커리어 띠) */
+  career: { companyName: string; grade: string; fromAge: number; toAge: number }[];
+  /** 시대별 주요 사건 (20대·30대·40대·50대, 시대마다 최대 4개, 오래된 순) */
+  eras: { label: string; items: { age: number; month: number; kind: ChronicleItemKind; text: string }[] }[];
+  /** 인연 깊은 동료 (최대 2명, 수치 비공개) */
+  bonds: { name: string; relation: string; note: string; together: number }[];
+  /** 완결한 연재 */
+  seriesDone: { title: string; ending: string; age: number }[];
+}
+
+export type ChronicleItemKind =
+  'JOIN' | 'TRANSFER' | 'PROMOTION' | 'SERIES' | 'SKILL' | 'SCAR' | 'RECOVER' | 'REVIEW' | 'RISK' | 'ENDING';
 
 /** S5 인생 목표 카드 */
 export interface PublicLifeGoal {
