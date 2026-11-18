@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { PublicActiveEvent, PublicChatLine, PublicChoice, PublicRunView } from '@company-life/shared';
 import { ChatThread } from '../components/Chat';
 import { Icon } from '../components/Icons';
@@ -42,6 +42,27 @@ export function EventScreen({ view, busy, onChoose }: Props) {
   const event = view.activeEvent;
   // 실직 경고가 붙은 선택지는 두 번 눌러야 확정 (실수 방지)
   const [armed, setArmed] = useState<string | null>(null);
+  // 위아래 분할: 대화 영역이 따로 스크롤되므로, 새 메시지가 올라오면 대화 영역 맨 아래로 따라간다
+  const bodyRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    // 사용자가 위로 올려 읽는 중이면 끌어내리지 않는다 (맨 아래 근처일 때만 따라감)
+    let nearBottom = true;
+    const onScroll = () => {
+      nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    };
+    const follow = () => {
+      if (nearBottom) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    const obs = new MutationObserver(follow);
+    obs.observe(el, { childList: true, subtree: true });
+    return () => {
+      obs.disconnect();
+      el.removeEventListener('scroll', onScroll);
+    };
+  }, [event?.occurrenceId]);
   if (!event) return null;
   const p = event.participant;
   const isLife = event.slot === 'life';
@@ -163,7 +184,7 @@ export function EventScreen({ view, busy, onChoose }: Props) {
   }
 
   return (
-    <section className="messenger">
+    <section className="messenger messenger-split">
       <header className="msg-head">
         <span className="avatar" aria-hidden="true">
           {p ? p.name.slice(0, 1) : <Icon name="company" />}
@@ -179,7 +200,7 @@ export function EventScreen({ view, busy, onChoose }: Props) {
         {progress}
       </header>
 
-      <div className="msg-body">
+      <div className="msg-body" ref={bodyRef}>
         {event.series && (
           <span className="series-badge">
             📺 연재 · {event.series.title}{' '}

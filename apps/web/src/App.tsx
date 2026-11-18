@@ -90,6 +90,18 @@ export function App() {
     [handleError],
   );
 
+  // 상단 바 실제 높이 → CSS 변수 (사건 메신저 위아래 분할 높이 계산용, 기기 글꼴에 따라 달라짐)
+  const headerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const set = () => document.documentElement.style.setProperty('--app-header-h', `${el.offsetHeight}px`);
+    set();
+    const obs = new ResizeObserver(set);
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   useEffect(() => {
     document.title =
       screen.kind === 'run' ? `${screen.view.profile.displayName}의 인생 — 오늘도 출근` : '오늘도 출근';
@@ -321,7 +333,7 @@ export function App() {
     <div
       className={`app ${screen.kind === 'run' && screen.view.phase === 'CHARACTER_SELECTION' ? 'app-wide' : ''}`}
     >
-      <header className="app-header">
+      <header className="app-header" ref={headerRef}>
         <span className="logo">오늘도 출근</span>
         {screen.kind === 'run' && (
           <span className="header-meta">

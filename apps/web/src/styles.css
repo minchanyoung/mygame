@@ -1175,8 +1175,6 @@ button.card {
 }
 
 .reply-panel {
-  position: sticky;
-  bottom: 0;
   background: var(--surface);
   border-radius: 20px 20px 0 0;
   box-shadow: 0 -6px 20px rgba(31, 42, 68, 0.1);
@@ -1184,10 +1182,38 @@ button.card {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  /* 선택지가 길어도 대화가 최소 40%는 보이게 */
-  max-height: 60dvh;
+}
+
+/*
+ * 사건 메신저: 화면 위아래 분할 (위 대화 · 아래 선택지, 각자 스크롤).
+ * 선택지 패널이 화면 아래에 떠 있으면 스크롤할 때 대화가 그 뒤로 가려졌다.
+ */
+.messenger-split {
+  /* 화면 높이 − 상단 바 − .app-main 위 여백(4px) − 노치 */
+  height: calc(100dvh - var(--app-header-h, 60px) - 4px - env(safe-area-inset-top, 0px));
+  min-height: 420px;
+  overflow: hidden;
+}
+.messenger-split .msg-head {
+  flex: 0 0 auto;
+}
+.messenger-split .msg-body {
+  flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+.messenger-split .reply-panel {
+  position: static;
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 50%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+/* 높이가 제한된 패널 안에서 선택지 카드가 찌그러지지 않고 스크롤되게 */
+.messenger-split .reply-panel > * {
+  flex-shrink: 0;
 }
 
 .choice {
