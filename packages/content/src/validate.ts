@@ -1,4 +1,5 @@
 import {
+  MONTHLY_ACTIONS,
   COMPANY_GRADES,
   PLAYER_RANKS,
   eventSlot,
@@ -338,6 +339,39 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
     if (a.rule.companies !== undefined && a.rule.companies > pack.companies.length)
       add(`achievements.${a.id}`, `회사가 ${pack.companies.length}곳뿐인데 ${a.rule.companies}곳 요구`);
   }
+  // S11 월간 행동: 6종 모두 정확히 한 번, 기본 행동은 비용 없음, 특성 보상은 활성 특성·극성 일치
+  const ma = pack.monthlyActions;
+  checkUnique(
+    ma.actions.map((a) => a.id),
+    'monthlyActions',
+  );
+  for (const id of MONTHLY_ACTIONS)
+    if (!ma.actions.some((a) => a.id === id)) add('monthlyActions', `행동 정의 없음: ${id}`);
+  if ((ma.actions.find((a) => a.id === ma.defaultAction)?.cost ?? 1) !== 0)
+    add('monthlyActions.defaultAction', '기본 행동은 비용이 없어야 함 (언제나 고를 수 있게)');
+  for (const a of ma.actions) {
+    if (a.income && a.income.minPermille > a.income.maxPermille)
+      add(`monthlyActions.${a.id}`, '부수입 범위가 뒤집힘');
+    for (const m of a.milestones ?? []) {
+      const t = pack.traits.find((x) => x.id === m.traitId);
+      if (!t) add(`monthlyActions.${a.id}`, `알 수 없는 특성: ${m.traitId}`);
+      else if (!t.active) add(`monthlyActions.${a.id}`, `비활성 특성: ${m.traitId}`);
+      else if ((t.polarity === 'POSITIVE') !== (m.kind === 'SKILL'))
+        add(`monthlyActions.${a.id}`, `${m.traitId}의 극성과 ${m.kind}가 맞지 않음`);
+      if (m.viaEventId) {
+        const ev = pack.events.find((e) => e.id === m.viaEventId);
+        const grants = ev?.choices.some((c) =>
+          [...(c.guaranteedEffects ?? []), ...(c.onSuccess?.effects ?? [])].some(
+            (e) => e.type === 'SKILL_SET_LEVEL' && e.id === m.traitId && e.from === 0,
+          ),
+        );
+        if (!ev) add(`monthlyActions.${a.id}`, `알 수 없는 기회 사건: ${m.viaEventId}`);
+        else if (!grants)
+          add(`monthlyActions.${a.id}`, `${m.viaEventId}는 ${m.traitId}를 처음 주는 사건이 아님`);
+      }
+    }
+  }
+
   const d = pack.rules.difficulty;
   if (!(d.EASY.chanceShift >= d.NORMAL.chanceShift && d.NORMAL.chanceShift >= d.REAL.chanceShift))
     add('rules.difficulty', '성공 확률 보정은 쉬움 ≥ 보통 ≥ 현실 순이어야 함');

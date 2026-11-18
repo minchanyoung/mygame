@@ -89,6 +89,16 @@ export function matchesTitleRule(
     const n = state.npcs.filter((n) => n.favor >= RELATION_HIGH).length;
     if (!inRange(n, rule.friends)) return false;
   }
+  if (rule.actionMonths) {
+    const { action, min, minPermille } = rule.actionMonths;
+    const n = state.actionLog.filter((e) => e.actionId === action).length;
+    if (min !== undefined && n < min) return false;
+    if (
+      minPermille !== undefined &&
+      (state.actionLog.length === 0 || (n * 1000) / state.actionLog.length < minPermille)
+    )
+      return false;
+  }
   if (rule.trustedBosses) {
     const n = state.npcs.filter((n) => n.role === 'BOSS' && n.trust >= RELATION_HIGH).length;
     if (!inRange(n, rule.trustedBosses)) return false;

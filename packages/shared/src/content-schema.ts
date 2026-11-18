@@ -11,6 +11,7 @@ import {
   EventIdSchema,
   JOB_IDS,
   JobIdSchema,
+  MonthlyActionSchema,
   NpcRelationStatSchema,
   NpcRoleSchema,
   PlayerRankSchema,
@@ -541,6 +542,15 @@ export const TitleRuleSchema = z
     friends: IntRangeSchema.optional(),
     /** 신뢰 높은 상사 수 */
     trustedBosses: IntRangeSchema.optional(),
+    /** S11 이 행동을 한 달 수 / 전체 달 중 비율(‰) */
+    actionMonths: z
+      .object({
+        action: MonthlyActionSchema,
+        min: z.number().int().min(1).optional(),
+        minPermille: z.number().int().min(1).max(1000).optional(),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 export type TitleRule = z.infer<typeof TitleRuleSchema>;
@@ -603,6 +613,102 @@ export const AchievementDefinitionSchema = z
   .strict();
 export type AchievementDefinition = z.infer<typeof AchievementDefinitionSchema>;
 
+/** S11 월간 행동: 자원 증감 (일부만) */
+const ResourceDeltaSchema = z
+  .object({
+    health: z.number().int().min(-20).max(20).optional(),
+    mental: z.number().int().min(-20).max(20).optional(),
+    focus: z.number().int().min(-20).max(20).optional(),
+    reputation: z.number().int().min(-20).max(20).optional(),
+  })
+  .strict();
+
+export const MonthlyActionDefinitionSchema = z
+  .object({
+    id: MonthlyActionSchema,
+    name: z.string().min(1).max(8),
+    emoji: z.string().min(1).max(4),
+    /** 카드 한 줄 설명 */
+    description: z.string().min(1).max(40),
+    /** 고른 달의 자원 변화 (손실은 난이도 배율) */
+    resources: ResourceDeltaSchema,
+    /** 고른 달의 비용 (첫해 물가 기준 원, 물가 지수를 곱함) */
+    cost: z.number().int().min(0),
+    /** 고른 달의 부수입 (세전 월급의 ‰ 범위, 시드 난수) */
+    income: z
+      .object({ minPermille: z.number().int().min(0), maxPermille: z.number().int().min(0) })
+      .strict()
+      .optional(),
+    /** 그해 인사평가 '업무 성과'에 더하는 점수 (달마다) */
+    performance: z.number().int().min(0).max(20),
+    /** 팀 동료 한 명의 호감 + */
+    favor: z.number().int().min(0).max(20).optional(),
+    /** 이 분류·태그의 사건이 조금 더 자주 (S11 Q3) */
+    eventCategories: z.array(z.string()),
+    eventTags: z.array(z.string()),
+    /** 같은 행동을 연속 from개월 이상 하면 매달 추가로 */
+    fatigue: z
+      .object({ from: z.number().int().min(2), resources: ResourceDeltaSchema, note: z.string().max(40) })
+      .strict()
+      .optional(),
+    /**
+     * 누적·연속 보상. viaEventId가 있으면 그 특성을 얻을 수 있는 사건을 이번 달에 예약한다(기회 — 성공해야 얻음).
+     * 없으면 특성이 바로 한 단계 바뀐다 (연속 야근 → 번아웃 같은 대가). 이미 그 특성이 있으면 없음.
+     */
+    milestones: z
+      .array(
+        z
+          .object({
+            by: z.enum(['total', 'streak']),
+            at: z.number().int().min(2),
+            kind: z.enum(['SKILL', 'NEGATIVE_TRAIT']),
+            traitId: ContentIdSchema,
+            viaEventId: EventIdSchema.optional(),
+            note: z.string().max(60).optional(),
+          })
+          .strict(),
+      )
+      .optional(),
+    /** 습관: 최근 window개월 중 min개월 이상이면 (어떤 행동을 고르든) 매달 효과 */
+    habit: z
+      .object({
+        window: z.number().int().min(2),
+        min: z.number().int().min(1),
+        label: z.string().max(20),
+        resources: ResourceDeltaSchema.optional(),
+        /** 이 태그 사건 가중치를 한 번 더 곱한다 */
+        eventTags: z.array(z.string()).optional(),
+      })
+      .strict()
+      .optional(),
+    /** 들킬 위험: (base + 연속개월×perStreak)‰, 최대 max. 들키면 자원 변화 + 그달 부수입 없음 */
+    risk: z
+      .object({
+        basePermille: z.number().int().min(0),
+        perStreakPermille: z.number().int().min(0),
+        maxPermille: z.number().int().max(1000),
+        resources: ResourceDeltaSchema,
+        note: z.string().max(60),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
+export type MonthlyActionDefinition = z.infer<typeof MonthlyActionDefinitionSchema>;
+
+export const MonthlyActionsConfigSchema = z
+  .object({
+    /** 첫 달·기록 없을 때 */
+    defaultAction: MonthlyActionSchema,
+    /** 관련 사건 가중치 배율 (‰) */
+    affinityPermille: z.number().int().min(1000).max(3000),
+    /** 한 해 행동으로 얻는 성과 점수 상한 */
+    performanceCap: z.number().int().min(0).max(50),
+    actions: z.array(MonthlyActionDefinitionSchema).min(1),
+  })
+  .strict();
+export type MonthlyActionsConfig = z.infer<typeof MonthlyActionsConfigSchema>;
+
 export const ContentPackSchema = z
   .object({
     contentVersion: z.string().min(1),
@@ -622,6 +728,8 @@ export const ContentPackSchema = z
     lifeGoals: z.array(LifeGoalDefinitionSchema).min(3),
     titles: z.array(TitleDefinitionSchema).min(1),
     achievements: z.array(AchievementDefinitionSchema).min(1),
+    /** S11 월간 행동 */
+    monthlyActions: MonthlyActionsConfigSchema,
   })
   .strict();
 export type ContentPack = z.infer<typeof ContentPackSchema>;

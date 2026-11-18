@@ -320,13 +320,13 @@
   ],
   "difficulty": {
     "EASY": {
-      "chanceShift": 0.04,
+      "chanceShift": 0.02,
       "lossPermille": 950,
       "livingCostPermille": 950,
       "startCashBonus": 3000000
     },
-    "NORMAL": { "chanceShift": 0, "lossPermille": 1000, "livingCostPermille": 1000, "startCashBonus": 0 },
-    "REAL": { "chanceShift": -0.02, "lossPermille": 1100, "livingCostPermille": 1100, "startCashBonus": 0 }
+    "NORMAL": { "chanceShift": -0.03, "lossPermille": 1000, "livingCostPermille": 1000, "startCashBonus": 0 },
+    "REAL": { "chanceShift": -0.05, "lossPermille": 1100, "livingCostPermille": 1100, "startCashBonus": 0 }
   },
   "retirement": {
     "comfortable": 600000000,

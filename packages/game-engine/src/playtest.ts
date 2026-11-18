@@ -1,4 +1,5 @@
 import {
+  DIFFICULTY_LABELS,
   type GameRunState,
   type PlaytestCatalog,
   type PlaytestDebugView,
@@ -113,7 +114,7 @@ export function playtestStartMonthWithEvent(
     }
     participantNpcId = match.npc.npcId;
   }
-  const started = startMonth(state, content, { eventId, participantNpcId });
+  const started = startMonth(state, content, { forced: { eventId, participantNpcId } });
   const participant = participantNpcId
     ? (started.npcs.find((n) => n.npcId === participantNpcId) ?? null)
     : null;
@@ -138,6 +139,7 @@ export function playtestDebugView(state: GameRunState, content: ContentIndex): P
   const candidates =
     state.phase === 'MONTH_START' && state.employment.current ? getEligibleEvents(state, content) : [];
   const total = candidates.reduce((s, c) => s + c.weight, 0);
+  const shift = content.pack.rules.difficulty[state.difficulty].chanceShift;
   return {
     seed: state.seed,
     rngState: state.rngState,
@@ -149,9 +151,17 @@ export function playtestDebugView(state: GameRunState, content: ContentIndex): P
           visible: c.visible,
           enabled: c.enabled,
           exactChancePercent: c.chance ? Math.round(c.chance.chance * 1000) / 10 : null,
-          breakdown: (c.chance?.breakdown ?? []).map(
-            (b) => `${label(b.source, b.id)} ${b.bonus >= 0 ? '+' : ''}${Math.round(b.bonus * 100)}%p`,
-          ),
+          breakdown: [
+            ...(c.chance?.breakdown ?? []).map(
+              (b) => `${label(b.source, b.id)} ${b.bonus >= 0 ? '+' : ''}${Math.round(b.bonus * 100)}%p`,
+            ),
+            // S10 난이도 보정 (화면의 판정 요인에는 없고 합계에만 들어간다)
+            ...(c.chance && shift !== 0
+              ? [
+                  `난이도 ${DIFFICULTY_LABELS[state.difficulty]} ${shift > 0 ? '+' : ''}${Math.round(shift * 100)}%p`,
+                ]
+              : []),
+          ],
         }))
       : [],
     eligibleEvents: candidates

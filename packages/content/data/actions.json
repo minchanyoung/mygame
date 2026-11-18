@@ -1,0 +1,163 @@
+{
+  "defaultAction": "rest",
+  "affinityPermille": 1300,
+  "performanceCap": 4,
+  "actions": [
+    {
+      "id": "rest",
+      "name": "휴식",
+      "emoji": "🛋️",
+      "description": "퇴근하면 바로 집. 아무것도 안 하는 것도 일이다.",
+      "resources": {
+        "health": 3,
+        "mental": 3
+      },
+      "cost": 0,
+      "performance": 0,
+      "eventCategories": [],
+      "eventTags": ["recovery"]
+    },
+    {
+      "id": "study",
+      "name": "자기계발",
+      "emoji": "📚",
+      "description": "학원·자격증 공부. 피곤하지만 실력이 쌓인다.",
+      "resources": {
+        "focus": 2,
+        "mental": -1
+      },
+      "cost": 300000,
+      "performance": 1,
+      "eventCategories": ["work"],
+      "eventTags": [],
+      "milestones": [
+        {
+          "by": "total",
+          "at": 6,
+          "kind": "SKILL",
+          "traitId": "observation",
+          "viaEventId": "evt_document_clue",
+          "note": "공부한 게 쓸모 있을지도 모르는 일이 생겼다"
+        },
+        {
+          "by": "total",
+          "at": 18,
+          "kind": "SKILL",
+          "traitId": "crisis",
+          "viaEventId": "evt_server_outage",
+          "note": "배운 걸 실전에서 시험할 기회가 왔다"
+        }
+      ]
+    },
+    {
+      "id": "network",
+      "name": "인맥 쌓기",
+      "emoji": "🍻",
+      "description": "모임·회식·동문회. 얼굴을 알려 두면 언젠가 돌아온다.",
+      "resources": {
+        "reputation": 1,
+        "health": -1
+      },
+      "cost": 200000,
+      "performance": 0,
+      "favor": 2,
+      "eventCategories": ["social"],
+      "eventTags": ["회식"],
+      "milestones": [
+        {
+          "by": "total",
+          "at": 12,
+          "kind": "SKILL",
+          "traitId": "socialSkill",
+          "viaEventId": "evt_social_breakthrough",
+          "note": "쌓아 둔 인맥이 시험대에 오를 일이 생겼다"
+        }
+      ],
+      "habit": {
+        "window": 12,
+        "min": 6,
+        "label": "넓은 인맥 (헤드헌터 연락↑)",
+        "eventTags": ["transfer"]
+      }
+    },
+    {
+      "id": "overtime",
+      "name": "자진 야근",
+      "emoji": "🌙",
+      "description": "남들 퇴근할 때 한 시간 더. 성과는 남지만 몸이 닳는다.",
+      "resources": {
+        "health": -2,
+        "mental": -2
+      },
+      "cost": 0,
+      "performance": 2,
+      "eventCategories": ["work"],
+      "eventTags": [],
+      "fatigue": {
+        "from": 3,
+        "resources": {
+          "health": -1,
+          "mental": -1
+        },
+        "note": "피로가 쌓였다 (연속 야근)"
+      },
+      "milestones": [
+        {
+          "by": "streak",
+          "at": 6,
+          "kind": "NEGATIVE_TRAIT",
+          "traitId": "burnout"
+        }
+      ]
+    },
+    {
+      "id": "exercise",
+      "name": "운동",
+      "emoji": "🏃",
+      "description": "헬스장 등록. 처음엔 힘들어도 몸이 기억한다.",
+      "resources": {
+        "health": 4,
+        "focus": -1
+      },
+      "cost": 100000,
+      "performance": 0,
+      "eventCategories": [],
+      "eventTags": ["recovery"],
+      "habit": {
+        "window": 12,
+        "min": 6,
+        "label": "꾸준한 운동 (매달 체력 +1)",
+        "resources": {
+          "health": 1
+        }
+      }
+    },
+    {
+      "id": "sidejob",
+      "name": "부업·재테크",
+      "emoji": "💰",
+      "description": "주말 알바, 투자 공부. 돈은 되지만 쉴 틈이 없다.",
+      "resources": {
+        "mental": -2,
+        "focus": -1
+      },
+      "cost": 0,
+      "income": {
+        "minPermille": 50,
+        "maxPermille": 150
+      },
+      "performance": 0,
+      "eventCategories": [],
+      "eventTags": [],
+      "risk": {
+        "basePermille": 10,
+        "perStreakPermille": 15,
+        "maxPermille": 150,
+        "resources": {
+          "reputation": -6
+        },
+        "note": "부업 사실이 회사에 알려져 눈총을 받았다. 이번 달 부수입도 날렸다."
+      }
+    }
+  ]
+}

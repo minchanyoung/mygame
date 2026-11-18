@@ -467,14 +467,15 @@ describe('playtest tools over HTTP', () => {
     );
     expect(forbidden.statusCode).toBe(403);
 
+    // S11 월 시작에 기본 행동(휴식)의 회복이 더해지므로 체력을 바닥 가까이로
     const patched = await post(`playtest/runs/${body.runId}/patch`, {
-      resources: { health: 3 },
+      resources: { health: 1 },
       idempotencyKey: 'key-pt-p1',
       expectedRevision: 3,
     });
     expect(patched.statusCode).toBe(200);
     const view = patched.json().view as PublicRunView;
-    expect(view.resources.health).toBe(3);
+    expect(view.resources.health).toBe(1);
     expect(view.playtestModified).toBe(true);
     expect(view.warnings.map((w) => w.code)).toContain('HEALTH_CRITICAL');
 
@@ -490,8 +491,8 @@ describe('playtest tools over HTTP', () => {
     );
 
     const debug = (await app.inject({ url: `/api/playtest/runs/${body.runId}/debug`, headers })).json();
-    // 기본 40% ± 배경 특성 보정(천재형 +10, 압박에 약함 −10)
-    expect([30, 40, 50]).toContain(
+    // 기본 40% ± 배경 특성 보정(천재형 +10, 압박에 약함 −10) + 보통 난이도 보정(−3)
+    expect([27, 37, 47]).toContain(
       debug.activeEventChoices.find((c: { id: string }) => c.id === 'first_response').exactChancePercent,
     );
   });
@@ -604,6 +605,6 @@ describe('S10 플레이어 도감·난이도 over HTTP', () => {
     const anon = (await app.inject({ url: '/api/player' })).json();
     expect(anon.runsFinished).toBe(0);
     expect(anon.found).toBe(0);
-    expect(anon.total).toBe(81);
+    expect(anon.total).toBe(85);
   }, 30_000);
 });

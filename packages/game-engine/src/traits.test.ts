@@ -8,6 +8,10 @@ import { requireFrom } from './content-index';
 import { ALWAYS_FAIL, ALWAYS_SUCCEED, content, employedRun, open, withTraits } from './test-fixtures';
 import { toPublicActiveEvent } from './view';
 
+/** 기준 확률 + 보통 난이도 보정 (S11부터 보통도 0이 아님). 예시 수치는 보정 전 값으로 읽는다 */
+const SHIFT = content.pack.rules.difficulty.NORMAL.chanceShift;
+const shifted = (n: number) => Math.round((n + SHIFT) * 100) / 100;
+
 // 배경 특성(강점·약점)의 사건 보정은 따로 검증하므로, 여기서는 영구 특성 효과만 보도록 비운다
 const base: GameRunState = { ...employedRun(), backgroundTraits: [] };
 const event = (id: string) => requireFrom(content.events, id, 'event');
@@ -40,15 +44,23 @@ describe('level bonuses are per-event and replace, not stack (§7.5, §23.2)', (
   });
 
   it('example A — Lv.1-effective event: none 40%, Lv.1 50%, Lv.2 52% (not 62%)', () => {
-    expect(chanceOf(base, 'evt_office_dinner_crisis', 'mediate')).toBe(0.4);
-    expect(chanceOf(withTraits(base, { socialSkill: 1 }), 'evt_office_dinner_crisis', 'mediate')).toBe(0.5);
-    expect(chanceOf(withTraits(base, { socialSkill: 2 }), 'evt_office_dinner_crisis', 'mediate')).toBe(0.52);
+    expect(chanceOf(base, 'evt_office_dinner_crisis', 'mediate')).toBe(shifted(0.4));
+    expect(chanceOf(withTraits(base, { socialSkill: 1 }), 'evt_office_dinner_crisis', 'mediate')).toBe(
+      shifted(0.5),
+    );
+    expect(chanceOf(withTraits(base, { socialSkill: 2 }), 'evt_office_dinner_crisis', 'mediate')).toBe(
+      shifted(0.52),
+    );
   });
 
   it('example B — Lv.2-only event: no bonus at Lv.1, +20%p and exclusive choice at Lv.2', () => {
-    expect(chanceOf(base, 'evt_executive_faction', 'negotiate')).toBe(0.25);
-    expect(chanceOf(withTraits(base, { socialSkill: 1 }), 'evt_executive_faction', 'negotiate')).toBe(0.25);
-    expect(chanceOf(withTraits(base, { socialSkill: 2 }), 'evt_executive_faction', 'negotiate')).toBe(0.45);
+    expect(chanceOf(base, 'evt_executive_faction', 'negotiate')).toBe(shifted(0.25));
+    expect(chanceOf(withTraits(base, { socialSkill: 1 }), 'evt_executive_faction', 'negotiate')).toBe(
+      shifted(0.25),
+    );
+    expect(chanceOf(withTraits(base, { socialSkill: 2 }), 'evt_executive_faction', 'negotiate')).toBe(
+      shifted(0.45),
+    );
 
     const enabled = (s: GameRunState) =>
       evaluateChoices(s, event('evt_executive_faction'), null, content).find(
@@ -79,7 +91,9 @@ describe('level bonuses are per-event and replace, not stack (§7.5, §23.2)', (
   });
 
   it('negative trait modifiers apply only at their defined level (burnout Lv.2 −10%p)', () => {
-    expect(chanceOf(withTraits(base, {}, { burnout: 2 }), 'evt_project_collapse', 'push_through')).toBe(0.35);
+    expect(chanceOf(withTraits(base, {}, { burnout: 2 }), 'evt_project_collapse', 'push_through')).toBe(
+      shifted(0.35),
+    );
   });
 
   it('final chance is clamped to [5%, 95%]', () => {
@@ -118,7 +132,7 @@ describe('positive skills: special-event success only (§4.2)', () => {
       { kind: 'SKILL', id: 'socialSkill', from: 1, to: 2, reason: 'upgrade' },
     ]);
     // 판정은 강화 전 레벨(Lv.1: +10%p)로 계산 — 새 레벨이 소급되지 않는다
-    expect(ok.result.chance).toBe(0.45);
+    expect(ok.result.chance).toBe(shifted(0.45));
 
     const fail = resolve(lv1, 'evt_department_mediation', 'mediate', ALWAYS_FAIL);
     expect(fail.state.skills).toEqual({ socialSkill: 1 });
@@ -296,8 +310,8 @@ describe('negative traits: grant / worsen / recover via explicit special events 
 
   it('positive and negative traits coexist and each applies only its own declared effect', () => {
     const s = withTraits(base, { crisis: 1 }, { burnout: 2 });
-    expect(chanceOf(s, 'evt_project_collapse', 'ask_help')).toBe(0.65);
-    expect(chanceOf(s, 'evt_project_collapse', 'push_through')).toBe(0.35);
+    expect(chanceOf(s, 'evt_project_collapse', 'ask_help')).toBe(shifted(0.65));
+    expect(chanceOf(s, 'evt_project_collapse', 'push_through')).toBe(shifted(0.35));
   });
 
   it('a level mismatch aborts the whole effect list atomically', () => {
@@ -343,8 +357,8 @@ describe('NPC event integration (§8.3)', () => {
     const mentor = withBossTags(['MENTOR']);
     const c = choice('evt_boss_code_review', 'accept_feedback');
     const p = mentor.npcs.find((n) => n.npcId === boss.npcId)!;
-    expect(calculateChoiceChance(mentor, c, { participant: p }, content)!.chance).toBe(0.8);
-    expect(calculateChoiceChance(mentor, c, { participant: null }, content)!.chance).toBe(0.7);
+    expect(calculateChoiceChance(mentor, c, { participant: p }, content)!.chance).toBe(shifted(0.8));
+    expect(calculateChoiceChance(mentor, c, { participant: null }, content)!.chance).toBe(shifted(0.7));
   });
 
   it('relation threshold unlocks a choice (trust ≥ 70) and relation deltas persist on the NPC', () => {

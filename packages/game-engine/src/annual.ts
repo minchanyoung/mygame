@@ -8,6 +8,7 @@ import {
 import { levelBonus } from './chance';
 import type { ContentIndex } from './content-index';
 import { clamp, clampStat, roundKrw } from './numbers';
+import { yearActionPerformance } from './monthly-actions';
 import { currentTeamNpcs } from './npcs';
 
 export type ReviewResult = ReviewDetail;
@@ -40,7 +41,10 @@ export function computeAnnualReview(state: GameRunState, content: ContentIndex):
     );
   });
   const workWins = workJudged.filter((o) => o.success).length;
-  const performance = workJudged.length > 0 ? Math.round((workWins / workJudged.length) * 100) : 50;
+  const basePerformance = workJudged.length > 0 ? Math.round((workWins / workJudged.length) * 100) : 50;
+  // S11 퇴근 후 자기계발·야근이 쌓인 만큼 성과 가산 (상한 있음)
+  const effort = yearActionPerformance(state, content, year);
+  const performance = Math.min(100, basePerformance + effort);
   const bossScore = boss ? Math.round(boss.trust * 0.7 + boss.favor * 0.3) : 50;
   const peerScore = peers.length > 0 ? Math.round(peers.reduce((s, p) => s + p.trust, 0) / peers.length) : 50;
   const condition = Math.round((state.resources.health + state.resources.focus) / 2);
@@ -51,9 +55,10 @@ export function computeAnnualReview(state: GameRunState, content: ContentIndex):
       score: performance,
       weight: w.performance,
       note:
-        workJudged.length > 0
+        (workJudged.length > 0
           ? `올해 업무 ${workJudged.length}건 중 ${workWins}건 성공`
-          : '결과가 갈리는 업무에 도전하지 않아 기본 50점 (확정 선택만 함)',
+          : '결과가 갈리는 업무에 도전하지 않아 기본 50점 (확정 선택만 함)') +
+        (effort > 0 ? ` · 퇴근 후 노력 +${effort}` : ''),
     },
     {
       key: 'boss' as const,

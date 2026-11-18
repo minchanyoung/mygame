@@ -250,11 +250,19 @@ describe('스펙 카드 근거와 이달의 이야기', () => {
   });
 
   it('강점이 실제로 판정 확률을 바꾼다 (공감능력 → 회식 중재 +10%p)', () => {
+    // 보통 난이도 보정이 합계에 더해진다 (차이 +10%p는 그대로)
+    const SHIFT = content.pack.rules.difficulty.NORMAL.chanceShift;
     const c = content.events.get('evt_office_dinner_crisis')!.choices.find((x) => x.id === 'mediate')!;
     const plain = { ...base, backgroundTraits: [] };
     const empath = { ...base, backgroundTraits: ['str_empathy'] };
-    expect(calculateChoiceChance(plain, c, { participant: null }, content)!.chance).toBe(0.4);
-    expect(calculateChoiceChance(empath, c, { participant: null }, content)!.chance).toBe(0.5);
+    expect(calculateChoiceChance(plain, c, { participant: null }, content)!.chance).toBeCloseTo(
+      0.4 + SHIFT,
+      6,
+    );
+    expect(calculateChoiceChance(empath, c, { participant: null }, content)!.chance).toBeCloseTo(
+      0.5 + SHIFT,
+      6,
+    );
   });
 
   it('이달의 이야기: 상황·선택·판정 요인·사건만의 변화·결과 문장을 준다 (수치 비공개)', () => {

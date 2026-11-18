@@ -134,11 +134,11 @@ describe('S10 도감', () => {
     expect(r.discovery.achievements).toContain('ach_storyteller');
   });
 
-  it('공개 도감: 못 본 항목은 ??? + 힌트, 81칸, 이번 판 새 발견을 돌려준다', () => {
+  it('공개 도감: 못 본 항목은 ??? + 힌트, 85칸, 이번 판 새 발견을 돌려준다', () => {
     const s = finished('col-4');
     const { collection } = mergeRun(emptyCollection(), s.runId, collectRun(s, content), 'EASY', NOW, content);
     const pub = toPublicCollection(collection, content, s.runId);
-    expect(pub.total).toBe(81);
+    expect(pub.total).toBe(85);
     expect(pub.found).toBeGreaterThan(0);
     const titles = pub.categories.find((c) => c.key === 'titles')!;
     const hidden = titles.items.find((i) => !i.found)!;

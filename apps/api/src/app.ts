@@ -9,6 +9,7 @@ import {
   TransferDecisionRequestSchema,
   ChooseRequestSchema,
   CommandRequestSchema,
+  StartMonthRequestSchema,
   DifficultySchema,
   emptyCollection,
   GameRunStateSchema,
@@ -401,9 +402,10 @@ export function buildApp(options: AppOptions): FastifyInstance {
 
   // ── 월간 루프 (§20.1, §23.3) ──
   app.post<{ Params: { id: string } }>('/api/runs/:id/start-month', async (req, reply) => {
-    const body = parseBody(CommandRequestSchema, req.body);
+    // S11 이번 달 행동 (생략하면 지난달 행동)
+    const body = parseBody(StartMonthRequestSchema, req.body);
     const out = await runCommand(req, 'startMonth', body, (state, content) => ({
-      state: startMonth(state, content),
+      state: startMonth(state, content, body.actionId ? { actionId: body.actionId } : {}),
     }));
     return reply.status(out.statusCode).send(out.body);
   });

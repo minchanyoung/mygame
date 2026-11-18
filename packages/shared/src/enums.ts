@@ -57,6 +57,11 @@ export const DifficultySchema = z.enum(DIFFICULTIES);
 export type Difficulty = z.infer<typeof DifficultySchema>;
 export const DIFFICULTY_LABELS: Record<Difficulty, string> = { EASY: '쉬움', NORMAL: '보통', REAL: '현실' };
 
+/** S11 월간 행동 (퇴근 후 무엇을 할까) */
+export const MONTHLY_ACTIONS = ['rest', 'study', 'network', 'overtime', 'exercise', 'sidejob'] as const;
+export const MonthlyActionSchema = z.enum(MONTHLY_ACTIONS);
+export type MonthlyAction = z.infer<typeof MonthlyActionSchema>;
+
 export const COMPANY_GRADES = ['S', 'A', 'B', 'C', 'D', 'F'] as const;
 export const CompanyGradeSchema = z.enum(COMPANY_GRADES);
 export type CompanyGrade = z.infer<typeof CompanyGradeSchema>;

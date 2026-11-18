@@ -45,6 +45,7 @@ import {
   type ResourceKey,
   type TraitLevels,
 } from '@company-life/shared';
+import { toPublicActionResult, toPublicMonthlyActions } from './action-view';
 import { backgroundEffects, recommendedJob } from './background-effects';
 import { inflate, priceIndex, difficultyKnobs, scaleLoss } from './economy';
 import { goalDef, lifeGoalProgress } from './goals';
@@ -364,6 +365,7 @@ function toMonthSummary(state: GameRunState, content: ContentIndex): PublicMonth
       const event = content.events.get(ev.eventId);
       return event ? [toStory(state, ev, event, content)] : [];
     }),
+    action: m.action ? toPublicActionResult(m.action, content) : null,
   };
 }
 
@@ -755,5 +757,6 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
       const event = ev ? content.events.get(ev.eventId) : undefined;
       return ev && event ? toStory(state, ev, event, content) : null;
     })(),
+    monthlyActions: toPublicMonthlyActions(state, content),
   };
 }

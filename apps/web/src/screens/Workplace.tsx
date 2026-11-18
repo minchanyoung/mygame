@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import type { PublicRunView } from '@company-life/shared';
+import type { MonthlyAction, PublicRunView } from '@company-life/shared';
+import { ActionHistory, ActionPicker } from '../components/MonthlyActions';
 import { Icon, IconBadge, type IconName } from '../components/Icons';
 import {
   CareerCard,
@@ -13,7 +14,7 @@ import {
 interface Props {
   view: PublicRunView;
   busy: boolean;
-  onStartMonth: () => void;
+  onStartMonth: (actionId: MonthlyAction) => void;
   onHome: () => void;
 }
 
@@ -28,6 +29,11 @@ const TABS: Array<{ id: Tab; label: string; icon: IconName }> = [
 /** MONTH_START: 사원증 메인 + 하단 탭 (회사 / 사람 / 나 / 기록) */
 export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
   const [tab, setTab] = useState<Tab>('company');
+  // S11 이번 달 행동: 서버가 정한 기본값(지난달 행동)에서 시작, 달이 바뀌면 다시 기본값
+  const actions = view.monthlyActions;
+  const [picked, setPicked] = useState<{ turn: number; id: MonthlyAction } | null>(null);
+  const actionId = picked && picked.turn === view.turn.turnIndex ? picked.id : (actions?.selected ?? 'rest');
+  const actionName = actions?.options.find((o) => o.id === actionId);
 
   const lastStory = view.history.find((h) => h.kind === 'EVENT_RESOLVED');
 
@@ -52,9 +58,24 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
             </button>
           )}
           <YearCalendar view={view} />
+          {actions && (
+            <ActionPicker
+              actions={actions}
+              value={actionId}
+              disabled={busy}
+              onChange={(id) => setPicked({ turn: view.turn.turnIndex, id })}
+            />
+          )}
           <div className="cta-wrap">
-            <button type="button" className="btn btn-primary" onClick={onStartMonth} disabled={busy}>
-              {busy ? '출근 중…' : `${view.turn.monthOfYear}월 출근하기`}
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => onStartMonth(actionId)}
+              disabled={busy}
+            >
+              {busy
+                ? '출근 중…'
+                : `${view.turn.monthOfYear}월 출근하기${actionName ? ` · ${actionName.emoji} ${actionName.name}` : ''}`}
             </button>
           </div>
         </>
@@ -117,6 +138,7 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
           <Gauges view={view} />
           <MoneyRow view={view} />
           <CareerCard view={view} />
+          {actions && <ActionHistory actions={actions} />}
           <div className="card">
             <strong>발견한 특성</strong>
             {view.skills.length + view.negativeTraits.length === 0 ? (

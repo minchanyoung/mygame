@@ -91,7 +91,9 @@ describe('playtest tools (dev only)', () => {
     expect(total).toBeLessThan(101);
     const opened = playtestStartMonthWithEvent(base, 'evt_office_dinner_crisis', content);
     const mediate = playtestDebugView(opened, content).activeEventChoices.find((c) => c.id === 'mediate')!;
-    expect(mediate.exactChancePercent).toBe(40);
-    expect(mediate.breakdown).toEqual(['기본 +40%p']);
+    // 보통 난이도 보정이 합계에 더해지고, 디버그에는 그 줄도 보인다
+    const shift = Math.round(content.pack.rules.difficulty.NORMAL.chanceShift * 100);
+    expect(mediate.exactChancePercent).toBe(40 + shift);
+    expect(mediate.breakdown).toEqual(['기본 +40%p', `난이도 보통 ${shift > 0 ? '+' : ''}${shift}%p`]);
   });
 });

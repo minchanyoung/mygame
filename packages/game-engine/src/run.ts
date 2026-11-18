@@ -72,6 +72,7 @@ export function createRun(input: CreateRunInput, content: ContentIndex): GameRun
     eventHistory: [{ turnIndex: 0, kind: 'RUN_CREATED', summary: '새 인생 시작' }],
     annualReviews: [],
     yearlyRecords: [],
+    actionLog: [],
     annualReviewProcessedYear: null,
     salaryAdjustedYear: null,
     statistics: {

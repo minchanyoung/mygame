@@ -4,6 +4,7 @@ import {
   type EndingType,
   type Difficulty,
   type GameRunState,
+  type MonthlyAction,
   type PlayerRank,
 } from '@company-life/shared';
 import type { ContentIndex } from './content-index';
@@ -12,6 +13,7 @@ import { EngineError } from './errors';
 import { evaluateChoices, type ChoiceEvaluation } from './events';
 import { applyForJob } from './jobs';
 import { chooseInMonth, nextMonth, startMonth } from './month';
+import { actionDef, actionLockReason, streakOf, totalOf, yearActionPerformance } from './monthly-actions';
 import { SeededRng } from './rng';
 import { chooseCharacter, chooseGoal, createRun } from './run';
 import { acceptTransfer, declineTransfer } from './transfer';
@@ -52,6 +54,8 @@ export interface AutoPlayResult {
   seriesFinished: number;
   /** S9 별명 [대표, 보조…] */
   titles: string[];
+  /** S11 행동별 달 수 */
+  actions: Record<string, number>;
 }
 
 function pickChoice(
@@ -121,6 +125,42 @@ function pickChoice(
   return [...pool].sort((a, b) => expected(b) - expected(a))[0]!.choice.id;
 }
 
+/**
+ * S11 월간 행동 봇.
+ * - random: 고를 수 있는 행동 중 무작위
+ * - cautious: 지치면 쉬고(체력이 더 낮으면 운동), 빚이 있으면 부업, 여유가 있으면 자기계발·인맥, 컨디션이 아주 좋으면 야근(연속 2개월까지)
+ */
+export function pickAction(
+  state: GameRunState,
+  policy: AutoPlayPolicy,
+  rng: SeededRng,
+  content: ContentIndex,
+): MonthlyAction {
+  const open = content.pack.monthlyActions.actions
+    .filter((a) => !actionLockReason(a, state, content))
+    .map((a) => a.id);
+  if (policy === 'random') return rng.pick(open);
+  const can = (id: MonthlyAction) => open.includes(id);
+  const last = state.actionLog.at(-1);
+  const streak = (id: MonthlyAction) =>
+    last?.actionId === id && last.turnIndex === state.turnIndex - 1
+      ? streakOf(state.actionLog, id, last.turnIndex)
+      : 0;
+  const { health, mental } = state.resources;
+  const monthly = Math.floor((state.employment.current?.annualSalary ?? 0) / 12);
+  if (Math.min(health, mental) <= 40) return health < mental - 10 && can('exercise') ? 'exercise' : 'rest';
+  if ((state.debt > 0 || state.cash < monthly) && mental >= 55 && streak('sidejob') < 4) return 'sidejob';
+  // 야근은 그해 성과 가산이 아직 덜 찼을 때만 (다 찼으면 몸만 닳는다)
+  const effortFull =
+    yearActionPerformance(state, content, Math.floor(state.turnIndex / 12)) >=
+    content.pack.monthlyActions.performanceCap;
+  if (health >= 70 && mental >= 65 && streak('overtime') < 2 && !effortFull) return 'overtime';
+  if (health < 55 && can('exercise')) return 'exercise';
+  if (can('study') && totalOf(state.actionLog, 'study') < 36 && mental >= 50) return 'study';
+  if (can('network') && mental >= 50) return 'network';
+  return actionDef(content, 'rest').id;
+}
+
 function careerStats(
   state: GameRunState,
   content: ContentIndex,
@@ -145,6 +185,10 @@ function careerStats(
     }).length,
     retirementTier: state.ending?.retirementTier ?? null,
     titles: state.ending?.titles ?? [],
+    actions: state.actionLog.reduce<Record<string, number>>((acc, e) => {
+      acc[e.actionId] = (acc[e.actionId] ?? 0) + 1;
+      return acc;
+    }, {}),
   };
 }
 
@@ -156,6 +200,8 @@ export function autoPlay(
   onFinish?: (state: GameRunState) => void,
   /** S10 난이도 */
   difficulty: Difficulty = 'NORMAL',
+  /** S11 행동 고르기: 정책대로 / 기본 행동만 (기능을 안 쓰는 사람) */
+  actions: 'policy' | 'default' = 'policy',
 ): AutoPlayResult {
   const policyRng = SeededRng.derive(seed, 'policy');
   const now = '2026-11-17T00:00:00.000Z';
@@ -178,7 +224,11 @@ export function autoPlay(
   for (let i = 0; i <= maxMonths; i++) {
     if (state.phase === 'GAME_OVER') break;
     try {
-      state = startMonth(state, content);
+      state = startMonth(
+        state,
+        content,
+        actions === 'policy' ? { actionId: pickAction(state, policy, policyRng, content) } : {},
+      );
       // 한 달에 사건이 여러 개 (업무 → 일상)
       for (let guard = 0; state.phase === 'EVENT_PENDING' && guard < 5; guard++) {
         const choiceId = pickChoice(state, policy, policyRng, content);

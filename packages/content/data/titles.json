@@ -6,7 +6,9 @@
     "rarity": "LEGENDARY",
     "priority": 1000,
     "reason": "임원 발령장을 받았다. 회사원이 오를 수 있는 가장 높은 곳.",
-    "rule": { "endingTypes": ["EXECUTIVE_PROMOTION"] }
+    "rule": {
+      "endingTypes": ["EXECUTIVE_PROMOTION"]
+    }
   },
   {
     "id": "title_fast_track",
@@ -15,7 +17,12 @@
     "rarity": "RARE",
     "priority": 650,
     "reason": "마흔이 되기 전에 부장 명함을 받았다.",
-    "rule": { "rankBeforeAge": { "rank": "DEPARTMENT_HEAD", "age": 40 } }
+    "rule": {
+      "rankBeforeAge": {
+        "rank": "DEPARTMENT_HEAD",
+        "age": 40
+      }
+    }
   },
   {
     "id": "title_ace",
@@ -24,7 +31,12 @@
     "rarity": "RARE",
     "priority": 640,
     "reason": "인사평가 S를 여섯 번 넘게 받았다.",
-    "rule": { "reviewCount": { "grades": ["S"], "min": 6 } }
+    "rule": {
+      "reviewCount": {
+        "grades": ["S"],
+        "min": 6
+      }
+    }
   },
   {
     "id": "title_rich",
@@ -33,7 +45,11 @@
     "rarity": "RARE",
     "priority": 620,
     "reason": "은퇴할 때 순자산이 8억 원(첫해 물가 기준)을 넘었다.",
-    "rule": { "netWorth": { "min": 800000000 } }
+    "rule": {
+      "netWorth": {
+        "min": 800000000
+      }
+    }
   },
   {
     "id": "title_one_club",
@@ -42,7 +58,12 @@
     "rarity": "RARE",
     "priority": 600,
     "reason": "이직 한 번 없이 한 회사에서 정년을 맞았다.",
-    "rule": { "endingTypes": ["RETIREMENT"], "transfers": { "max": 0 } }
+    "rule": {
+      "endingTypes": ["RETIREMENT"],
+      "transfers": {
+        "max": 0
+      }
+    }
   },
   {
     "id": "title_work_life",
@@ -51,7 +72,12 @@
     "rarity": "RARE",
     "priority": 600,
     "reason": "커리어 내내 체력·정신력이 절반 아래로 떨어진 적이 없다.",
-    "rule": { "category": "NORMAL", "lowestWellbeing": { "min": 50 } }
+    "rule": {
+      "category": "NORMAL",
+      "lowestWellbeing": {
+        "min": 50
+      }
+    }
   },
   {
     "id": "title_migrant",
@@ -60,7 +86,11 @@
     "rarity": "RARE",
     "priority": 580,
     "reason": "세 번 넘게 회사를 옮겼다. 더 나은 둥지를 찾아서.",
-    "rule": { "transfers": { "min": 3 } }
+    "rule": {
+      "transfers": {
+        "min": 3
+      }
+    }
   },
   {
     "id": "title_phoenix",
@@ -69,7 +99,12 @@
     "rarity": "RARE",
     "priority": 570,
     "reason": "쓰러지기 직전까지 간 달이 세 번 넘었지만, 끝내 버텼다.",
-    "rule": { "category": "NORMAL", "nearCollapseMonths": { "min": 3 } }
+    "rule": {
+      "category": "NORMAL",
+      "nearCollapseMonths": {
+        "min": 3
+      }
+    }
   },
   {
     "id": "title_comeback",
@@ -78,7 +113,12 @@
     "rarity": "RARE",
     "priority": 560,
     "reason": "인사평가 D를 받고도 다시 S까지 올라섰다.",
-    "rule": { "comeback": { "from": ["D"], "to": ["S"] } }
+    "rule": {
+      "comeback": {
+        "from": ["D"],
+        "to": ["S"]
+      }
+    }
   },
   {
     "id": "title_debt_war",
@@ -87,7 +127,15 @@
     "rarity": "RARE",
     "priority": 540,
     "reason": "빚이 한계선 턱밑까지 갔다가 0원으로 끝냈다.",
-    "rule": { "category": "NORMAL", "peakDebtPermille": { "min": 700 }, "debtAtEnd": { "max": 0 } }
+    "rule": {
+      "category": "NORMAL",
+      "peakDebtPermille": {
+        "min": 700
+      },
+      "debtAtEnd": {
+        "max": 0
+      }
+    }
   },
   {
     "id": "title_whistle",
@@ -98,8 +146,14 @@
     "reason": "장부의 비밀을 끝내 세상에 꺼냈다.",
     "rule": {
       "choicesAny": [
-        { "eventId": "evt_arc_ledger_4", "choiceId": "submit_all" },
-        { "eventId": "evt_arc_ledger_farewell", "choiceId": "hand_over" }
+        {
+          "eventId": "evt_arc_ledger_4",
+          "choiceId": "submit_all"
+        },
+        {
+          "eventId": "evt_arc_ledger_farewell",
+          "choiceId": "hand_over"
+        }
       ]
     }
   },
@@ -110,7 +164,14 @@
     "rarity": "COMMON",
     "priority": 240,
     "reason": "키운 후배가 나를 넘어서는 날, 기꺼이 박수를 쳤다.",
-    "rule": { "choicesAny": [{ "eventId": "evt_arc_mentee_4", "choiceId": "proud" }] }
+    "rule": {
+      "choicesAny": [
+        {
+          "eventId": "evt_arc_mentee_4",
+          "choiceId": "proud"
+        }
+      ]
+    }
   },
   {
     "id": "title_politician",
@@ -119,7 +180,11 @@
     "rarity": "RARE",
     "priority": 510,
     "reason": "세 명 넘는 상사에게 깊은 신뢰를 받았다.",
-    "rule": { "trustedBosses": { "min": 3 } }
+    "rule": {
+      "trustedBosses": {
+        "min": 3
+      }
+    }
   },
   {
     "id": "title_unlucky",
@@ -131,7 +196,10 @@
     "rule": {
       "category": "FAILURE",
       "endingCauses": ["LAYOFF", "RESTRUCTURING", "FORCED_RESIGNATION", "COMPANY_CLOSURE"],
-      "reviewCount": { "grades": ["S", "A"], "min": 3 }
+      "reviewCount": {
+        "grades": ["S", "A"],
+        "min": 3
+      }
     }
   },
   {
@@ -141,7 +209,12 @@
     "rarity": "COMMON",
     "priority": 400,
     "reason": "서른이 되기 전에 회사 생활이 끝났다. 짧고 뜨거웠다.",
-    "rule": { "category": "FAILURE", "endAge": { "max": 29 } }
+    "rule": {
+      "category": "FAILURE",
+      "endAge": {
+        "max": 29
+      }
+    }
   },
   {
     "id": "title_burnout",
@@ -150,7 +223,9 @@
     "rarity": "COMMON",
     "priority": 380,
     "reason": "몸이나 마음이 먼저 바닥났다. 그만큼 일했다.",
-    "rule": { "endingCauses": ["OVERWORK_DISMISSAL", "BURNOUT_DISMISSAL"] }
+    "rule": {
+      "endingCauses": ["OVERWORK_DISMISSAL", "BURNOUT_DISMISSAL"]
+    }
   },
   {
     "id": "title_rival",
@@ -161,8 +236,14 @@
     "reason": "라이벌 동기와 끝까지 승부를 냈다.",
     "rule": {
       "choicesAny": [
-        { "eventId": "evt_arc_rival_4", "choiceId": "winner" },
-        { "eventId": "evt_arc_rival_4", "choiceId": "shake_hands" }
+        {
+          "eventId": "evt_arc_rival_4",
+          "choiceId": "winner"
+        },
+        {
+          "eventId": "evt_arc_rival_4",
+          "choiceId": "shake_hands"
+        }
       ]
     }
   },
@@ -173,7 +254,14 @@
     "rarity": "COMMON",
     "priority": 250,
     "reason": "라이벌 동기와 손잡고 '저 둘'로 불렸다.",
-    "rule": { "choicesAny": [{ "eventId": "evt_arc_rival_4", "choiceId": "toast_together" }] }
+    "rule": {
+      "choicesAny": [
+        {
+          "eventId": "evt_arc_rival_4",
+          "choiceId": "toast_together"
+        }
+      ]
+    }
   },
   {
     "id": "title_plant",
@@ -182,7 +270,14 @@
     "rarity": "COMMON",
     "priority": 230,
     "reason": "멘토의 마지막 출근 날, 1층까지 짐을 들어 드렸다.",
-    "rule": { "choicesAny": [{ "eventId": "evt_arc_mentor_4", "choiceId": "see_off" }] }
+    "rule": {
+      "choicesAny": [
+        {
+          "eventId": "evt_arc_mentor_4",
+          "choiceId": "see_off"
+        }
+      ]
+    }
   },
   {
     "id": "title_frugal",
@@ -191,7 +286,12 @@
     "rarity": "COMMON",
     "priority": 430,
     "reason": "과장 이하 직급으로 순자산 3억 원(첫해 물가 기준)을 모았다.",
-    "rule": { "highestRanks": ["STAFF", "ASSISTANT_MANAGER", "MANAGER"], "netWorth": { "min": 300000000 } }
+    "rule": {
+      "highestRanks": ["STAFF", "ASSISTANT_MANAGER", "MANAGER"],
+      "netWorth": {
+        "min": 300000000
+      }
+    }
   },
   {
     "id": "title_eternal_manager",
@@ -200,7 +300,13 @@
     "rarity": "COMMON",
     "priority": 450,
     "reason": "과장으로 10년 넘게 일했다. 과장 자리가 제일 편했다.",
-    "rule": { "highestRanks": ["MANAGER"], "rankYears": { "rank": "MANAGER", "min": 10 } }
+    "rule": {
+      "highestRanks": ["MANAGER"],
+      "rankYears": {
+        "rank": "MANAGER",
+        "min": 10
+      }
+    }
   },
   {
     "id": "title_insider",
@@ -209,7 +315,11 @@
     "rarity": "COMMON",
     "priority": 300,
     "reason": "나를 좋아하는 동료가 네 명이 넘었다.",
-    "rule": { "friends": { "min": 4 } }
+    "rule": {
+      "friends": {
+        "min": 4
+      }
+    }
   },
   {
     "id": "title_overtime",
@@ -218,7 +328,11 @@
     "rarity": "COMMON",
     "priority": 280,
     "reason": "위험한 일을 반년 넘게 연달아 떠안았다.",
-    "rule": { "maxHighRiskStreak": { "min": 6 } }
+    "rule": {
+      "maxHighRiskStreak": {
+        "min": 6
+      }
+    }
   },
   {
     "id": "title_late_bloomer",
@@ -227,7 +341,9 @@
     "rarity": "COMMON",
     "priority": 270,
     "reason": "쉰이 넘어서도 승진했다. 늦게 핀 꽃도 꽃이다.",
-    "rule": { "promotedFromAge": 50 }
+    "rule": {
+      "promotedFromAge": 50
+    }
   },
   {
     "id": "title_steady",
@@ -236,7 +352,68 @@
     "rarity": "COMMON",
     "priority": 400,
     "reason": "10년 넘게 평가가 A 아니면 B였다. 튀지 않는 것도 재능이다.",
-    "rule": { "reviewsWithin": { "grades": ["A", "B"], "minCount": 10 } }
+    "rule": {
+      "reviewsWithin": {
+        "grades": ["A", "B"],
+        "minCount": 10
+      }
+    }
+  },
+  {
+    "id": "title_night_school",
+    "name": "주경야독",
+    "emoji": "📚",
+    "rarity": "COMMON",
+    "priority": 420,
+    "reason": "퇴근 후 3년 넘게 책을 폈다. 낮엔 회사원, 밤엔 수험생.",
+    "rule": {
+      "actionMonths": {
+        "action": "study",
+        "min": 36
+      }
+    }
+  },
+  {
+    "id": "title_networker",
+    "name": "마당발",
+    "emoji": "🤝",
+    "rarity": "COMMON",
+    "priority": 410,
+    "reason": "3년 넘게 저녁마다 누군가를 만났다. 업계에 모르는 사람이 없다.",
+    "rule": {
+      "actionMonths": {
+        "action": "network",
+        "min": 36
+      }
+    }
+  },
+  {
+    "id": "title_n_jobber",
+    "name": "N잡러",
+    "emoji": "💼",
+    "rarity": "COMMON",
+    "priority": 390,
+    "reason": "월급 하나로는 모자랐다. 3년 넘게 두 번째 일을 했다.",
+    "rule": {
+      "actionMonths": {
+        "action": "sidejob",
+        "min": 36
+      }
+    }
+  },
+  {
+    "id": "title_iron_body",
+    "name": "철인 회사원",
+    "emoji": "🏋️",
+    "rarity": "COMMON",
+    "priority": 380,
+    "reason": "4년 넘게 헬스장에 출석했다. 회사보다 운동이 더 꾸준했다.",
+    "rule": {
+      "actionMonths": {
+        "action": "exercise",
+        "min": 48
+      }
+    }
   },
   {
     "id": "title_default",
