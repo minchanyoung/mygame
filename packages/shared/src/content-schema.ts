@@ -589,6 +589,8 @@ export const AchievementRuleSchema = z
     titleRarity: TitleRaritySchema.optional(),
     /** 모든 연재를 한 번 이상 완결 */
     allSeries: z.literal(true).optional(),
+    /** S12 모든 직무 연재를 한 번 이상 완결 */
+    allJobSeries: z.literal(true).optional(),
     /** 한 연재에서 본 서로 다른 결말 수 */
     seriesEndingsInOne: z.number().int().min(1).optional(),
     /** 다녀 본 회사 수 */

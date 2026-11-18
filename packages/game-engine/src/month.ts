@@ -172,7 +172,11 @@ function pickMonthlyEvents(
     }
     const taken = new Set(selections.map((s) => s.eventId));
     const candidates = getEligibleEvents(state, content, slot).filter((c) => !taken.has(c.event.id));
-    selections.push(selectEvent(candidates, rng, content, slot));
+    // S12 보장 사건(직무 연재 1화): 기한이 지났고 조건이 맞으면 추첨 없이 연다
+    const guaranteed = candidates.find(
+      (c) => c.event.guaranteeFromTurn !== undefined && state.turnIndex >= c.event.guaranteeFromTurn,
+    );
+    selections.push(selectEvent(guaranteed ? [guaranteed] : candidates, rng, content, slot));
   }
   return { selections, scheduledEvents };
 }

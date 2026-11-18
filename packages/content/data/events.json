@@ -12672,5 +12672,3531 @@
         ]
       }
     ]
+  },
+  {
+    "id": "evt_jarc_dev_1",
+    "version": 1,
+    "status": "published",
+    "title": "전면 개편, 여섯 달 안에",
+    "description": "회사가 15년 된 주문 시스템을 통째로 갈아엎기로 했다. 일정표의 오픈일이 이상하게 가깝다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 8,
+    "maxOccurrencesPerRun": 1,
+    "guaranteeFromTurn": 36,
+    "series": {
+      "id": "job_dev",
+      "title": "차세대 시스템",
+      "episode": 1,
+      "total": 4,
+      "job": "DEV",
+      "farewellEventId": "evt_jarc_dev_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "jobs": ["DEV"],
+      "tenureMonths": {
+        "min": 12
+      },
+      "seriesNone": true,
+      "npc": {
+        "role": "PEER"
+      }
+    },
+    "channel": "차세대 TF 단톡방",
+    "dialogue": [
+      {
+        "speaker": "BOSS",
+        "text": "차세대 프로젝트 킥오프합니다. 오픈은 6개월 뒤 1일. 대표님 보고 끝난 날짜예요."
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "(개인 메시지) 6개월이요…? 테이블만 400개인데 ㅋㅋ 같이 살아남아요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "push_back",
+        "label": "일정이 불가능한 근거를 정리해 올린다",
+        "reply": "현재 범위로는 6개월이 어렵습니다. 모듈별 공수 산정 첨부드립니다.",
+        "guaranteedEffects": [
+          {
+            "type": "FLAG_SET",
+            "key": "jdev_realist",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_dev_2",
+            "delayMonths": 3
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "…숫자로 보니 할 말이 없네. 범위를 줄여 봅시다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "BOSS",
+              "stat": "favor",
+              "amount": -5
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "안 되는 이유 말고 되는 방법을 가져오세요."
+            }
+          ]
+        }
+      },
+      {
+        "id": "say_yes",
+        "label": "일단 해보겠다고 한다",
+        "reply": "네, 해보겠습니다. 최대한 맞춰 볼게요.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jdev_yes",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_dev_2",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "BOSS",
+            "text": "좋아요, 그 자세. 기대할게요."
+          }
+        ]
+      },
+      {
+        "id": "pair_up",
+        "label": "동료와 핵심 모듈을 둘이 나눠 맡는다",
+        "reply": "결제랑 주문은 우리 둘이 반씩 나눠요. 서로 리뷰해 주고.",
+        "guaranteedEffects": [
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": 6
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jdev_pair",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_dev_2",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "콜. 대신 제 코드 리뷰 너무 맵게 하지 마요 ㅎㅎ"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_dev_2",
+    "version": 1,
+    "status": "published",
+    "title": "기술 부채 폭탄",
+    "description": "옛 코드 깊숙한 곳에서 아무도 모르는 정산 로직이 나왔다. 건드리면 어디가 터질지 모른다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "job_dev",
+      "title": "차세대 시스템",
+      "episode": 2,
+      "total": 4,
+      "job": "DEV",
+      "farewellEventId": "evt_jarc_dev_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "차세대 TF 단톡방",
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "이거 봐요. 주석이 '절대 수정 금지 — 2011'이래요."
+      },
+      {
+        "speaker": "SYSTEM",
+        "text": "📎 legacy_settlement_v2_final_진짜최종.java (4,812줄)"
+      }
+    ],
+    "choices": [
+      {
+        "id": "fix_properly",
+        "label": "몇 주 밀리더라도 제대로 다시 짠다",
+        "reply": "이건 감싸서 넘길 물건이 아니에요. 테스트부터 붙이고 다시 짭시다.",
+        "guaranteedEffects": [
+          {
+            "type": "FLAG_SET",
+            "key": "jdev_clean",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_dev_3",
+            "delayMonths": 3
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "focus",
+              "amount": -4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "PARTICIPANT",
+              "text": "와… 테스트 다 초록불이에요. 이게 되네."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "health",
+              "amount": -6
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "일정은요? 이러다 오픈 못 해요."
+            }
+          ]
+        }
+      },
+      {
+        "id": "wrap_it",
+        "label": "일단 감싸서(우회해서) 넘긴다",
+        "reply": "건드리지 말고 바깥에서 감싸서 호출만 바꿔요. 오픈 후에 정리하죠.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -2
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jdev_patch",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_dev_3",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "…오픈 후에 정리한다는 말, 10년째 듣는 중이에요."
+          }
+        ]
+      },
+      {
+        "id": "weekend_dig",
+        "label": "동료와 주말에 같이 파고든다",
+        "reply": "주말에 나와서 둘이 끝까지 파 봐요. 치킨은 내가 살게.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jdev_pair",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -6
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "trust",
+            "amount": 10
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jdev_clean",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_dev_3",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "일요일 새벽 3시에 찾았어요. 이거 평생 안 잊을 듯."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_dev_3",
+    "version": 1,
+    "status": "published",
+    "title": "오픈 D-day",
+    "description": "자정 전환 작업. 모두가 모니터를 보고 있다. 버튼은 당신 손에 있다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "job_dev",
+      "title": "차세대 시스템",
+      "episode": 3,
+      "total": 4,
+      "job": "DEV",
+      "farewellEventId": "evt_jarc_dev_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "차세대 TF 단톡방",
+    "dialogue": [
+      {
+        "speaker": "BOSS",
+        "text": "대표님도 지금 보고 계십니다. 자정에 전환 갑니다."
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "모니터링 대시보드 띄웠어요. …손 떨리네요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "launch_patched",
+        "label": "버튼을 누른다",
+        "reply": "전환 시작합니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jdev_patch",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "outcome": {
+          "baseChance": 0.35,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "jdev_success",
+              "scope": "RUN"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "SYSTEM",
+              "text": "✅ 신규 시스템 주문 처리 정상 — 00:12"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -8
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -8
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "jdev_incident",
+              "scope": "RUN"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "SYSTEM",
+              "text": "🚨 정산 배치 실패 — 주문 3,214건 보류"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_dev_4",
+            "delayMonths": 2
+          }
+        ]
+      },
+      {
+        "id": "launch_clean",
+        "label": "준비한 대로 버튼을 누른다",
+        "reply": "테스트 다 통과했습니다. 전환 시작합니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jdev_clean",
+              "scope": "RUN"
+            }
+          ],
+          "flagsNone": [
+            {
+              "key": "jdev_patch",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "outcome": {
+          "baseChance": 0.7,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 8
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "jdev_success",
+              "scope": "RUN"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "SYSTEM",
+              "text": "✅ 신규 시스템 주문 처리 정상 — 00:04"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -4
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -4
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "jdev_incident",
+              "scope": "RUN"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "SYSTEM",
+              "text": "⚠ 일부 결제 지연 — 40분 뒤 복구"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_dev_4",
+            "delayMonths": 2
+          }
+        ]
+      },
+      {
+        "id": "call_delay",
+        "label": "오픈 연기를 주장한다",
+        "reply": "지금 넘기면 사고 납니다. 2주만 미루죠. 책임은 제가 지겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "BOSS",
+            "stat": "favor",
+            "amount": -6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -2
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jdev_delay",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_dev_4",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "BOSS",
+            "text": "…대표님께 뭐라고 말하라는 거예요. 알겠어요. 2주."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_dev_4",
+    "version": 1,
+    "status": "published",
+    "title": "회고",
+    "description": "오픈 한 달 뒤, 프로젝트 회고 자리. 모두가 당신의 첫마디를 기다린다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "job_dev",
+      "title": "차세대 시스템",
+      "episode": 4,
+      "total": 4,
+      "job": "DEV"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "차세대 TF 단톡방",
+    "dialogue": [
+      {
+        "speaker": "BOSS",
+        "text": "차세대 회고 시작합시다. 잘한 것, 아쉬운 것 솔직하게."
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "(개인 메시지) 뭐라고 말할 거예요?"
+      }
+    ],
+    "choices": [
+      {
+        "id": "credit_team",
+        "label": "\"우리가 해냈다\" — 공을 팀에 돌린다",
+        "reply": "제가 버튼만 눌렀지, 다 같이 만든 겁니다. 특히 옆자리 이분이요.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jdev_success",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 1
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 6
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "trust",
+            "amount": 10
+          }
+        ],
+        "resultText": "15년 묵은 시스템을 갈아엎었다. 사내 개발자들 사이에서 당신 이름이 오르내린다."
+      },
+      {
+        "id": "safe_delay",
+        "label": "\"연기한 덕에 사고는 없었다\"",
+        "reply": "2주 미룬 게 정답이었다고 생각합니다. 숫자가 말해 줄 거예요.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jdev_delay",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 1
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          }
+        ],
+        "resultText": "화려하진 않았다. 하지만 아무도 새벽에 불려 나오지 않았다."
+      },
+      {
+        "id": "own_incident",
+        "label": "장애 보고서를 내가 쓴다",
+        "reply": "장애 원인은 제 판단이었습니다. 재발 방지안까지 제가 정리하겠습니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jdev_incident",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "BOSS",
+            "stat": "trust",
+            "amount": 8
+          },
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 1
+          }
+        ],
+        "resultText": "책임을 진 사람에게 다음 프로젝트가 왔다. 이상하게도."
+      },
+      {
+        "id": "blame_partner",
+        "label": "동료의 모듈이 원인이었다고 말한다",
+        "reply": "로그상으로는 결제 모듈 쪽 문제였습니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jdev_incident",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "trust",
+            "amount": -20
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "rivalry",
+            "amount": 20
+          }
+        ],
+        "resultText": "회의실을 나서는데, 옆자리 동료가 눈을 마주치지 않았다."
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_dev_farewell",
+    "version": 1,
+    "status": "published",
+    "title": "떠난 동료의 커밋 메시지",
+    "description": "함께 차세대를 맡던 동료가 회사를 떠났다. 마지막 커밋 메시지가 눈에 띈다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "job_dev",
+      "title": "차세대 시스템",
+      "episode": 4,
+      "total": 4,
+      "job": "DEV"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "SYSTEM",
+        "text": "commit 7f3a9c — \"남은 건 부탁해요. 주석 꼼꼼히 달아 뒀어요.\""
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "(퇴사 후 메시지) 오픈 날 같이 못 있어서 미안해요. 잘 될 거예요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "carry_on",
+        "label": "남은 코드를 이어받는다",
+        "reply": "걱정 마요. 주석 덕분에 다 읽혀요. 잘 지내요.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -3
+          }
+        ],
+        "resultText": "혼자 남은 프로젝트는 조금 늦게, 그래도 끝까지 갔다."
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_hr_1",
+    "version": 1,
+    "status": "published",
+    "title": "비밀 TF",
+    "description": "인사담당 임원이 조용히 불렀다. '조직 효율화 TF'. 서약서부터 내민다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 8,
+    "maxOccurrencesPerRun": 1,
+    "guaranteeFromTurn": 36,
+    "series": {
+      "id": "job_hr",
+      "title": "구조조정 명단",
+      "episode": 1,
+      "total": 4,
+      "job": "HR",
+      "farewellEventId": "evt_jarc_hr_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "jobs": ["HR"],
+      "tenureMonths": {
+        "min": 12
+      },
+      "seriesNone": true,
+      "npc": {
+        "role": "PEER"
+      }
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "text": "이 방에서 나간 얘기는 없던 얘기입니다. 서명하시죠.",
+        "name": "인사담당 상무"
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "(메신저) 오늘 점심 같이 해요? 요즘 회사 분위기 이상하지 않아요? ㅎㅎ"
+      }
+    ],
+    "choices": [
+      {
+        "id": "take_lead",
+        "label": "적극적으로 맡겠다고 한다",
+        "reply": "맡겨 주시면 기준부터 제대로 세워 보겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -3
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jhr_eager",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_hr_2",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "text": "역시. 그래서 {me} 씨를 부른 겁니다.",
+            "name": "인사담당 상무"
+          }
+        ]
+      },
+      {
+        "id": "quiet_work",
+        "label": "조용히 실무만 하겠다고 한다",
+        "reply": "주신 자료 정리만 하겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -1
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jhr_quiet",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_hr_2",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "점심 약속은 '일이 생겨서'라고 미뤘다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_hr_2",
+    "version": 1,
+    "status": "published",
+    "title": "명단 속 이름",
+    "description": "초안 명단을 넘기다 손이 멈췄다. 매일 점심을 같이 먹는 그 사람의 이름이 있다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "job_hr",
+      "title": "구조조정 명단",
+      "episode": 2,
+      "total": 4,
+      "job": "HR",
+      "farewellEventId": "evt_jarc_hr_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "SYSTEM",
+        "text": "📎 조직효율화_대상자_초안(대외비).xlsx — 47행"
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "(메신저) 이번 주 금요일 회식 빠지면 안 돼요~ 내가 쏜다!"
+      }
+    ],
+    "choices": [
+      {
+        "id": "review_again",
+        "label": "평가 자료를 다시 검토해 빼 보자고 한다",
+        "reply": "이 대상자는 최근 2년 평가가 기준보다 높습니다. 재검토가 필요해 보입니다.",
+        "outcome": {
+          "baseChance": 0.45,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "FLAG_SET",
+              "key": "jhr_saved",
+              "scope": "RUN"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "…맞네. 기준 오류입니다. 빼죠.",
+              "name": "인사담당 상무"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "FLAG_SET",
+              "key": "jhr_tried",
+              "scope": "RUN"
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "BOSS",
+              "stat": "trust",
+              "amount": -8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "사적인 감정이 들어간 거 아니죠?",
+              "name": "인사담당 상무"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_hr_3",
+            "delayMonths": 3
+          }
+        ]
+      },
+      {
+        "id": "by_the_rules",
+        "label": "원칙대로 둔다",
+        "reply": "(아무 말도 하지 않고 다음 행으로 넘긴다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -5
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jhr_principle",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_hr_3",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "금요일 회식에서 그 사람이 따라 준 술이 유난히 썼다."
+          }
+        ]
+      },
+      {
+        "id": "tip_off",
+        "label": "동료에게 슬쩍 귀띔한다",
+        "reply": "(개인 메시지) …요즘 이력서 한번 정리해 둬요. 그냥, 혹시 몰라서.",
+        "guaranteedEffects": [
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": 10
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jhr_leak",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_hr_3",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "…무슨 뜻인지 알 것 같아요. 고마워요."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_hr_3",
+    "version": 1,
+    "status": "published",
+    "title": "소문",
+    "description": "익명 게시판에 '구조조정 명단 있다'는 글이 올라왔다. 상무가 TF를 소집했다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "job_hr",
+      "title": "구조조정 명단",
+      "episode": 3,
+      "total": 4,
+      "job": "HR",
+      "farewellEventId": "evt_jarc_hr_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "text": "누가 흘렸는지 찾을 겁니다. 이 방 안에 있다는 거, 다들 알죠?",
+        "name": "인사담당 상무"
+      },
+      {
+        "speaker": "SYSTEM",
+        "text": "블라인드 · 조회 4,281 · 댓글 312"
+      }
+    ],
+    "choices": [
+      {
+        "id": "play_dumb",
+        "label": "모른 척한다",
+        "reply": "저도 게시판 보고 놀랐습니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jhr_leak",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "FLAG_SET",
+              "key": "jhr_hidden",
+              "scope": "RUN"
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "의심의 눈길은 다른 팀으로 옮겨 갔다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "FLAG_SET",
+              "key": "jhr_caught",
+              "scope": "RUN"
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -10
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "{me} 씨 메신저 기록, 감사팀이 보고 있습니다.",
+              "name": "인사담당 상무"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_hr_4",
+            "delayMonths": 2
+          }
+        ]
+      },
+      {
+        "id": "confess",
+        "label": "내가 말했다고 털어놓는다",
+        "reply": "제가 한 사람에게 언질을 줬습니다. 책임지겠습니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jhr_leak",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -6
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "BOSS",
+            "stat": "trust",
+            "amount": -10
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jhr_caught",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_hr_4",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "text": "…솔직한 건 인정하죠. 그래도 TF에선 빠지세요.",
+            "name": "인사담당 상무"
+          }
+        ]
+      },
+      {
+        "id": "secure_tf",
+        "label": "TF 보안을 다시 점검하자고 한다",
+        "reply": "문서 접근 기록부터 확인하고, 발표 일정을 당기는 게 좋겠습니다.",
+        "visibleIf": {
+          "flagsNone": [
+            {
+              "key": "jhr_leak",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "BOSS",
+            "stat": "trust",
+            "amount": 6
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_hr_4",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "text": "그래요. 이런 게 일 잘하는 거지.",
+            "name": "인사담당 상무"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_hr_4",
+    "version": 1,
+    "status": "published",
+    "title": "발표 날",
+    "description": "오전 10시, 대상자 개별 면담이 시작됐다. 사무실에 키보드 소리만 들린다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "job_hr",
+      "title": "구조조정 명단",
+      "episode": 4,
+      "total": 4,
+      "job": "HR"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "SYSTEM",
+        "text": "📢 [전사 공지] 조직 효율화 관련 안내"
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "(메신저) …오늘 점심, 같이 먹을 수 있어요?"
+      }
+    ],
+    "choices": [
+      {
+        "id": "principle_end",
+        "label": "원칙을 지킨 사람으로 남는다",
+        "reply": "(점심 대신 면담 일정표를 연다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jhr_principle",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 3
+          }
+        ],
+        "resultText": "회사는 당신을 '믿을 수 있는 사람'이라고 불렀다. 점심을 같이 먹던 자리는 비었다."
+      },
+      {
+        "id": "saved_end",
+        "label": "그 사람이 남은 걸 조용히 확인한다",
+        "reply": "응, 먹자. 오늘은 내가 살게.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jhr_saved",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 1
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 8
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "trust",
+            "amount": 15
+          }
+        ],
+        "resultText": "그 사람은 끝내 몰랐다. 당신이 엑셀 한 줄을 지웠다는 걸."
+      },
+      {
+        "id": "tried_end",
+        "label": "\"할 수 있는 건 다 했어\"",
+        "reply": "미안해. 정말로 할 수 있는 건 다 해 봤어.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jhr_tried",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": 6
+          }
+        ],
+        "resultText": "막지 못했다. 그래도 그 사람은 마지막 날 당신에게만 인사를 하고 갔다."
+      },
+      {
+        "id": "leak_end",
+        "label": "그 사람의 마지막 출근길을 배웅한다",
+        "reply": "(엘리베이터 앞까지 같이 걸어간다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jhr_leak",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "favor",
+            "amount": 10
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "trust",
+            "amount": 8
+          }
+        ],
+        "resultText": "그 사람은 미리 옮길 곳을 구해 떠났다. 둘만 아는 비밀이 하나 생겼다. 그 대가가 무엇이었든."
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_hr_farewell",
+    "version": 1,
+    "status": "published",
+    "title": "명단 밖으로 떠난 사람",
+    "description": "발표도 나기 전에, 그 사람이 먼저 사표를 냈다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "job_hr",
+      "title": "구조조정 명단",
+      "episode": 4,
+      "total": 4,
+      "job": "HR"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "분위기 보니 알겠더라고요. 먼저 나가는 게 덜 아플 것 같아서."
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "{me} 씨는 끝까지 잘 버텨요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "see_off",
+        "label": "배웅한다",
+        "reply": "…미안해요. 그리고 고마웠어요.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          }
+        ],
+        "resultText": "명단은 한 줄 줄었다. 사무실은 한 사람만큼 조용해졌다."
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_sales_1",
+    "version": 1,
+    "status": "published",
+    "title": "올해 가장 큰 입찰",
+    "description": "업계 3위 한결물산이 5년짜리 공급 계약 입찰을 냈다. 올해 팀 목표의 절반이 걸렸다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 8,
+    "maxOccurrencesPerRun": 1,
+    "guaranteeFromTurn": 36,
+    "series": {
+      "id": "job_sales",
+      "title": "연간 최대 계약",
+      "episode": 1,
+      "total": 4,
+      "job": "SALES"
+    },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "jobs": ["SALES"],
+      "tenureMonths": {
+        "min": 12
+      },
+      "seriesNone": true
+    },
+    "channel": "영업2팀 단톡방",
+    "dialogue": [
+      {
+        "speaker": "BOSS",
+        "text": "이번 한결 건, {me} 씨가 메인으로 갑니다. 이거 따면 올해 다 한 거예요."
+      },
+      {
+        "speaker": "NAMED",
+        "text": "제안서는 다음 달 15일까지입니다. 기대하겠습니다.",
+        "name": "한결물산 박 상무"
+      }
+    ],
+    "choices": [
+      {
+        "id": "write_own",
+        "label": "제안서를 처음부터 직접 쓴다",
+        "reply": "고객사 공장부터 다녀오겠습니다. 제안서는 제가 직접 쓰죠.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jsales_own",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_sales_2",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "한결물산 공장 앞 국밥집 사장님과 친해졌다."
+          }
+        ]
+      },
+      {
+        "id": "borrow_ref",
+        "label": "선배 팀의 성공 제안서를 빌린다",
+        "reply": "작년 대성 건 제안서 틀 좀 빌려 쓸게요. 고객사 이름만 바꾸진 않고요 ㅎㅎ",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jsales_ref",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_sales_2",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "BOSS",
+            "text": "효율적이네. 대신 디테일은 챙겨요."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_sales_2",
+    "version": 1,
+    "status": "published",
+    "title": "경쟁사의 덤핑",
+    "description": "경쟁사가 30% 낮은 가격을 들고 왔다는 소문. 박 상무의 답장이 짧아졌다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "series": {
+      "id": "job_sales",
+      "title": "연간 최대 계약",
+      "episode": 2,
+      "total": 4,
+      "job": "SALES"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "영업2팀 단톡방",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "text": "솔직히 말씀드리면, 가격 차이가 너무 납니다.",
+        "name": "한결물산 박 상무"
+      },
+      {
+        "speaker": "BOSS",
+        "text": "마진 깎는 건 내 선에서 10%까지예요. 그 이상은 안 돼요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "cut_price",
+        "label": "가격을 맞춘다 (마진 포기)",
+        "reply": "가격, 맞춰 보겠습니다. 대신 3년 차부터 단가 조정 조항을 넣죠.",
+        "guaranteedEffects": [
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "BOSS",
+            "stat": "favor",
+            "amount": -6
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jsales_cheap",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_sales_3",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "BOSS",
+            "text": "…이거 따도 남는 게 없는 거 알죠?"
+          }
+        ]
+      },
+      {
+        "id": "sell_value",
+        "label": "가치로 설득한다",
+        "reply": "5년 총비용으로 보시면 저희가 더 쌉니다. 불량률 자료 보여 드릴게요.",
+        "outcome": {
+          "baseChance": 0.45,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "jsales_value",
+              "scope": "RUN"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "…불량률 차이가 이 정도예요? 다시 검토해 보죠.",
+              "name": "한결물산 박 상무"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -6
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "jsales_behind",
+              "scope": "RUN"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "자료는 잘 봤습니다. 위에선 가격만 봐요.",
+              "name": "한결물산 박 상무"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_sales_3",
+            "delayMonths": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_sales_3",
+    "version": 1,
+    "status": "published",
+    "title": "상무님의 제안",
+    "description": "최종 발표 일주일 전, 박 상무가 저녁 자리를 청했다. 2차에서 그가 잔을 내려놓았다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "series": {
+      "id": "job_sales",
+      "title": "연간 최대 계약",
+      "episode": 3,
+      "total": 4,
+      "job": "SALES"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "영업2팀 단톡방",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "text": "{me} 씨, 이 업계 오래 계실 거죠? 서로 돕고 살아야지.",
+        "name": "한결물산 박 상무"
+      },
+      {
+        "speaker": "NAMED",
+        "text": "계약 금액의 2%. 제 쪽으로 따로. 그럼 결과는 걱정 마세요.",
+        "name": "한결물산 박 상무"
+      }
+    ],
+    "choices": [
+      {
+        "id": "decline",
+        "label": "정중히 거절한다",
+        "reply": "상무님, 그 얘기는 못 들은 걸로 하겠습니다. 제안서로 승부하겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jsales_clean",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_sales_4",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "text": "…허허, 원칙주의자시네. 알겠습니다.",
+            "name": "한결물산 박 상무"
+          }
+        ]
+      },
+      {
+        "id": "golf_only",
+        "label": "골프 접대까지만 한다",
+        "reply": "이번 주말 라운딩 모시겠습니다. 거기까지만요.",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -500000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -3
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jsales_golf",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_sales_4",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "18홀 내내 웃었다. 집에 와서 한참 샤워를 했다."
+          }
+        ]
+      },
+      {
+        "id": "promise_rebate",
+        "label": "리베이트를 약속한다",
+        "reply": "…알겠습니다. 방법은 제가 찾아보겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jsales_rebate",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_audit",
+            "delayMonths": 12
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_sales_4",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "text": "역시 말이 통하는 분이야.",
+            "name": "한결물산 박 상무"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_sales_4",
+    "version": 1,
+    "status": "published",
+    "title": "계약 발표",
+    "description": "한결물산의 우선협상대상자 발표 날. 팀 전체가 메일함 새로고침만 누르고 있다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "series": {
+      "id": "job_sales",
+      "title": "연간 최대 계약",
+      "episode": 4,
+      "total": 4,
+      "job": "SALES"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "영업2팀 단톡방",
+    "dialogue": [
+      {
+        "speaker": "BOSS",
+        "text": "결과 오면 바로 공유해요. 다들 손 놓고 기다리는 중."
+      },
+      {
+        "speaker": "SYSTEM",
+        "text": "📧 [한결물산] 공급사 선정 결과 안내 — 1건의 새 메일"
+      }
+    ],
+    "choices": [
+      {
+        "id": "sign_rebate",
+        "label": "계약서에 사인한다",
+        "reply": "(메일을 열기도 전에 결과를 알고 있다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jsales_rebate",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SALARY_MONTHS",
+            "months": 2
+          },
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 1
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          }
+        ],
+        "resultText": "따냈다. 성과급도 나왔다. 그런데 휴대폰이 울릴 때마다 가슴이 내려앉는다."
+      },
+      {
+        "id": "wait_golf",
+        "label": "결과를 기다린다",
+        "reply": "(새로고침을 누른다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jsales_golf",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "outcome": {
+          "baseChance": 0.6,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "SALARY_MONTHS",
+              "months": 2
+            },
+            {
+              "type": "PROMOTION_POINT_DELTA",
+              "amount": 1
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "앞으로 5년 잘 부탁드립니다.",
+              "name": "한결물산 박 상무"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -6
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 2
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "이번엔 아쉽게 됐습니다. 다음에 또 라운딩 하시죠.",
+              "name": "한결물산 박 상무"
+            }
+          ]
+        }
+      },
+      {
+        "id": "wait_strong",
+        "label": "\"우리 제안이 제일 낫다\"",
+        "reply": "(결과보다 먼저 박 상무에게 감사 메일을 쓴다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jsales_clean",
+              "scope": "RUN"
+            },
+            {
+              "key": "jsales_value",
+              "scope": "RUN"
+            }
+          ],
+          "flagsNone": []
+        },
+        "outcome": {
+          "baseChance": 0.7,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "SALARY_MONTHS",
+              "months": 2
+            },
+            {
+              "type": "PROMOTION_POINT_DELTA",
+              "amount": 2
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "솔직히 그날 거절하실 때 알아봤습니다. 같이 갑시다.",
+              "name": "한결물산 박 상무"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -2
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "위에서 가격을 골랐습니다. 저는 {me} 씨를 기억할 겁니다.",
+              "name": "한결물산 박 상무"
+            }
+          ]
+        }
+      },
+      {
+        "id": "wait_clean",
+        "label": "\"결과는 하늘에 맡긴다\"",
+        "reply": "(새로고침을 누른다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jsales_clean",
+              "scope": "RUN"
+            }
+          ],
+          "flagsNone": [
+            {
+              "key": "jsales_value",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "outcome": {
+          "baseChance": 0.4,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "SALARY_MONTHS",
+              "months": 2
+            },
+            {
+              "type": "PROMOTION_POINT_DELTA",
+              "amount": 2
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "가격 말고 사람을 보고 골랐습니다.",
+              "name": "한결물산 박 상무"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "졌지만 깔끔했어요. 한결 쪽에서 다음 건은 먼저 연락 준대요."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_fin_1",
+    "version": 1,
+    "status": "published",
+    "title": "IPO 실사팀 차출",
+    "description": "회사가 내년 상장을 추진한다. 팀장이 실사 대응 실무자로 당신을 찍었다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 8,
+    "maxOccurrencesPerRun": 1,
+    "guaranteeFromTurn": 36,
+    "series": {
+      "id": "job_fin",
+      "title": "상장 준비",
+      "episode": 1,
+      "total": 4,
+      "job": "FINANCE",
+      "farewellEventId": "evt_jarc_fin_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "jobs": ["FINANCE"],
+      "tenureMonths": {
+        "min": 12
+      },
+      "seriesNone": true,
+      "npc": {
+        "role": "BOSS"
+      }
+    },
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "주관사 실사 들어옵니다. 3년 치 증빙 전부요. {me} 씨가 실무 맡아 줘요."
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "상장만 되면 우리사주, 다들 집 한 칸씩은 생길 거예요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "all_in",
+        "label": "밤샘 각오로 맡는다",
+        "reply": "맡겨 주세요. 증빙은 제가 다 맞춰 놓겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_fin_2",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "역시. 상장하면 이 공은 꼭 기억할게요."
+          }
+        ]
+      },
+      {
+        "id": "balance",
+        "label": "본업과 병행하겠다고 한다",
+        "reply": "월 마감이랑 같이 하려면 우선순위 조정이 필요합니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -4
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_fin_2",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "…그래요. 마감은 다른 사람한테 좀 넘겨 볼게요."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_fin_2",
+    "version": 1,
+    "status": "published",
+    "title": "숫자를 맞춰라",
+    "description": "상장 심사 기준 매출에 3%가 모자란다. 팀장이 다음 분기 계약을 이번 분기로 당기자고 한다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "job_fin",
+      "title": "상장 준비",
+      "episode": 2,
+      "total": 4,
+      "job": "FINANCE",
+      "farewellEventId": "evt_jarc_fin_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "어차피 다음 달이면 들어올 매출이에요. 인식 시점만 조금 당기는 거지."
+      },
+      {
+        "speaker": "SYSTEM",
+        "text": "📎 3분기_매출인식_조정안(초안).xlsx"
+      }
+    ],
+    "choices": [
+      {
+        "id": "say_no",
+        "label": "회계 기준상 안 된다고 말한다",
+        "reply": "팀장님, 이건 기준 위반입니다. 심사에서 걸리면 상장 자체가 날아가요.",
+        "guaranteedEffects": [
+          {
+            "type": "FLAG_SET",
+            "key": "jfin_clean",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_fin_3",
+            "delayMonths": 3
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 2
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "PARTICIPANT",
+              "text": "…맞아요. 내가 급했네. 다른 방법 찾아봅시다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PARTICIPANT",
+              "stat": "favor",
+              "amount": -8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "PARTICIPANT",
+              "text": "원칙 좋죠. 그럼 대안을 가져와요."
+            }
+          ]
+        }
+      },
+      {
+        "id": "just_once",
+        "label": "이번 한 번만 맞춘다",
+        "reply": "…알겠습니다. 이번 분기만입니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jfin_cooked",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_fin_3",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "고마워요. 이 일은 우리 둘만 아는 걸로."
+          }
+        ]
+      },
+      {
+        "id": "ask_auditor",
+        "label": "감사인과 미리 상의하자고 한다",
+        "reply": "회계법인에 먼저 물어보죠. 괜찮다고 하면 그때 하고요.",
+        "guaranteedEffects": [
+          {
+            "type": "FLAG_SET",
+            "key": "jfin_clean",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_fin_3",
+            "delayMonths": 3
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.6,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "그건 안 됩니다. 대신 이 방식은 가능해요.",
+              "name": "회계법인 매니저"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "PARTICIPANT",
+              "text": "괜히 긁어 부스럼 만든 거 아니에요?"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_fin_3",
+    "version": 1,
+    "status": "published",
+    "title": "감사인과의 줄다리기",
+    "description": "상장 전 마지막 감사. 회계법인이 3분기 매출 증빙을 다시 요청했다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "job_fin",
+      "title": "상장 준비",
+      "episode": 3,
+      "total": 4,
+      "job": "FINANCE",
+      "farewellEventId": "evt_jarc_fin_farewell"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "text": "3분기 계약 건들, 납품 확인서 원본 보여 주실 수 있죠?",
+        "name": "회계법인 매니저"
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "(개인 메시지) 어떻게 할 거예요?"
+      }
+    ],
+    "choices": [
+      {
+        "id": "doctor_docs",
+        "label": "자료를 손본다",
+        "reply": "(밤새 날짜를 맞춘 확인서를 다시 출력한다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jfin_cooked",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": []
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "FLAG_SET",
+              "key": "jfin_passed",
+              "scope": "RUN"
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -6
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "네, 확인됐습니다.",
+              "name": "회계법인 매니저"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "FLAG_SET",
+              "key": "jfin_flagged",
+              "scope": "RUN"
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "이 확인서, 날짜 형식이 다른 것과 다르네요?",
+              "name": "회계법인 매니저"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_fin_4",
+            "delayMonths": 2
+          }
+        ]
+      },
+      {
+        "id": "tell_truth",
+        "label": "감사인에게 사실대로 말한다",
+        "reply": "3분기 일부 매출은 인식 시점에 문제가 있습니다. 수정하겠습니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jfin_cooked",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PARTICIPANT",
+            "stat": "trust",
+            "amount": -15
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 6
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jfin_delayed",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_fin_4",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PARTICIPANT",
+            "text": "…상장, 한 해 밀리겠네요."
+          }
+        ]
+      },
+      {
+        "id": "explain",
+        "label": "원칙대로 소명한다",
+        "reply": "모든 매출은 납품 확인 기준입니다. 원본 바로 드리겠습니다.",
+        "visibleIf": {
+          "flagsNone": [
+            {
+              "key": "jfin_cooked",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "outcome": {
+          "baseChance": 0.65,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "FLAG_SET",
+              "key": "jfin_passed",
+              "scope": "RUN"
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "깔끔하네요. 이런 회사 드뭅니다.",
+              "name": "회계법인 매니저"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "FLAG_SET",
+              "key": "jfin_delayed",
+              "scope": "RUN"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "다른 쪽 이슈로 심사가 한 분기 늦어지겠습니다.",
+              "name": "회계법인 매니저"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_fin_4",
+            "delayMonths": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_fin_4",
+    "version": 1,
+    "status": "published",
+    "title": "상장 당일",
+    "description": "거래소 상장 기념식 날. 전광판에 회사 이름이 떴다. 아니면, 뜨지 않았다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "job_fin",
+      "title": "상장 준비",
+      "episode": 4,
+      "total": 4,
+      "job": "FINANCE"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "SYSTEM",
+        "text": "📈 오늘의 신규 상장 종목"
+      },
+      {
+        "speaker": "PARTICIPANT",
+        "text": "{me} 씨, 지금 어디예요?"
+      }
+    ],
+    "choices": [
+      {
+        "id": "bell_clean",
+        "label": "종 치는 걸 지켜본다",
+        "reply": "여기 있어요. 맨 뒷줄에서 보고 있어요.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jfin_passed",
+              "scope": "RUN"
+            }
+          ],
+          "flagsNone": [
+            {
+              "key": "jfin_cooked",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SALARY_MONTHS",
+            "months": 3
+          },
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 1
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 6
+          }
+        ],
+        "resultText": "우리사주가 공모가의 두 배로 시작했다. 떳떳한 숫자로 만든 돈이었다."
+      },
+      {
+        "id": "bell_cooked",
+        "label": "웃으며 박수를 친다",
+        "reply": "(박수를 치면서 3분기 확인서를 떠올린다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jfin_passed",
+              "scope": "RUN"
+            },
+            {
+              "key": "jfin_cooked",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SALARY_MONTHS",
+            "months": 3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_audit",
+            "delayMonths": 12
+          }
+        ],
+        "resultText": "우리사주는 올랐다. 밤마다 그 엑셀 파일 꿈을 꾼다."
+      },
+      {
+        "id": "next_time",
+        "label": "다음 기회를 기약한다",
+        "reply": "올해는 아니었네요. 내년엔 더 깨끗하게 갑시다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jfin_delayed",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 2
+          },
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 1
+          }
+        ],
+        "resultText": "상장은 한 해 밀렸다. 그래도 '그 재무팀은 믿을 만하다'는 말이 돌았다."
+      },
+      {
+        "id": "withdrawn",
+        "label": "상장 철회 소식을 듣는다",
+        "reply": "(아무 말도 하지 못한다)",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jfin_flagged",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -8
+          }
+        ],
+        "resultText": "상장 심사는 철회됐다. 회의실 화이트보드의 D-day 숫자를 누군가 조용히 지웠다."
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_fin_farewell",
+    "version": 1,
+    "status": "published",
+    "title": "팀장의 마지막 결재",
+    "description": "상장을 함께 준비하던 팀장이 회사를 떠났다. 책상에 메모가 남아 있다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "inheritsParticipant": true,
+    "series": {
+      "id": "job_fin",
+      "title": "상장 준비",
+      "episode": 4,
+      "total": 4,
+      "job": "FINANCE"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "dialogue": [
+      {
+        "speaker": "PARTICIPANT",
+        "text": "실사 자료는 {me} 씨가 제일 잘 알아요. 끝까지 부탁해요."
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "메모 아래에는 우리사주 청약 안내문이 끼워져 있었다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "finish_it",
+        "label": "남은 실사를 마무리한다",
+        "reply": "걱정 마세요. 끝까지 맞춰 놓겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -4
+          }
+        ],
+        "resultText": "팀장 없는 상장 준비는 더디게, 그래도 원칙대로 흘러갔다."
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_plan_1",
+    "version": 1,
+    "status": "published",
+    "title": "대표 직속 TF",
+    "description": "대표가 주말에 다녀온 해외 박람회에서 '꽂힌' 사업이 있다. 반려식물 AI 구독 서비스.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 8,
+    "maxOccurrencesPerRun": 1,
+    "guaranteeFromTurn": 36,
+    "series": {
+      "id": "job_plan",
+      "title": "대표님의 신사업",
+      "episode": 1,
+      "total": 4,
+      "job": "PLANNING"
+    },
+    "conditions": {
+      "employment": "EMPLOYED",
+      "jobs": ["PLANNING"],
+      "tenureMonths": {
+        "min": 12
+      },
+      "seriesNone": true
+    },
+    "channel": "신사업 TF",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "text": "이거 된다니까. 반려식물이랑 대화하는 AI! 3개월 안에 사업계획서 가져와요.",
+        "name": "대표님"
+      },
+      {
+        "speaker": "BOSS",
+        "text": "(개인 메시지) {me} 씨가 맡아요. 나는… 응원할게요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "build_it",
+        "label": "대표님 아이디어를 구체화한다",
+        "reply": "말씀하신 방향으로 바로 계획서 초안 잡겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jplan_yes",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_plan_2",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "text": "그렇지! 이런 사람이 필요했어.",
+            "name": "대표님"
+          }
+        ]
+      },
+      {
+        "id": "research_first",
+        "label": "시장조사부터 하자고 한다",
+        "reply": "고객 인터뷰 30명부터 해 보고 숫자로 말씀드리겠습니다.",
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 3
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "jplan_data",
+              "scope": "RUN"
+            },
+            {
+              "type": "SCHEDULE_EVENT",
+              "eventId": "evt_jarc_plan_2",
+              "delayMonths": 2
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "음, 근거 있는 게 좋지. 그렇게 해요.",
+              "name": "대표님"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "jplan_yes",
+              "scope": "RUN"
+            },
+            {
+              "type": "SCHEDULE_EVENT",
+              "eventId": "evt_jarc_plan_2",
+              "delayMonths": 2
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "조사는 무슨, 감이 오잖아 감이.",
+              "name": "대표님"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_plan_2",
+    "version": 1,
+    "status": "published",
+    "title": "숫자가 말한다",
+    "description": "조사 결과가 나왔다. 반려식물과 대화하고 싶은 사람은 30명 중 2명. 그중 1명은 대표의 조카였다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "series": {
+      "id": "job_plan",
+      "title": "대표님의 신사업",
+      "episode": 2,
+      "total": 4,
+      "job": "PLANNING"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "신사업 TF",
+    "dialogue": [
+      {
+        "speaker": "SYSTEM",
+        "text": "📎 고객조사_결과(최종).pdf — 구매 의향 6.7%"
+      },
+      {
+        "speaker": "NAMED",
+        "text": "보고 언제 해요? 기대돼요!",
+        "name": "대표님"
+      }
+    ],
+    "choices": [
+      {
+        "id": "spin",
+        "label": "보고서를 대표 입맛에 맞게 다듬는다",
+        "reply": "'잠재 고객층의 높은 호기심 확인' 정도로 정리하겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jplan_spin",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_plan_3",
+            "delayMonths": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "text": "봐, 내가 된다고 했잖아!",
+            "name": "대표님"
+          }
+        ]
+      },
+      {
+        "id": "tell_straight",
+        "label": "있는 그대로 보고한다",
+        "reply": "결론부터 말씀드리면, 지금 형태로는 어렵습니다. 대신 이 숫자를 보시죠.",
+        "outcome": {
+          "baseChance": 0.45,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 5
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "jplan_trust",
+              "scope": "RUN"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "…아프네. 그래도 이런 보고가 진짜 보고지.",
+              "name": "대표님"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -5
+            },
+            {
+              "type": "FLAG_SET",
+              "key": "jplan_honest_fail",
+              "scope": "RUN"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "그러니까 되게 만들라고 TF를 만든 거잖아요.",
+              "name": "대표님"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_plan_3",
+            "delayMonths": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_plan_3",
+    "version": 1,
+    "status": "published",
+    "title": "파일럿",
+    "description": "결국 파일럿 서비스가 열렸다. 첫 달 가입자 214명, 해지 198명.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "series": {
+      "id": "job_plan",
+      "title": "대표님의 신사업",
+      "episode": 3,
+      "total": 4,
+      "job": "PLANNING"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "신사업 TF",
+    "dialogue": [
+      {
+        "speaker": "SYSTEM",
+        "text": "📉 파일럿 대시보드 — 리텐션 7.5%"
+      },
+      {
+        "speaker": "BOSS",
+        "text": "다음 주 대표님 보고예요. 뭐라고 할지 정해야 해요."
+      }
+    ],
+    "choices": [
+      {
+        "id": "pivot",
+        "label": "피벗안을 만들어 간다",
+        "reply": "식물 말고 '화분 관리 알림'만 떼서 B2B로 팔면 숫자가 나옵니다.",
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "crisis",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            },
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "FLAG_SET",
+              "key": "jplan_pivot",
+              "scope": "RUN"
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "…이거 진짜 되겠는데요?"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "FLAG_SET",
+              "key": "jplan_blame",
+              "scope": "RUN"
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "시간이 너무 없어요. 이걸로 설득이 될까…"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_plan_4",
+            "delayMonths": 2
+          }
+        ]
+      },
+      {
+        "id": "wrap_up",
+        "label": "실패를 인정하고 정리하자고 한다",
+        "reply": "여기서 멈추는 게 회사에 가장 싸게 먹힙니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -3
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jplan_honest",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_plan_4",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "BOSS",
+            "text": "용기 있네요. 대표님 앞에서도 그렇게 말할 수 있어요?"
+          }
+        ]
+      },
+      {
+        "id": "dress_up",
+        "label": "숫자를 예쁘게 포장한다",
+        "reply": "가입자 '누적 214명 돌파'로 가죠. 해지는 별첨으로 빼고요.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jplan_spin",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "jplan_cover",
+            "scope": "RUN"
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_jarc_plan_4",
+            "delayMonths": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "BOSS",
+            "text": "…그 별첨, 아무도 안 읽겠죠."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_plan_4",
+    "version": 1,
+    "status": "published",
+    "title": "보고 자리",
+    "description": "대표실. 임원 다섯 명이 앉아 있다. 슬라이드 첫 장이 떴다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "scheduledOnly": true,
+    "series": {
+      "id": "job_plan",
+      "title": "대표님의 신사업",
+      "episode": 4,
+      "total": 4,
+      "job": "PLANNING"
+    },
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "신사업 TF",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "text": "자, 우리 반려식물 사업 어떻게 됐어요?",
+        "name": "대표님"
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "프로젝터 팬 소리만 들린다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "report_pivot",
+        "label": "피벗 성공을 보고한다",
+        "reply": "식물은 말을 못 하지만, 화분 회사들은 돈을 냅니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jplan_pivot",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 6
+          }
+        ],
+        "resultText": "반려식물 AI는 사라졌고, 화분 관리 B2B 사업부가 생겼다. 초대 팀장 후보에 당신 이름이 있다."
+      },
+      {
+        "id": "report_lesson",
+        "label": "실패에서 배운 것을 보고한다",
+        "reply": "실패했습니다. 대신 이 TF가 배운 것 세 가지를 말씀드리겠습니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jplan_honest",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": 1
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 4
+          }
+        ],
+        "resultText": "대표가 한참 말이 없다가 박수를 쳤다. '실패 보고를 이렇게 하는 사람은 처음 봤네.'"
+      },
+      {
+        "id": "take_blame",
+        "label": "책임을 떠안는다",
+        "reply": "기획을 맡은 제 판단이 부족했습니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jplan_blame",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "BOSS",
+            "stat": "trust",
+            "amount": 10
+          }
+        ],
+        "resultText": "사업은 접혔고, 책임은 당신 이름으로 정리됐다. 팀장이 그날 저녁 술을 샀다."
+      },
+      {
+        "id": "hold_cover",
+        "label": "포장한 숫자로 버틴다",
+        "reply": "누적 가입자 214명 돌파, 다음 분기 확장을 제안드립니다.",
+        "visibleIf": {
+          "flagsAll": [
+            {
+              "key": "jplan_cover",
+              "scope": "RUN"
+            }
+          ]
+        },
+        "outcome": {
+          "baseChance": 0.4,
+          "modifiers": []
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "PROMOTION_POINT_DELTA",
+              "amount": 1
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 2
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "봐, 된다니까! 예산 두 배로 줘요.",
+              "name": "대표님"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -10
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "…해지율은 왜 별첨에 있죠?",
+              "name": "재무담당 전무"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_jarc_audit",
+    "version": 1,
+    "status": "published",
+    "title": "감사실에서 온 메일",
+    "description": "1년 전 그 일에 대해 감사실이 '몇 가지 확인'을 요청했다.",
+    "category": "work",
+    "rarity": "rare",
+    "weight": 1,
+    "scheduledOnly": true,
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "감사실",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "text": "작년 건 관련해 면담 일정을 잡고 싶습니다. 편한 시간 알려 주세요.",
+        "name": "감사실 차장"
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "답장 버튼 위에서 손가락이 멈췄다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "admit",
+        "label": "솔직하게 인정한다",
+        "reply": "제가 판단을 잘못했습니다. 경위를 전부 말씀드리겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -8
+          },
+          {
+            "type": "PROMOTION_POINT_DELTA",
+            "amount": -1
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          }
+        ],
+        "resultText": "징계위원회는 감봉으로 끝났다. 몸은 무거웠지만 잠은 잘 잤다."
+      },
+      {
+        "id": "deny",
+        "label": "아는 바 없다고 버틴다",
+        "reply": "확인해 보겠지만, 제 기억으로는 문제없었습니다.",
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": []
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -6
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "…일단 알겠습니다. 추가 자료 있으면 연락드리죠.",
+              "name": "감사실 차장"
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -12
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -10
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "text": "메일 기록이 남아 있습니다. 다시 말씀해 보시죠.",
+              "name": "감사실 차장"
+            }
+          ]
+        }
+      }
+    ]
   }
 ]

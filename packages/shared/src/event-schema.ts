@@ -299,6 +299,11 @@ const EventObjectSchema = z
     highRisk: z.boolean().optional(),
     /** 예약(SCHEDULE_EVENT)으로만 발생하는 후속 사건. 무작위 추첨 후보에서 제외된다 (§7.4). */
     scheduledOnly: z.boolean().optional(),
+    /**
+     * S12 이 턴(커리어 개월)부터 후보에 들면 추첨 없이 그 칸에 연다 (예약 사건 다음 우선).
+     * 조건(직무·진행 중 연재 없음 등)은 그대로 적용되므로 막혀 있으면 풀릴 때까지 기다린다.
+     */
+    guaranteeFromTurn: z.number().int().min(0).optional(),
     /** S8 예약한 사건(또는 사내 소식)의 참여 동료를 이어받는다. scheduledOnly 사건만 가능 */
     inheritsParticipant: z.boolean().optional(),
     /** S8 연재: 같은 동료와 이어지는 n화 이야기. 2화부터는 예약 전용이며 참여 동료를 이어받는다 */
@@ -310,6 +315,8 @@ const EventObjectSchema = z
         total: z.number().int().min(1).max(10),
         /** 참여 동료가 떠나 다음 화를 이어갈 수 없을 때 대신 여는 정리 화 */
         farewellEventId: EventIdSchema.optional(),
+        /** S12 직무 연재: 이 직무만 볼 수 있다 (업적 '이야기꾼'은 공통 연재만 센다) */
+        job: JobIdSchema.optional(),
       })
       .strict()
       .optional(),

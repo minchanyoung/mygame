@@ -605,6 +605,6 @@ describe('S10 플레이어 도감·난이도 over HTTP', () => {
     const anon = (await app.inject({ url: '/api/player' })).json();
     expect(anon.runsFinished).toBe(0);
     expect(anon.found).toBe(0);
-    expect(anon.total).toBe(85);
+    expect(anon.total).toBe(108);
   }, 30_000);
 });

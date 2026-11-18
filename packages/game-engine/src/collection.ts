@@ -1,6 +1,7 @@
 import {
   COLLECTION_KINDS,
   DIFFICULTY_LABELS,
+  JOB_LABELS,
   type AchievementRule,
   type CollectionKind,
   type Difficulty,
@@ -35,6 +36,7 @@ function seriesEndingDefs(content: ContentIndex) {
         key: `${e.id}:${c.id}`,
         seriesId: e.series!.id,
         seriesTitle: e.series!.title,
+        job: e.series!.job ?? null,
         name: e.id.endsWith('_farewell')
           ? `${e.title} · ${c.label.replace(/^"|"$/g, '')}`
           : `“${c.label.replace(/^"|"$/g, '')}”`,
@@ -93,13 +95,19 @@ function matchesAchievement(rule: AchievementRule, col: PlayerCollection, conten
     )
   )
     return false;
-  if (rule.allSeries || rule.seriesEndingsInOne !== undefined) {
+  if (rule.allSeries || rule.allJobSeries || rule.seriesEndingsInOne !== undefined) {
     const defs = seriesEndingDefs(content);
     const perSeries = new Map<string, number>();
     for (const d of defs) perSeries.set(d.seriesId, perSeries.get(d.seriesId) ?? 0);
     for (const d of defs)
       if (col.seriesEndings[d.key]) perSeries.set(d.seriesId, perSeries.get(d.seriesId)! + 1);
-    if (rule.allSeries && [...perSeries.values()].some((n) => n === 0)) return false;
+    const done = (job: boolean) =>
+      [...new Set(defs.filter((d) => (d.job !== null) === job).map((d) => d.seriesId))].every(
+        (id) => (perSeries.get(id) ?? 0) > 0,
+      );
+    // S12 '이야기꾼'은 공통 연재만 (직무 연재는 한 판에 하나뿐이라 따로 센다)
+    if (rule.allSeries && !done(false)) return false;
+    if (rule.allJobSeries && !done(true)) return false;
     if (rule.seriesEndingsInOne !== undefined && Math.max(0, ...perSeries.values()) < rule.seriesEndingsInOne)
       return false;
   }
@@ -259,14 +267,16 @@ export function toPublicCollection(
     {
       key: 'seriesEndings',
       label: '연재 결말',
-      items: seriesEndingDefs(content).map((d) =>
-        item(
+      items: seriesEndingDefs(content).map((d) => {
+        // S12 직무 연재는 꼬리표에 직무를 붙이고, 그 직무에서만 볼 수 있다고 알려 준다
+        const tag = d.job ? `${d.seriesTitle} · ${JOB_LABELS[d.job]}` : d.seriesTitle;
+        return item(
           'seriesEndings',
           d.key,
-          { name: d.name, emoji: '📖', text: d.seriesTitle, tag: d.seriesTitle },
-          { text: '아직 보지 못한 결말', tag: d.seriesTitle },
-        ),
-      ),
+          { name: d.name, emoji: d.job ? '💼' : '📖', text: d.seriesTitle, tag },
+          { text: d.job ? `${JOB_LABELS[d.job]} 직무에서만 볼 수 있는 결말` : '아직 보지 못한 결말', tag },
+        );
+      }),
     },
     {
       key: 'traits',

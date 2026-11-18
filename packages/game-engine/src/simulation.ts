@@ -56,6 +56,10 @@ export interface AutoPlayResult {
   titles: string[];
   /** S11 행동별 달 수 */
   actions: Record<string, number>;
+  /** S12 직무, 직무 연재 1화를 본 턴(없으면 null), 결말까지 봤는지 */
+  jobId: string | null;
+  jobSeriesStartTurn: number | null;
+  jobSeriesFinished: boolean;
 }
 
 function pickChoice(
@@ -164,6 +168,8 @@ export function pickAction(
 function careerStats(
   state: GameRunState,
   content: ContentIndex,
+  /** 첫 직장의 직무 (이직해도 직무는 그대로) */
+  jobId: string | null,
 ): Omit<AutoPlayResult, 'seed' | 'endingType' | 'category' | 'age' | 'months' | 'stuck'> {
   const first = state.eventHistory.find((h) => h.kind === 'PROMOTION');
   return {
@@ -185,6 +191,16 @@ function careerStats(
     }).length,
     retirementTier: state.ending?.retirementTier ?? null,
     titles: state.ending?.titles ?? [],
+    jobId,
+    jobSeriesStartTurn:
+      state.eventOccurrences.find((o) => {
+        const s = content.events.get(o.eventId)?.series;
+        return s?.job !== undefined && s.episode === 1;
+      })?.turnIndex ?? null,
+    jobSeriesFinished: state.eventOccurrences.some((o) => {
+      const s = content.events.get(o.eventId)?.series;
+      return s?.job !== undefined && s.episode === s.total;
+    }),
     actions: state.actionLog.reduce<Record<string, number>>((acc, e) => {
       acc[e.actionId] = (acc[e.actionId] ?? 0) + 1;
       return acc;
@@ -219,6 +235,7 @@ export function autoPlay(
   state = chooseCharacter(state, policyRng.pick(state.characterCards).cardId, content);
   state = chooseGoal(state, policyRng.pick(state.lifeGoalOffers), content);
   state = applyForJob(state, policyRng.pick(state.jobOffers).offerId, content).state;
+  const jobId = state.employment.current?.jobId ?? null;
 
   const maxMonths = (content.pack.rules.retireAge - content.pack.rules.startAge) * 12 + 1;
   for (let i = 0; i <= maxMonths; i++) {
@@ -234,7 +251,7 @@ export function autoPlay(
         const choiceId = pickChoice(state, policy, policyRng, content);
         if (!choiceId) {
           return {
-            ...careerStats(state, content),
+            ...careerStats(state, content, jobId),
             seed,
             endingType: null,
             category: null,
@@ -257,7 +274,7 @@ export function autoPlay(
     } catch (err) {
       const msg = err instanceof EngineError ? `${err.code}: ${err.message}` : String(err);
       return {
-        ...careerStats(state, content),
+        ...careerStats(state, content, jobId),
         seed,
         endingType: null,
         category: null,
@@ -270,7 +287,7 @@ export function autoPlay(
   const e = state.ending;
   onFinish?.(state);
   return {
-    ...careerStats(state, content),
+    ...careerStats(state, content, jobId),
     seed,
     endingType: e?.type ?? null,
     category: e?.category ?? null,

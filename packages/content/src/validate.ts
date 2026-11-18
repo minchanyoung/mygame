@@ -385,6 +385,14 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
     if (!eventIds.has(id)) add('rules.npcLife.followUps', `알 수 없는 사건: ${id}`);
     scheduledTargets.add(id);
   }
+  // S12 보장 사건은 무작위 후보여야 하고, 직무 연재 1화는 그 직무 조건이 있어야 한다
+  for (const e of pack.events) {
+    if (e.guaranteeFromTurn !== undefined && e.scheduledOnly)
+      add(`events.${e.id}`, '예약 전용 사건에는 guaranteeFromTurn을 둘 수 없음');
+    const job = e.series?.job;
+    if (job && e.series?.episode === 1 && !e.scheduledOnly && !(e.conditions?.jobs ?? []).includes(job))
+      add(`events.${e.id}`, `직무 연재 1화는 conditions.jobs에 ${job}가 있어야 함`);
+  }
   for (const e of pack.events) {
     const fw = e.series?.farewellEventId;
     if (fw) {

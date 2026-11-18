@@ -16,7 +16,7 @@ import { validateContentPack } from './validate';
 export * from './validate';
 
 /** 콘텐츠 버전. 데이터가 바뀌면 올린다. 새 run은 생성 시 이 버전에 고정된다 (§23.1). */
-export const CONTENT_VERSION = '2026.11.18-p3.0';
+export const CONTENT_VERSION = '2026.11.18-p4.0';
 
 const jsonClone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
 

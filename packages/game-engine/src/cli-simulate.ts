@@ -3,7 +3,14 @@
  * 밸런스 판단용 개발 도구이며 서버에서 쓰지 않는다.
  */
 import { loadContentPack } from '@company-life/content';
-import { DIFFICULTIES, DIFFICULTY_LABELS, RANK_LABELS, type Difficulty } from '@company-life/shared';
+import {
+  DIFFICULTIES,
+  DIFFICULTY_LABELS,
+  JOB_IDS,
+  JOB_LABELS,
+  RANK_LABELS,
+  type Difficulty,
+} from '@company-life/shared';
 import { indexContent } from './content-index';
 import { autoPlay, type AutoPlayPolicy } from './simulation';
 
@@ -133,6 +140,41 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
       .sort((a, b) => b[1] - a[1])
       .map(([id, n]) => `${id} ${((n / actionTotal) * 100).toFixed(0)}%`)
       .join(' · ')}`,
+  );
+  // S12 직무 연재: 직무별 시작률(1화)·완결률·시작 시점, 직무별 실패율·부장 도달 (직무 간 차이 ±5%p 목표)
+  const jobRows = JOB_IDS.map((job) => {
+    const rs = results.filter((r) => r.jobId === job);
+    const started = rs.filter((r) => r.jobSeriesStartTurn !== null);
+    const turns = started.map((r) => r.jobSeriesStartTurn as number).sort((a, b) => a - b);
+    const alive = rs.filter((r) => r.months >= 48);
+    const startedBy4 = alive.filter((r) => r.jobSeriesStartTurn !== null && r.jobSeriesStartTurn < 48);
+    const normalJ = rs.filter((r) => r.category === 'NORMAL');
+    return {
+      job,
+      n: rs.length,
+      startRate: started.length / Math.max(1, rs.length),
+      by4: startedBy4.length / Math.max(1, alive.length),
+      finished: rs.filter((r) => r.jobSeriesFinished).length / Math.max(1, started.length),
+      medianYear: turns.length ? Math.floor((turns[Math.floor(turns.length / 2)] ?? 0) / 12) + 1 : null,
+      fail: rs.filter((r) => r.category === 'FAILURE').length / Math.max(1, rs.length),
+      head: normalJ.filter((r) => r.highestRank === 'DEPARTMENT_HEAD').length / Math.max(1, normalJ.length),
+    };
+  });
+  const spread = (k: 'fail' | 'head') =>
+    Math.max(...jobRows.map((j) => j[k])) - Math.min(...jobRows.map((j) => j[k]));
+  console.log(
+    `  직무 연재 (4년 차까지 시작 / 완결 / 시작 중앙 연차): ${jobRows
+      .map(
+        (j) =>
+          `${JOB_LABELS[j.job]} ${(j.by4 * 100).toFixed(0)}%/${(j.finished * 100).toFixed(0)}%/${j.medianYear ?? '-'}년`,
+      )
+      .join(' · ')}`,
+  );
+  console.log(
+    `  ${mark(spread('fail') <= 0.1)} 직무별 실패율 ${jobRows.map((j) => `${JOB_LABELS[j.job]} ${(j.fail * 100).toFixed(0)}%`).join(' · ')} (차이 ${(spread('fail') * 100).toFixed(0)}%p, 표본 직무당 ~${Math.round(runs / 5)}판)`,
+  );
+  console.log(
+    `  직무별 부장 도달 ${jobRows.map((j) => `${JOB_LABELS[j.job]} ${(j.head * 100).toFixed(0)}%`).join(' · ')} (차이 ${(spread('head') * 100).toFixed(0)}%p)`,
   );
   // S9 별명: 기본 별명 비율(목표 10% 이하), 별명별 대표·획득 비율
   const defaults = results.filter((r) => r.titles[0] === 'title_default').length;
