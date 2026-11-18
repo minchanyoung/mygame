@@ -11,7 +11,6 @@ import {
   FlagScopeSchema,
   JobIdSchema,
   JobLossReasonSchema,
-  MonthlyActionSchema,
   NpcAssignmentRoleSchema,
   NpcRankSchema,
   NpcRelationStatSchema,
@@ -279,38 +278,6 @@ export const NewsItemSchema = z
 export type NewsItem = z.infer<typeof NewsItemSchema>;
 
 /** 이번 달 기록 (월말 요약 표시용) */
-/** S11 이번 달 행동의 결과 (결산 화면용) */
-export const MonthActionResultSchema = z
-  .object({
-    actionId: MonthlyActionSchema,
-    resourceDelta: z.record(z.string(), z.number().int()),
-    /** 비용·부수입 합 (부호 있음) */
-    cashDelta: z.number().int(),
-    /** 그해 평가에 쌓인 성과 점수 (상한 반영 후) */
-    performance: z.number().int().min(0),
-    traitChanges: z.array(
-      z
-        .object({
-          kind: z.enum(['SKILL', 'NEGATIVE_TRAIT']),
-          id: ContentIdSchema,
-          from: TraitLevelSchema,
-          to: TraitLevelSchema,
-        })
-        .strict(),
-    ),
-    /** 연속 개월 수 (이번 달 포함) */
-    streak: z.number().int().min(1),
-    /** 피로 누적·들킴·습관·호감 등 한 줄 메모 */
-    notes: z.array(z.string()),
-  })
-  .strict();
-export type MonthActionResult = z.infer<typeof MonthActionResultSchema>;
-
-export const ActionLogEntrySchema = z
-  .object({ turnIndex: z.number().int().min(0), actionId: MonthlyActionSchema })
-  .strict();
-export type ActionLogEntry = z.infer<typeof ActionLogEntrySchema>;
-
 export const MonthLogSchema = z
   .object({
     turnIndex: z.number().int().min(0),
@@ -348,8 +315,6 @@ export const MonthLogSchema = z
     goalMilestone: z.number().int().nullable(),
     /** 이번 달 사건 결과 (업무 → 일상 순) */
     eventResults: z.array(EventResultSchema),
-    /** S11 이번 달 행동 */
-    action: MonthActionResultSchema.nullable(),
   })
   .strict();
 export type MonthLog = z.infer<typeof MonthLogSchema>;
@@ -555,8 +520,6 @@ export const GameRunStateSchema = z
     eventHistory: z.array(HistoryEntrySchema),
     annualReviews: z.array(AnnualReviewSchema),
     yearlyRecords: z.array(YearlyRecordSchema),
-    /** S11 달마다 고른 행동 */
-    actionLog: z.array(ActionLogEntrySchema),
     annualReviewProcessedYear: z.number().int().nullable(),
     salaryAdjustedYear: z.number().int().nullable(),
     statistics: z

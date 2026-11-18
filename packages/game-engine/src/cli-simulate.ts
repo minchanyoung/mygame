@@ -27,8 +27,8 @@ const difficulty = (argv[3] ?? 'NORMAL') as Difficulty;
 const content = indexContent(loadContentPack());
 
 /**
- * 밸런스 목표 (봇별). 무작위 봇은 아무렇게나 해도 이 정도로 실패, 신중 봇은 정확한 확률을 알고 월간 행동도 잘 고르는 상한선.
- * S11부터 난이도 요약의 목표는 '행동을 안 쓰는 신중 봇'(늘 휴식) 기준이다. 행동을 잘 쓰는 신중 봇도 보통에서 10~25%를 지킨다.
+ * 밸런스 목표 (봇별). 무작위 봇은 아무렇게나 해도 이 정도로 실패, 신중 봇은 정확한 확률을 아는 상한선.
+ * 난이도 요약의 목표는 신중 봇 기준이다.
  */
 const TARGET = {
   failureRate: { random: { min: 0.3, max: 0.4 }, cautious: { min: 0.1, max: 0.25 } },
@@ -130,18 +130,7 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
   console.log(
     `  ${mark(newsPerYear >= 1 && newsPerYear <= 2)} 사내 소식 연 ${newsPerYear.toFixed(2)}건 (목표 1~2) · 연재 시작 판당 ${(started / runs).toFixed(2)}편, 완결률 ${started ? ((finished / started) * 100).toFixed(0) : 0}%`,
   );
-  // S11 월간 행동 분포 (전체 달 기준)
-  const actionCount = new Map<string, number>();
-  for (const r of results)
-    for (const [id, n] of Object.entries(r.actions)) actionCount.set(id, (actionCount.get(id) ?? 0) + n);
-  const actionTotal = [...actionCount.values()].reduce((a, b) => a + b, 0) || 1;
-  console.log(
-    `  월간 행동: ${[...actionCount.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .map(([id, n]) => `${id} ${((n / actionTotal) * 100).toFixed(0)}%`)
-      .join(' · ')}`,
-  );
-  // S12 직무 연재: 직무별 시작률(1화)·완결률·시작 시점, 직무별 실패율·부장 도달 (직무 간 차이 ±5%p 목표)
+  // S12 직무 연재: 직무별 시작률(1화)·완결률·시작 시점. S13 직무별 실패율·부장 도달은 평균 ±10%p 목표
   const jobRows = JOB_IDS.map((job) => {
     const rs = results.filter((r) => r.jobId === job);
     const started = rs.filter((r) => r.jobSeriesStartTurn !== null);
@@ -162,6 +151,11 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
   });
   const spread = (k: 'fail' | 'head') =>
     Math.max(...jobRows.map((j) => j[k])) - Math.min(...jobRows.map((j) => j[k]));
+  /** S13 직무 평균에서 가장 먼 직무까지의 거리 */
+  const offMean = (k: 'fail' | 'head') => {
+    const mean = jobRows.reduce((s, j) => s + j[k], 0) / jobRows.length;
+    return Math.max(...jobRows.map((j) => Math.abs(j[k] - mean)));
+  };
   console.log(
     `  직무 연재 (4년 차까지 시작 / 완결 / 시작 중앙 연차): ${jobRows
       .map(
@@ -171,10 +165,10 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
       .join(' · ')}`,
   );
   console.log(
-    `  ${mark(spread('fail') <= 0.1)} 직무별 실패율 ${jobRows.map((j) => `${JOB_LABELS[j.job]} ${(j.fail * 100).toFixed(0)}%`).join(' · ')} (차이 ${(spread('fail') * 100).toFixed(0)}%p, 표본 직무당 ~${Math.round(runs / 5)}판)`,
+    `  ${mark(offMean('fail') <= 0.1)} 직무별 실패율 ${jobRows.map((j) => `${JOB_LABELS[j.job]} ${(j.fail * 100).toFixed(0)}%`).join(' · ')} (평균에서 최대 ${(offMean('fail') * 100).toFixed(0)}%p, 목표 ±10 · 차이 ${(spread('fail') * 100).toFixed(0)}%p, 표본 직무당 ~${Math.round(runs / 5)}판)`,
   );
   console.log(
-    `  직무별 부장 도달 ${jobRows.map((j) => `${JOB_LABELS[j.job]} ${(j.head * 100).toFixed(0)}%`).join(' · ')} (차이 ${(spread('head') * 100).toFixed(0)}%p)`,
+    `  ${mark(offMean('head') <= 0.1)} 직무별 부장 도달 ${jobRows.map((j) => `${JOB_LABELS[j.job]} ${(j.head * 100).toFixed(0)}%`).join(' · ')} (평균에서 최대 ${(offMean('head') * 100).toFixed(0)}%p, 목표 ±10)`,
   );
   // S9 별명: 기본 별명 비율(목표 10% 이하), 별명별 대표·획득 비율
   const defaults = results.filter((r) => r.titles[0] === 'title_default').length;
@@ -199,23 +193,16 @@ for (const policy of ['random', 'cautious'] as AutoPlayPolicy[]) {
   }
 }
 
-// S10 난이도 요약: 50세 전 실패율. S11부터 목표는 '행동 안 씀'(늘 휴식) 신중 봇 기준, 행동 활용·무작위는 참고
+// S10 난이도 요약: 50세 전 실패율. 목표는 신중 봇 기준, 무작위는 참고
 const DIFFICULTY_TARGET: Record<Difficulty, { min: number; max: number }> = {
   EASY: { min: 0.03, max: 0.08 },
   NORMAL: { min: 0.1, max: 0.25 },
   REAL: { min: 0.4, max: 0.55 },
 };
-console.log('\n=== 난이도 요약 (50세 전 실패율: 행동 안 씀 [목표] · 행동 활용 · 무작위) ===');
+console.log('\n=== 난이도 요약 (50세 전 실패율: 신중 [목표] · 무작위) ===');
 for (const d of DIFFICULTIES) {
-  const bots = [
-    ['cautious', 'default'],
-    ['cautious', 'policy'],
-    ['random', 'policy'],
-  ] as const;
-  const row = bots.map(([policy, actions]) => {
-    const rs = Array.from({ length: runs }, (_, i) =>
-      autoPlay(`sim-${i}`, policy, content, undefined, d, actions),
-    );
+  const row = (['cautious', 'random'] as const).map((policy) => {
+    const rs = Array.from({ length: runs }, (_, i) => autoPlay(`sim-${i}`, policy, content, undefined, d));
     const fail = rs.filter((r) => r.category === 'FAILURE').length / runs;
     const normal = rs.filter((r) => r.category === 'NORMAL');
     const retired = normal.filter((r) => r.endingType === 'RETIREMENT').length / Math.max(1, normal.length);
@@ -224,8 +211,8 @@ for (const d of DIFFICULTIES) {
     return { fail, retired, avgAge, stuck };
   });
   const t = DIFFICULTY_TARGET[d];
-  const [c, smart, r] = [row[0]!, row[1]!, row[2]!];
+  const [c, r] = [row[0]!, row[1]!];
   console.log(
-    `  ${mark(c.fail >= t.min && c.fail <= t.max)} ${DIFFICULTY_LABELS[d]}: 행동 안 씀 ${(c.fail * 100).toFixed(1)}% (목표 ${Math.round(t.min * 100)}~${Math.round(t.max * 100)}%) · 정년 ${(c.retired * 100).toFixed(0)}% | 행동 활용 ${(smart.fail * 100).toFixed(1)}% · ${smart.avgAge.toFixed(1)}세 | 무작위 ${(r.fail * 100).toFixed(1)}% · ${r.avgAge.toFixed(1)}세 · 진행 불능 ${c.stuck + smart.stuck + r.stuck}`,
+    `  ${mark(c.fail >= t.min && c.fail <= t.max)} ${DIFFICULTY_LABELS[d]}: 신중 ${(c.fail * 100).toFixed(1)}% (목표 ${Math.round(t.min * 100)}~${Math.round(t.max * 100)}%) · 정년 ${(c.retired * 100).toFixed(0)}% · ${c.avgAge.toFixed(1)}세 | 무작위 ${(r.fail * 100).toFixed(1)}% · ${r.avgAge.toFixed(1)}세 · 진행 불능 ${c.stuck + r.stuck}`,
   );
 }

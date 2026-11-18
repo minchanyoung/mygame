@@ -2912,17 +2912,17 @@
         "guaranteedEffects": [
           {
             "type": "RESOURCE_DELTA",
-            "key": "focus",
-            "amount": -12
+            "key": "health",
+            "amount": -4
           },
           {
             "type": "RESOURCE_DELTA",
-            "key": "health",
-            "amount": -4
+            "key": "focus",
+            "amount": -10
           }
         ],
         "outcome": {
-          "baseChance": 0.6,
+          "baseChance": 0.65,
           "modifiers": [
             {
               "source": "SKILL",
@@ -2973,7 +2973,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": -6
+              "amount": -5
             }
           ],
           "dialogue": [
@@ -2991,6 +2991,11 @@
         "description": "당장은 조용해지겠지만…",
         "guaranteedEffects": [
           {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_tech_debt_return",
+            "delayMonths": 4
+          },
+          {
             "type": "RESOURCE_DELTA",
             "key": "focus",
             "amount": -3
@@ -2998,12 +3003,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": 2
-          },
-          {
-            "type": "SCHEDULE_EVENT",
-            "eventId": "evt_tech_debt_return",
-            "delayMonths": 4
+            "amount": 1
           }
         ],
         "resultText": "급한 불은 껐다. 주석에 'TODO: 나중에 고치기'를 남겼다.",
@@ -3022,7 +3022,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": -4
+            "amount": -3
           }
         ],
         "reply": "이전 버전으로 롤백합니다.",
@@ -3120,7 +3120,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": -12
+              "amount": -10
             }
           ],
           "dialogue": [
@@ -3137,15 +3137,15 @@
         "label": "임시 패치였다고 솔직히 보고한다",
         "guaranteedEffects": [
           {
-            "type": "RESOURCE_DELTA",
-            "key": "reputation",
-            "amount": -9
-          },
-          {
             "type": "NPC_RELATION_DELTA",
             "target": "BOSS",
             "stat": "trust",
             "amount": 3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -5
           }
         ],
         "resultText": "한숨 소리가 들렸지만, 팀장은 솔직하게 말해 줘서 고맙다고 했다.",
@@ -3196,8 +3196,8 @@
         "guaranteedEffects": [
           {
             "type": "RESOURCE_DELTA",
-            "key": "focus",
-            "amount": -10
+            "key": "mental",
+            "amount": -8
           }
         ],
         "outcome": {
@@ -3263,7 +3263,7 @@
         "id": "skim",
         "label": "첫인상과 분위기로 빠르게 판단한다",
         "outcome": {
-          "baseChance": 0.4
+          "baseChance": 0.5
         },
         "onSuccess": {
           "effects": [
@@ -3285,7 +3285,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": -12
+              "amount": -7
             }
           ],
           "resultText": "당신이 강력 추천한 신입이 사흘 만에 퇴사했다.",
@@ -3341,7 +3341,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "health",
-            "amount": -7
+            "amount": -6
           }
         ],
         "outcome": {
@@ -3456,12 +3456,12 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": -9
+              "amount": -8
             },
             {
               "type": "RESOURCE_DELTA",
               "key": "mental",
-              "amount": -7
+              "amount": -4
             }
           ],
           "dialogue": [
@@ -3481,7 +3481,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": -4
+            "amount": -3
           }
         ],
         "reply": "선배님이 맡으시는 게 확률이 높을 것 같습니다.",
@@ -3528,7 +3528,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "focus",
-            "amount": -15
+            "amount": -12
           }
         ],
         "outcome": {
@@ -3597,7 +3597,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": 1
+              "amount": 2
             }
           ],
           "dialogue": [
@@ -3612,7 +3612,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": -15
+              "amount": -8
             }
           ],
           "resultText": "감사팀이 그 한 줄을 찾아냈다.",
@@ -3690,7 +3690,7 @@
           }
         ],
         "outcome": {
-          "baseChance": 0.55,
+          "baseChance": 0.6,
           "modifiers": [
             {
               "source": "SKILL",
@@ -3746,7 +3746,7 @@
         "label": "숫자를 조금 부풀려 화려하게 발표한다",
         "description": "박수는 확실하다. 그 다음은…",
         "outcome": {
-          "baseChance": 0.7,
+          "baseChance": 0.6,
           "modifiers": [
             {
               "source": "BACKGROUND",
@@ -3781,7 +3781,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": -7
+              "amount": -8
             }
           ],
           "dialogue": [
@@ -4813,7 +4813,7 @@
         "label": "취향 문제는 근거를 들어 반박한다",
         "reply": "37번~47번은 컨벤션 문서에 없는 내용이라 이번 PR 범위 밖인 것 같습니다. 의견 주시면 별도 이슈로 논의할게요!",
         "outcome": {
-          "baseChance": 0.45,
+          "baseChance": 0.5,
           "modifiers": [
             {
               "source": "SKILL",
@@ -4835,7 +4835,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": 6
+              "amount": 7
             }
           ],
           "dialogue": [
@@ -4848,15 +4848,15 @@
         "onFailure": {
           "effects": [
             {
-              "type": "RESOURCE_DELTA",
-              "key": "reputation",
-              "amount": -8
-            },
-            {
               "type": "NPC_RELATION_DELTA",
               "target": "PEERS",
               "stat": "rivalry",
               "amount": 8
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -6
             }
           ],
           "dialogue": [
@@ -4875,7 +4875,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": -6
+            "amount": -3
           }
         ],
         "resultDialogue": [
@@ -5004,13 +5004,13 @@
         "guaranteedEffects": [
           {
             "type": "RESOURCE_DELTA",
-            "key": "focus",
-            "amount": -6
+            "key": "reputation",
+            "amount": 1
           },
           {
             "type": "RESOURCE_DELTA",
-            "key": "reputation",
-            "amount": 2
+            "key": "focus",
+            "amount": -5
           }
         ],
         "resultDialogue": [
@@ -5063,7 +5063,12 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "mental",
-              "amount": -7
+              "amount": -5
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
             }
           ],
           "dialogue": [
@@ -5149,12 +5154,12 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": -10
+              "amount": -8
             },
             {
               "type": "RESOURCE_DELTA",
               "key": "mental",
-              "amount": -7
+              "amount": -6
             }
           ],
           "dialogue": [
@@ -5172,13 +5177,13 @@
         "guaranteedEffects": [
           {
             "type": "RESOURCE_DELTA",
-            "key": "focus",
-            "amount": -8
+            "key": "reputation",
+            "amount": 2
           },
           {
             "type": "RESOURCE_DELTA",
-            "key": "reputation",
-            "amount": 3
+            "key": "focus",
+            "amount": -6
           }
         ],
         "resultDialogue": [
@@ -5194,15 +5199,15 @@
         "reply": "저는 그냥 직접 짜는 게 빠를 것 같습니다.",
         "guaranteedEffects": [
           {
-            "type": "RESOURCE_DELTA",
-            "key": "reputation",
-            "amount": -8
-          },
-          {
             "type": "NPC_RELATION_DELTA",
             "target": "BOSS",
             "stat": "favor",
             "amount": -5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -4
           }
         ],
         "resultDialogue": [
@@ -5250,7 +5255,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "mental",
-            "amount": -11
+            "amount": -9
           }
         ],
         "outcome": {
@@ -5365,7 +5370,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": -5
+            "amount": -3
           }
         ],
         "resultDialogue": [
@@ -5413,7 +5418,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "mental",
-            "amount": -14
+            "amount": -10
           }
         ],
         "outcome": {
@@ -5473,20 +5478,20 @@
         "reply": "…일단 구두 경고로 마무리하겠습니다.",
         "guaranteedEffects": [
           {
-            "type": "RESOURCE_DELTA",
-            "key": "mental",
-            "amount": -11
-          },
-          {
-            "type": "RESOURCE_DELTA",
-            "key": "reputation",
-            "amount": -6
-          },
-          {
             "type": "NPC_RELATION_DELTA",
             "target": "BOSS",
             "stat": "favor",
             "amount": 6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -4
           }
         ],
         "resultDialogue": [
@@ -5503,13 +5508,13 @@
         "guaranteedEffects": [
           {
             "type": "RESOURCE_DELTA",
-            "key": "focus",
-            "amount": -5
+            "key": "mental",
+            "amount": -4
           },
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": 4
+            "amount": 2
           }
         ],
         "resultDialogue": [
@@ -5556,8 +5561,8 @@
         "guaranteedEffects": [
           {
             "type": "RESOURCE_DELTA",
-            "key": "focus",
-            "amount": -10
+            "key": "mental",
+            "amount": -8
           }
         ],
         "outcome": {
@@ -5617,12 +5622,12 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": -5
+            "amount": -3
           },
           {
             "type": "RESOURCE_DELTA",
             "key": "mental",
-            "amount": -6
+            "amount": -5
           }
         ],
         "resultDialogue": [
@@ -5653,7 +5658,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": -14
+              "amount": -10
             }
           ],
           "dialogue": [
@@ -5675,7 +5680,7 @@
     "category": "work",
     "rarity": "common",
     "weight": 14,
-    "cooldownMonths": 4,
+    "cooldownMonths": 6,
     "tags": ["job"],
     "conditions": {
       "employment": "EMPLOYED",
@@ -5700,16 +5705,16 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "health",
-            "amount": -8
+            "amount": -7
           },
           {
             "type": "RESOURCE_DELTA",
             "key": "mental",
-            "amount": -11
+            "amount": -2
           }
         ],
         "outcome": {
-          "baseChance": 0.5,
+          "baseChance": 0.6,
           "modifiers": [
             {
               "source": "BACKGROUND",
@@ -5726,13 +5731,13 @@
         "onSuccess": {
           "effects": [
             {
-              "type": "RESOURCE_DELTA",
-              "key": "reputation",
-              "amount": 8
-            },
-            {
               "type": "CASH_DELTA",
               "amount": 300000
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
             }
           ],
           "resultText": "187번째 전화에서 계약이 터졌다. 인센티브 30만 원.",
@@ -5748,7 +5753,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "mental",
-              "amount": -7
+              "amount": -4
             }
           ],
           "dialogue": [
@@ -5803,7 +5808,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": -6
+              "amount": -5
             }
           ],
           "dialogue": [
@@ -5822,7 +5827,12 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": -7
+            "amount": -3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -3
           }
         ],
         "resultDialogue": [
@@ -5843,7 +5853,7 @@
     "category": "work",
     "rarity": "common",
     "weight": 12,
-    "cooldownMonths": 5,
+    "cooldownMonths": 6,
     "highRisk": true,
     "tags": ["job"],
     "conditions": {
@@ -5874,8 +5884,13 @@
         "guaranteedEffects": [
           {
             "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -5
+          },
+          {
+            "type": "RESOURCE_DELTA",
             "key": "mental",
-            "amount": -14
+            "amount": -4
           }
         ],
         "outcome": {
@@ -5917,7 +5932,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": -8
+              "amount": -6
             }
           ],
           "dialogue": [
@@ -5935,15 +5950,15 @@
         "reply": "알겠습니다, 부장님. 20% 맞춰드리겠습니다.",
         "guaranteedEffects": [
           {
-            "type": "RESOURCE_DELTA",
-            "key": "reputation",
-            "amount": 2
-          },
-          {
             "type": "NPC_RELATION_DELTA",
             "target": "BOSS",
             "stat": "trust",
             "amount": -8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 1
           }
         ],
         "resultDialogue": [
@@ -5961,7 +5976,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": -4
+            "amount": -3
           }
         ],
         "resultDialogue": [
@@ -6006,17 +6021,13 @@
         "reply": "영광입니다 상무님! 꼭 가겠습니다.",
         "guaranteedEffects": [
           {
-            "type": "CASH_DELTA",
-            "amount": -350000
-          },
-          {
             "type": "RESOURCE_DELTA",
             "key": "health",
             "amount": -6
           }
         ],
         "outcome": {
-          "baseChance": 0.6,
+          "baseChance": 0.65,
           "modifiers": [
             {
               "source": "SKILL",
@@ -6038,7 +6049,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": 10
+              "amount": 8
             }
           ],
           "dialogue": [
@@ -6054,7 +6065,7 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "mental",
-              "amount": -7
+              "amount": -4
             }
           ],
           "dialogue": [
@@ -6073,7 +6084,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": -6
+            "amount": -3
           }
         ],
         "resultDialogue": [
@@ -6457,11 +6468,6 @@
         "reply": "솔선수범으로 재무팀 예산부터 15% 줄이겠습니다.",
         "guaranteedEffects": [
           {
-            "type": "RESOURCE_DELTA",
-            "key": "reputation",
-            "amount": 6
-          },
-          {
             "type": "NPC_RELATION_DELTA",
             "target": "BOSS",
             "stat": "favor",
@@ -6472,6 +6478,16 @@
             "target": "PEERS",
             "stat": "favor",
             "amount": -5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
           }
         ],
         "resultDialogue": [
@@ -6556,12 +6572,12 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": -8
+            "amount": -6
           },
           {
             "type": "RESOURCE_DELTA",
             "key": "mental",
-            "amount": -7
+            "amount": -5
           }
         ],
         "resultDialogue": [
@@ -6615,16 +6631,16 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "health",
-            "amount": -10
+            "amount": -8
           },
           {
             "type": "RESOURCE_DELTA",
             "key": "mental",
-            "amount": -9
+            "amount": -6
           }
         ],
         "outcome": {
-          "baseChance": 0.6,
+          "baseChance": 0.65,
           "modifiers": [
             {
               "source": "BACKGROUND",
@@ -6714,14 +6730,14 @@
         "onFailure": {
           "effects": [
             {
-              "type": "RESOURCE_DELTA",
-              "key": "reputation",
-              "amount": -10
-            },
-            {
               "type": "NPC_RELATION_DELTA",
               "target": "BOSS",
               "stat": "favor",
+              "amount": -8
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
               "amount": -8
             }
           ],
@@ -6741,7 +6757,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": -6
+            "amount": -3
           }
         ],
         "resultDialogue": [
@@ -6807,12 +6823,12 @@
             {
               "type": "RESOURCE_DELTA",
               "key": "reputation",
-              "amount": -10
+              "amount": -8
             },
             {
               "type": "RESOURCE_DELTA",
               "key": "mental",
-              "amount": -9
+              "amount": -5
             }
           ],
           "dialogue": [
@@ -6887,7 +6903,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": -5
+            "amount": -3
           }
         ],
         "resultDialogue": [
@@ -6933,12 +6949,12 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": 2
+            "amount": 1
           },
           {
             "type": "RESOURCE_DELTA",
             "key": "mental",
-            "amount": -8
+            "amount": -6
           }
         ],
         "resultDialogue": [
@@ -7627,6 +7643,266 @@
           }
         ],
         "resultText": "잠은 잘 잤다. 마음 한구석은 여전히 시끄러웠다."
+      }
+    ]
+  },
+  {
+    "id": "evt_life_cert_exam",
+    "version": 1,
+    "status": "published",
+    "title": "자격증 시험 접수 마감",
+    "description": "오늘 밤 12시에 다음 회차 자격증 시험 접수가 마감된다. 작년에도 마감 10분 전까지 고민만 했다.",
+    "category": "life",
+    "rarity": "common",
+    "weight": 10,
+    "cooldownMonths": 12,
+    "choices": [
+      {
+        "id": "enroll",
+        "label": "접수하고 퇴근 후 책을 편다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -200000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": 5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          }
+        ],
+        "resultText": "퇴근길 지하철에서 기출문제를 푼다. 낮엔 회사원, 밤엔 수험생."
+      },
+      {
+        "id": "buy_book",
+        "label": "책만 사 둔다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -30000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": 1
+          }
+        ],
+        "resultText": "책상 위에 새 문제집이 생겼다. 비닐도 아직 안 뜯었다."
+      },
+      {
+        "id": "skip",
+        "label": "이번 회차는 넘긴다",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 2
+          }
+        ],
+        "resultText": "다음 회차가 있으니까. 다음 회차도 있으니까."
+      }
+    ]
+  },
+  {
+    "id": "evt_life_industry_meetup",
+    "version": 1,
+    "status": "published",
+    "title": "오랜만의 업계 모임",
+    "description": "대학 선배가 업계 사람들 모이는 저녁 자리에 부른다. '얼굴 알려 두면 다 도움 된다'며.",
+    "category": "life",
+    "rarity": "common",
+    "weight": 10,
+    "cooldownMonths": 12,
+    "choices": [
+      {
+        "id": "mingle",
+        "label": "나가서 명함을 돌린다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -100000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -4
+          }
+        ],
+        "resultText": "명함 14장을 주고 11장을 받았다. 이름은 셋쯤 기억난다."
+      },
+      {
+        "id": "brief",
+        "label": "얼굴만 비추고 일찍 나온다",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 1
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -1
+          }
+        ],
+        "resultText": "'다음에 꼭 한잔해요'를 다섯 번 말하고 나왔다."
+      },
+      {
+        "id": "home",
+        "label": "피곤해서 집에 간다",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 2
+          }
+        ],
+        "resultText": "선배에게 '다음엔 꼭 갈게요'라고 보냈다."
+      }
+    ]
+  },
+  {
+    "id": "evt_life_side_gig",
+    "version": 1,
+    "status": "published",
+    "title": "지인의 부업 제안",
+    "description": "친구가 주말에 하는 일을 같이 하자고 한다. '한 달에 몇십은 그냥 벌어. 회사엔 말 안 하면 되지.'",
+    "category": "life",
+    "rarity": "common",
+    "weight": 10,
+    "cooldownMonths": 12,
+    "choices": [
+      {
+        "id": "try",
+        "label": "해 본다",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -2
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.8
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "CASH_DELTA",
+              "amount": 700000
+            }
+          ],
+          "resultText": "월급날이 한 번 더 생긴 기분이다. 대신 주말이 사라졌다."
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "CASH_DELTA",
+              "amount": 200000
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -5
+            }
+          ],
+          "resultText": "팀장님이 '요즘 주말에 뭐 한다며?'라고 물었다. 소문은 빠르다."
+        }
+      },
+      {
+        "id": "weekend_only",
+        "label": "한 달에 한두 번만 돕는다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": 250000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          }
+        ],
+        "resultText": "용돈 정도는 됐다. 피곤도 용돈 정도로 쌓였다."
+      },
+      {
+        "id": "decline",
+        "label": "정중히 거절한다",
+        "resultText": "'생각 바뀌면 연락해'. 친구는 오늘도 바빠 보였다."
+      }
+    ]
+  },
+  {
+    "id": "evt_life_running_crew",
+    "version": 1,
+    "status": "published",
+    "title": "점심 러닝 크루 모집",
+    "description": "사내 게시판에 '점심시간 5km 러닝 크루' 모집 글이 올라왔다. 댓글에 아는 이름이 몇 보인다.",
+    "category": "life",
+    "rarity": "common",
+    "weight": 10,
+    "cooldownMonths": 12,
+    "tags": ["recovery"],
+    "choices": [
+      {
+        "id": "join",
+        "label": "가입해서 매주 뛴다",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -50000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -2
+          }
+        ],
+        "resultText": "첫 주는 2km에서 걸었다. 셋째 주엔 5km를 뛰었다. 점심은 샐러드가 됐다."
+      },
+      {
+        "id": "weekend_walk",
+        "label": "주말 산책으로 대신한다",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 2
+          }
+        ],
+        "resultText": "동네 공원을 두 바퀴 돌았다. 이것도 운동이다."
+      },
+      {
+        "id": "skip",
+        "label": "점심은 쉬는 시간이다",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 1
+          }
+        ],
+        "resultText": "점심엔 밥을 먹고 낮잠을 잔다. 회사원의 권리다."
       }
     ]
   },

@@ -1,5 +1,4 @@
 import {
-  MONTHLY_ACTIONS,
   COMPANY_GRADES,
   PLAYER_RANKS,
   eventSlot,
@@ -318,7 +317,7 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
   if (defaults.length !== 1)
     add('titles', `기본 별명(빈 rule)은 정확히 1개여야 함 (현재 ${defaults.length}개)`);
   for (const t of pack.titles) {
-    for (const pick of t.rule.choicesAny ?? []) {
+    for (const pick of [...(t.rule.choicesAny ?? []), ...(t.rule.choiceCount?.picks ?? [])]) {
       const ev = pack.events.find((e) => e.id === pick.eventId);
       if (!ev) add(`titles.${t.id}`, `알 수 없는 사건: ${pick.eventId}`);
       else if (!ev.choices.some((c) => c.id === pick.choiceId))
@@ -339,36 +338,22 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
     if (a.rule.companies !== undefined && a.rule.companies > pack.companies.length)
       add(`achievements.${a.id}`, `회사가 ${pack.companies.length}곳뿐인데 ${a.rule.companies}곳 요구`);
   }
-  // S11 월간 행동: 6종 모두 정확히 한 번, 기본 행동은 비용 없음, 특성 보상은 활성 특성·극성 일치
-  const ma = pack.monthlyActions;
-  checkUnique(
-    ma.actions.map((a) => a.id),
-    'monthlyActions',
-  );
-  for (const id of MONTHLY_ACTIONS)
-    if (!ma.actions.some((a) => a.id === id)) add('monthlyActions', `행동 정의 없음: ${id}`);
-  if ((ma.actions.find((a) => a.id === ma.defaultAction)?.cost ?? 1) !== 0)
-    add('monthlyActions.defaultAction', '기본 행동은 비용이 없어야 함 (언제나 고를 수 있게)');
-  for (const a of ma.actions) {
-    if (a.income && a.income.minPermille > a.income.maxPermille)
-      add(`monthlyActions.${a.id}`, '부수입 범위가 뒤집힘');
-    for (const m of a.milestones ?? []) {
-      const t = pack.traits.find((x) => x.id === m.traitId);
-      if (!t) add(`monthlyActions.${a.id}`, `알 수 없는 특성: ${m.traitId}`);
-      else if (!t.active) add(`monthlyActions.${a.id}`, `비활성 특성: ${m.traitId}`);
-      else if ((t.polarity === 'POSITIVE') !== (m.kind === 'SKILL'))
-        add(`monthlyActions.${a.id}`, `${m.traitId}의 극성과 ${m.kind}가 맞지 않음`);
-      if (m.viaEventId) {
-        const ev = pack.events.find((e) => e.id === m.viaEventId);
-        const grants = ev?.choices.some((c) =>
-          [...(c.guaranteedEffects ?? []), ...(c.onSuccess?.effects ?? [])].some(
-            (e) => e.type === 'SKILL_SET_LEVEL' && e.id === m.traitId && e.from === 0,
-          ),
-        );
-        if (!ev) add(`monthlyActions.${a.id}`, `알 수 없는 기회 사건: ${m.viaEventId}`);
-        else if (!grants)
-          add(`monthlyActions.${a.id}`, `${m.viaEventId}는 ${m.traitId}를 처음 주는 사건이 아님`);
-      }
+  // S13 직무 단발 사건의 선택지 틀 (직무 간 난이도 격차 방지, DESIGN_S13 §2)
+  // - 확정 평판 상승은 +2 이하 (공짜에 가까운 안전한 선택지 금지)
+  // - 고위험이 아닌 사건의 실패 평판 손실은 −8까지, 고위험 사건도 −10까지
+  for (const e of pack.events) {
+    if (!e.conditions?.jobs || e.series) continue;
+    const rep = (effects: readonly { type: string; key?: string; amount?: number }[] | undefined) =>
+      (effects ?? [])
+        .filter((x) => x.type === 'RESOURCE_DELTA' && x.key === 'reputation')
+        .reduce((s, x) => s + (x.amount ?? 0), 0);
+    const floor = e.highRisk ? -10 : -8;
+    for (const c of e.choices) {
+      const sure = rep(c.guaranteedEffects);
+      if (sure > 2) add(`events.${e.id}.${c.id}`, `직무 사건의 확정 평판 +${sure} (상한 +2)`);
+      const lost = sure + rep(c.onFailure?.effects);
+      if (c.outcome && lost < floor)
+        add(`events.${e.id}.${c.id}`, `직무 사건의 실패 평판 ${lost} (하한 ${floor})`);
     }
   }
 

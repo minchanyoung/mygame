@@ -23,7 +23,6 @@ export * from './migrate';
 export * from './transfer';
 export * from './npc-life';
 export * from './month';
-export * from './monthly-actions';
 export * from './simulation';
 export * from './playtest';
 export * from './view';

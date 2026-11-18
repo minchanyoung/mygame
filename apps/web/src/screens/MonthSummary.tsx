@@ -1,7 +1,6 @@
 import { RESOURCE_KEYS, RESOURCE_LABELS, type PublicReview, type PublicRunView } from '@company-life/shared';
 import { formatKrw } from '../api';
 import { Icon } from '../components/Icons';
-import { ActionResultCard } from '../components/MonthlyActions';
 import { Warnings } from '../components/StatusPanel';
 import { StoryOutcome, verdictOf } from './StoryResult';
 
@@ -101,8 +100,6 @@ export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
       <h2>
         {view.turn.monthOfYear}월 결산 <span className="small muted">{view.turn.age}세</span>
       </h2>
-
-      {m?.action && <ActionResultCard result={m.action} />}
 
       {m && m.events.length > 0 && (
         <article className="card story" aria-label="이달의 이야기">

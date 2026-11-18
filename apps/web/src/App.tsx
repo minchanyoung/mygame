@@ -269,10 +269,10 @@ export function App() {
               view={view}
               busy={busy}
               onHome={() => setScreen({ kind: 'start' })}
-              onStartMonth={(actionId) =>
+              onStartMonth={() =>
                 command(
                   `start:${view.turn.turnIndex}`,
-                  async (s, v, key) => (await api.startMonth(s, actionId, v.revision, key)).view,
+                  async (s, v, key) => (await api.startMonth(s, v.revision, key)).view,
                 )
               }
             />

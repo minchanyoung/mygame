@@ -365,11 +365,24 @@
     "emoji": "📚",
     "rarity": "COMMON",
     "priority": 420,
-    "reason": "퇴근 후 3년 넘게 책을 폈다. 낮엔 회사원, 밤엔 수험생.",
+    "reason": "퇴근 후에도 책을 폈다. 낮엔 회사원, 밤엔 수험생.",
     "rule": {
-      "actionMonths": {
-        "action": "study",
-        "min": 36
+      "choiceCount": {
+        "picks": [
+          {
+            "eventId": "evt_life_cert_exam",
+            "choiceId": "enroll"
+          },
+          {
+            "eventId": "evt_weekend_recharge",
+            "choiceId": "study"
+          },
+          {
+            "eventId": "evt_life_sns_envy",
+            "choiceId": "course"
+          }
+        ],
+        "min": 32
       }
     }
   },
@@ -379,11 +392,20 @@
     "emoji": "🤝",
     "rarity": "COMMON",
     "priority": 410,
-    "reason": "3년 넘게 저녁마다 누군가를 만났다. 업계에 모르는 사람이 없다.",
+    "reason": "부르는 자리마다 나갔다. 업계에 모르는 사람이 없다.",
     "rule": {
-      "actionMonths": {
-        "action": "network",
-        "min": 36
+      "choiceCount": {
+        "picks": [
+          {
+            "eventId": "evt_life_industry_meetup",
+            "choiceId": "mingle"
+          },
+          {
+            "eventId": "evt_life_industry_meetup",
+            "choiceId": "brief"
+          }
+        ],
+        "min": 15
       }
     }
   },
@@ -393,11 +415,20 @@
     "emoji": "💼",
     "rarity": "COMMON",
     "priority": 390,
-    "reason": "월급 하나로는 모자랐다. 3년 넘게 두 번째 일을 했다.",
+    "reason": "월급 하나로는 모자랐다. 주말마다 두 번째 일을 했다.",
     "rule": {
-      "actionMonths": {
-        "action": "sidejob",
-        "min": 36
+      "choiceCount": {
+        "picks": [
+          {
+            "eventId": "evt_life_side_gig",
+            "choiceId": "try"
+          },
+          {
+            "eventId": "evt_life_side_gig",
+            "choiceId": "weekend_only"
+          }
+        ],
+        "min": 15
       }
     }
   },
@@ -407,11 +438,24 @@
     "emoji": "🏋️",
     "rarity": "COMMON",
     "priority": 380,
-    "reason": "4년 넘게 헬스장에 출석했다. 회사보다 운동이 더 꾸준했다.",
+    "reason": "회사보다 운동이 더 꾸준했다. 뛰고, 들고, 또 뛰었다.",
     "rule": {
-      "actionMonths": {
-        "action": "exercise",
-        "min": 48
+      "choiceCount": {
+        "picks": [
+          {
+            "eventId": "evt_life_running_crew",
+            "choiceId": "join"
+          },
+          {
+            "eventId": "evt_life_gym",
+            "choiceId": "register"
+          },
+          {
+            "eventId": "evt_senior_health_check",
+            "choiceId": "lifestyle"
+          }
+        ],
+        "min": 20
       }
     }
   },

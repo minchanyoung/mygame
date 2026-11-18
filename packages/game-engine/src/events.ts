@@ -11,7 +11,6 @@ import {
 import { calculateChoiceChance, riskLevel, type ChanceBreakdownItem, type ChanceResult } from './chance';
 import { matchesConditions, npcMatches, type EvalContext } from './conditions';
 import { requireFrom, type ContentIndex } from './content-index';
-import { actionAffinity } from './monthly-actions';
 import { applyEffects, levelEffectsApplicable, type TraitChange } from './effects';
 import { EngineError } from './errors';
 import { currentTeamNpcs } from './npcs';
@@ -107,7 +106,6 @@ export function getEligibleEvents(
   // §26.3 위험 구간이면 회복(recovery) 이벤트 가중치 가산
   const critical = isInCriticalZone(state, content);
   const stats = occurrenceStats(state, content);
-  const affinityOf = actionAffinity(state, content);
   const candidates: EventCandidate[] = [];
 
   for (const event of content.pack.events) {
@@ -156,9 +154,7 @@ export function getEligibleEvents(
       }
     }
     if (critical && event.tags?.includes('recovery')) weight += rules.gameOver.recoveryWeightBonus;
-    // S11 이번 달 행동·습관에 맞는 사건은 조금 더 자주
-    const affinity = affinityOf(event);
-    candidates.push({ event, participants, weight: Math.max(1, Math.round((weight * affinity) / 1000)) });
+    candidates.push({ event, participants, weight: Math.max(1, weight) });
   }
   return candidates;
 }

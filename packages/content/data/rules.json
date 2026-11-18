@@ -156,8 +156,8 @@
     "debtInterestPermille": 5,
     "debtRepayment": 200000,
     "naturalChange": {
-      "health": 2,
-      "mental": 3,
+      "health": 5,
+      "mental": 6,
       "focus": 2,
       "reputation": 1
     }

@@ -41,10 +41,10 @@ export function migrateRunState(raw: unknown): GameRunState {
     m.goalMilestone ??= null;
     m.news ??= [];
     m.eventResults ??= [];
-    // S11 월간 행동 (옛 달은 행동 없음)
-    m.action ??= null;
+    // S13: S11 월간 행동 제거 — 옛 세이브의 행동 기록을 버린다
+    delete m.action;
   }
-  s.actionLog ??= [];
+  delete s.actionLog;
   s.pendingEvents ??= [];
   // S8: 예약 사건의 참여 동료
   if (Array.isArray(s.scheduledEvents))

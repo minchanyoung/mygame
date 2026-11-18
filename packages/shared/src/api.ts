@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { MonthlyActionSchema } from './enums';
 import type {
   CompanyGrade,
   Difficulty,
@@ -7,7 +6,6 @@ import type {
   EndingType,
   Gender,
   JobId,
-  MonthlyAction,
   NpcRank,
   NpcRole,
   PlayerRank,
@@ -68,16 +66,6 @@ export const CommandRequestSchema = z
   .object({ idempotencyKey: IdempotencyKeySchema, expectedRevision: RevisionSchema })
   .strict();
 export type CommandRequest = z.infer<typeof CommandRequestSchema>;
-
-/** S11 startMonth: 이번 달 행동 (생략하면 지난달 행동 그대로) */
-export const StartMonthRequestSchema = z
-  .object({
-    actionId: MonthlyActionSchema.optional(),
-    idempotencyKey: IdempotencyKeySchema,
-    expectedRevision: RevisionSchema,
-  })
-  .strict();
-export type StartMonthRequest = z.infer<typeof StartMonthRequestSchema>;
 
 /** 현재 사건(occurrenceId)에 대한 선택. 다른 사건의 선택지를 잘못 제출하는 것을 막는다. */
 export const ChooseRequestSchema = z
@@ -339,45 +327,6 @@ export interface PublicMonthSummary {
   events: PublicStory[];
   /** S8 사내 소식 */
   news: Array<{ kind: string; text: string }>;
-  /** S11 이번 달 행동 결과 */
-  action: PublicActionResult | null;
-}
-
-/** S11 월간 행동 카드 */
-export interface PublicActionOption {
-  id: MonthlyAction;
-  name: string;
-  emoji: string;
-  description: string;
-  /** '체력 +4' 같은 확정 효과 */
-  effects: string[];
-  /** '−30만원' (없으면 null) */
-  costLabel: string | null;
-  /** 고를 수 없는 이유 (고를 수 있으면 null) */
-  locked: string | null;
-  /** 누적·연속 진행 안내 ('관찰력까지 4개월', '연속 3개월 — 피로 누적') */
-  progress: string | null;
-  /** 경고 톤으로 보일 안내인가 */
-  warn: boolean;
-}
-
-export interface PublicActionResult {
-  name: string;
-  emoji: string;
-  /** '체력 +4 · 현금 −30만원' 같은 요약 */
-  lines: string[];
-  notes: string[];
-  traitGains: string[];
-}
-
-export interface PublicMonthlyActions {
-  options: PublicActionOption[];
-  /** 기본 선택 (지난달 행동, 잠겼으면 휴식) */
-  selected: MonthlyAction;
-  /** 지금 켜진 습관 ('꾸준한 운동' 등) */
-  habits: string[];
-  /** 최근 12개월 (오래된 순) */
-  recent: Array<{ age: number; month: number; actionId: MonthlyAction; emoji: string; name: string }>;
 }
 
 export interface PublicReview {
@@ -533,8 +482,6 @@ export interface PublicRunView {
   history: PublicHistoryEntry[];
   /** 방금 끝난 사건의 이야기 (같은 달 안에서 결과 대화를 보여주기 위함) */
   lastStory: PublicStory | null;
-  /** S11 월간 행동 (재직 중일 때) */
-  monthlyActions: PublicMonthlyActions | null;
 }
 
 export interface CreateRunResponse {

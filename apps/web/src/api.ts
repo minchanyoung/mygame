@@ -5,7 +5,6 @@ import {
   type CreateRunResponse,
   type Difficulty,
   type Gender,
-  type MonthlyAction,
   type PublicCollection,
   type PlaytestCatalog,
   type PlaytestDebugView,
@@ -130,11 +129,11 @@ export const api = {
       body: JSON.stringify({ offerId, expectedRevision, idempotencyKey }),
     }),
 
-  startMonth: (s: Session, actionId: MonthlyAction, expectedRevision: number, idempotencyKey: string) =>
+  startMonth: (s: Session, expectedRevision: number, idempotencyKey: string) =>
     request<{ view: PublicRunView }>(`/api/runs/${s.runId}/start-month`, {
       method: 'POST',
       token: s.guestToken,
-      body: JSON.stringify({ actionId, expectedRevision, idempotencyKey }),
+      body: JSON.stringify({ expectedRevision, idempotencyKey }),
     }),
 
   choose: (

@@ -128,4 +128,23 @@ describe('content pack', () => {
     expect(out).toMatch(/burnout: 활성 특성의 레벨 전이 2→1/);
     expect(out).toMatch(/burnout: 활성 특성의 레벨 전이 1→0/);
   });
+  it('S13: rejects job one-shot events with free reputation or deep failure losses', () => {
+    const p = raw();
+    const ev = p.events.find((e) => e.id === 'evt_fin_budget_cut')!;
+    const cut = ev.choices.find((c) => c.id === 'cut_own')!;
+    cut.guaranteedEffects = [{ type: 'RESOURCE_DELTA', key: 'reputation', amount: 6 }];
+    const kpi = p.events.find((e) => e.id === 'evt_plan_kpi')!;
+    const amb = kpi.choices.find((c) => c.id === 'ambitious')! as { onFailure: { effects: unknown[] } };
+    amb.onFailure.effects = [{ type: 'RESOURCE_DELTA', key: 'reputation', amount: -12 }];
+    const out = issues(p).join('\n');
+    expect(out).toMatch(/evt_fin_budget_cut\.cut_own: 직무 사건의 확정 평판 \+6/);
+    expect(out).toMatch(/evt_plan_kpi\.ambitious: 직무 사건의 실패 평판 -12 \(하한 -8\)/);
+  });
+
+  it('S13: title choice counts must point at real choices', () => {
+    const p = raw() as Raw & { titles: Array<{ id: string; rule: Record<string, unknown> }> };
+    const t = p.titles.find((x) => x.id === 'title_networker')!;
+    t.rule = { choiceCount: { picks: [{ eventId: 'evt_life_industry_meetup', choiceId: 'nope' }], min: 2 } };
+    expect(issues(p).join('\n')).toMatch(/evt_life_industry_meetup에 없는 선택지: nope/);
+  });
 });

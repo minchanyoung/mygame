@@ -5,7 +5,6 @@ import {
   type EventResult,
   type EventSlot,
   type GameRunState,
-  type MonthlyAction,
   type ScheduledEvent,
 } from '@company-life/shared';
 import { processAnnualReview, processSalaryAdjustment } from './annual';
@@ -17,7 +16,6 @@ import { EngineError } from './errors';
 import { updateLifeGoalMilestone } from './goals';
 import { rollNpcLife } from './npc-life';
 import { currentTeamNpcs } from './npcs';
-import { applyMonthlyAction, assertActionAvailable, defaultActionId } from './monthly-actions';
 import { processPromotion } from './promotion';
 import {
   evaluateChoices,
@@ -182,13 +180,11 @@ function pickMonthlyEvents(
 }
 
 export interface StartMonthOptions {
-  /** S11 이번 달 행동 (생략하면 지난달 행동, 잠겼으면 기본 행동) */
-  actionId?: MonthlyAction;
   /** 플레이테스트 도구 전용 (추첨을 건너뛰고 지정 사건 1개만 연다) */
   forced?: EventSelection;
 }
 
-/** MONTH_START --startMonth--> EVENT_PENDING: 정산·정기 처리·행동·사건 선정을 한 번에 원자적으로 (§20.1). */
+/** MONTH_START --startMonth--> EVENT_PENDING: 정산·정기 처리·사건 선정을 한 번에 원자적으로 (§20.1). */
 export function startMonth(
   state: GameRunState,
   content: ContentIndex,
@@ -198,15 +194,11 @@ export function startMonth(
   assertCommand(state.phase, 'startMonth');
   assertTransition(state.phase, 'startMonth', 'EVENT_PENDING');
   const start = { resources: { ...state.resources }, cash: state.cash, debt: state.debt };
-  const actionId = options.actionId ?? defaultActionId(state, content);
-  assertActionAvailable(state, actionId, content);
   // §20.1 순서: 1월 연봉 조정 → 1월 승진 심사(직급·상사 재배치) → 정산 → 12월 인사평가 → 사건 선정
   const adjusted = processSalaryAdjustment(state, content);
   const promoted = processPromotion(adjusted.state, content);
   const settled = applyMonthlySettlement(promoted.state, content);
-  // S11 퇴근 후 행동: 정산 직후, 12월 평가 전 (12월 행동도 그해 성과에 들어간다)
-  const acted = applyMonthlyAction(settled.state, actionId, content);
-  const reviewed0 = processAnnualReview(acted.state, content);
+  const reviewed0 = processAnnualReview(settled.state, content);
   // S9 연간 기록: 인사평가가 처리된 달(12월)에 한 줄 남긴다
   const annual = reviewed0.review
     ? { ...reviewed0, state: withYearlyRecord(reviewed0.state, content, reviewed0.review.grade) }
@@ -238,7 +230,6 @@ export function startMonth(
       news: life.news,
       goalMilestone: null,
       eventResults: [],
-      action: acted.result,
     },
   };
 }
