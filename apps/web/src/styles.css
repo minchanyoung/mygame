@@ -80,6 +80,9 @@
 body {
   margin: 0;
   background: var(--paper);
+  /* 한국어는 어절 단위로 줄바꿈 ('확인이'가 '확/인이'로 끊기지 않게), 너무 긴 낱말만 강제로 끊는다 */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 h1,
@@ -132,7 +135,9 @@ p {
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  padding: 14px 0 10px;
+  /* 배경이 좌우 여백까지 덮어야 스크롤할 때 아래 내용이 양옆으로 비치지 않는다 */
+  margin: 0 -16px;
+  padding: 14px 16px 10px;
   background: var(--paper);
 }
 
@@ -787,8 +792,9 @@ button.card {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 700;
+  white-space: nowrap;
   border: 1px solid var(--line);
   background: var(--paper);
   color: var(--muted);
@@ -804,6 +810,11 @@ button.card {
   background: var(--surface);
   border: 2px solid var(--stamp);
   color: var(--ink);
+}
+
+.cal-review {
+  border: 1.5px solid #d9a84a;
+  color: #8a5a00;
 }
 
 .cal-scheduled {
@@ -836,7 +847,7 @@ button.card {
   gap: 2px;
   color: var(--muted);
   font: inherit;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
 }
@@ -950,7 +961,7 @@ button.card {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
   white-space: nowrap;
   opacity: 0.9;
@@ -1002,7 +1013,7 @@ button.card {
   max-width: 100%;
 }
 .bubble-name {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--ink-2);
 }
@@ -1173,6 +1184,10 @@ button.card {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  /* 선택지가 길어도 대화가 최소 40%는 보이게 */
+  max-height: 60dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .choice {
@@ -1827,6 +1842,7 @@ details summary {
   gap: 6px;
 }
 .spec-pager-dot {
+  position: relative;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -1835,6 +1851,11 @@ details summary {
   color: var(--ink-2);
   font-family: var(--display);
   cursor: pointer;
+}
+.spec-pager-dot::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 .spec-pager-dot.on {
   background: var(--navy);
@@ -1845,6 +1866,8 @@ details summary {
   margin-left: auto;
 }
 .spec-row {
+  /* 안쪽 절대 위치 요소(.sr-only)가 스크롤 영역 밖으로 빠져 휴대폰 화면을 축소시키지 않게 기준점을 둔다 */
+  position: relative;
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 86%;
@@ -1887,6 +1910,9 @@ details summary {
   position: absolute;
   width: 1px;
   height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
@@ -2050,7 +2076,7 @@ details summary {
   line-height: 1.45;
 }
 .spec-rare-tag {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--trait);
   border: 1px solid currentColor;
@@ -2227,7 +2253,25 @@ details summary {
   display: block;
   width: 100%;
   height: auto;
-  touch-action: manipulation;
+  /* 세로 스크롤은 그대로, 가로로 끌면 해를 고른다 */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.life-chart svg:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.chart-sel {
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+.chart-sel-salary {
+  fill: var(--navy);
+}
+.chart-sel-net {
+  fill: var(--c-cash);
 }
 .chart-legend {
   display: flex;
@@ -2257,7 +2301,7 @@ details summary {
 }
 .chart-axis {
   fill: var(--muted);
-  font-size: 9px;
+  font-size: 11px;
 }
 .chart-salary,
 .chart-net {
@@ -2281,17 +2325,18 @@ details summary {
   stroke: var(--line-2);
   stroke-width: 1;
 }
-.chart-hit {
-  fill: transparent;
-  cursor: pointer;
+.life-chart svg {
+  cursor: crosshair;
 }
 .chart-readout {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  min-height: 1.6em;
+  word-break: keep-all;
+  min-height: 3.2em;
   margin: 4px 0 0;
+  line-height: 1.6;
+}
+.chart-readout .grade {
+  margin-left: 6px;
+  vertical-align: middle;
 }
 
 .career-band-wrap {

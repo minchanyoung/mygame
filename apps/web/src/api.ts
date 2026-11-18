@@ -141,7 +141,19 @@ export const playtestApi = {
     }),
 };
 
-export const newIdempotencyKey = (): string => crypto.randomUUID();
+/**
+ * 요청 고유 키 (UUID v4 형식).
+ * crypto.randomUUID는 https·localhost에서만 있다 — 같은 와이파이의 휴대폰(http://192.168.x.x)으로
+ * 접속하면 없어서 모든 버튼이 '네트워크 오류'가 됐다. getRandomValues는 어디서나 된다.
+ */
+export function newIdempotencyKey(): string {
+  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6]! & 0x0f) | 0x40;
+  b[8] = (b[8]! & 0x3f) | 0x80;
+  const h = [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
 
 export const formatKrw = (n: number): string =>
   n >= 10_000 ? `${Math.round(n / 10_000).toLocaleString('ko-KR')}만원` : `${n.toLocaleString('ko-KR')}원`;

@@ -231,15 +231,17 @@ export function YearCalendar({ view }: { view: PublicRunView }) {
                 ? 'cal-current'
                 : m.scheduled
                   ? 'cal-scheduled'
-                  : '';
-          const label =
-            m.status === 'FUTURE' && m.scheduled ? '?' : m.review && m.status === 'FUTURE' ? '평가' : m.month;
+                  : m.review
+                    ? 'cal-review'
+                    : '';
+          // 평가 달은 좁은 칸에서도 한 줄로: 숫자 + 노란 테두리 (머리글에 '12월 연말 평가')
+          const label = m.status === 'FUTURE' && m.scheduled ? '?' : m.month;
           return (
             <div
               key={m.month}
               role="listitem"
               className={`cal-cell ${cls}`}
-              aria-label={`${m.month}월${m.status === 'CURRENT' ? ' (이번 달)' : ''}${m.scheduled ? ' (예정된 일)' : ''}`}
+              aria-label={`${m.month}월${m.status === 'CURRENT' ? ' (이번 달)' : ''}${m.scheduled ? ' (예정된 일)' : ''}${m.review ? ' (연말 평가)' : ''}`}
             >
               {label}
             </div>

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, type KeyboardEvent, type PointerEvent } from 'react';
 import type { ChronicleItemKind, PublicChronicle, PublicTitle } from '@company-life/shared';
 
 /** 금액 짧게: 1.4억 · 4,200만 · −500만 */
 export function krwShort(n: number): string {
   const sign = n < 0 ? '−' : '';
   const abs = Math.abs(n);
+  if (abs < 10_000) return '0';
   if (abs >= 100_000_000) {
     const eok = abs / 100_000_000;
     return `${sign}${eok >= 10 ? Math.round(eok) : eok.toFixed(1).replace(/\.0$/, '')}억`;
@@ -54,9 +55,9 @@ export function TitleCard({ titles }: { titles: { main: PublicTitle; subs: Publi
 
 const W = 320;
 const H = 170;
-const PAD = { l: 40, r: 10, t: 12, b: 22 };
+const PAD = { l: 44, r: 10, t: 12, b: 24 };
 
-/** 나이별 연봉·순자산 그래프 (SVG). 막대 영역을 누르면 그해 기록을 보여준다. */
+/** 나이별 연봉·순자산 그래프 (SVG). 누르거나 손가락으로 끌면(가로) 가장 가까운 해의 기록을 보여준다. */
 export function LifeChart({ yearly }: { yearly: PublicChronicle['yearly'] }) {
   const [sel, setSel] = useState(yearly.length - 1);
   if (yearly.length < 2) {
@@ -77,8 +78,24 @@ export function LifeChart({ yearly }: { yearly: PublicChronicle['yearly'] }) {
       .filter((r) => pick(r) !== null)
       .map((r) => `${x(r.age).toFixed(1)},${y(pick(r)!).toFixed(1)}`)
       .join(' ');
-  const colW = (W - PAD.l - PAD.r) / Math.max(1, yearly.length - 1);
-  const cur = yearly[Math.min(sel, yearly.length - 1)]!;
+  const idx = Math.min(sel, yearly.length - 1);
+  const cur = yearly[idx]!;
+  // 화면 좌표 → 그래프 좌표 → 가장 가까운 해 (막대가 7px 남짓이라 직접 누르기 어렵다)
+  const pickAt = (e: PointerEvent<SVGSVGElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const px = ((e.clientX - rect.left) / rect.width) * W;
+    let best = 0;
+    yearly.forEach((r, i) => {
+      if (Math.abs(x(r.age) - px) < Math.abs(x(yearly[best]!.age) - px)) best = i;
+    });
+    setSel(best);
+  };
+  const onKey = (e: KeyboardEvent<SVGSVGElement>) => {
+    if (e.key === 'ArrowLeft') setSel(Math.max(0, idx - 1));
+    else if (e.key === 'ArrowRight') setSel(Math.min(yearly.length - 1, idx + 1));
+    else return;
+    e.preventDefault();
+  };
   const decades = [20, 30, 40, 50, 60].filter((a) => a >= minAge && a <= maxAge);
 
   return (
@@ -95,12 +112,23 @@ export function LifeChart({ yearly }: { yearly: PublicChronicle['yearly'] }) {
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
-        aria-label={`${minAge}세부터 ${maxAge}세까지 연봉과 순자산 그래프`}
+        aria-label={`${minAge}세부터 ${maxAge}세까지 연봉과 순자산 그래프. 좌우 화살표로 해를 고를 수 있어요`}
+        tabIndex={0}
+        // 누를 때는 포커스 테두리를 띄우지 않는다 (키보드 Tab 포커스만)
+        onMouseDown={(e) => e.preventDefault()}
+        onPointerDown={(e) => {
+          e.currentTarget.setPointerCapture(e.pointerId);
+          pickAt(e);
+        }}
+        onPointerMove={(e) => {
+          if (e.buttons > 0 || e.pointerType === 'touch') pickAt(e);
+        }}
+        onKeyDown={onKey}
       >
         {[top, (top + bottom) / 2, bottom].map((v, i) => (
           <g key={i}>
             <line className="chart-grid" x1={PAD.l} x2={W - PAD.r} y1={y(v)} y2={y(v)} />
-            <text className="chart-axis" x={PAD.l - 4} y={y(v) + 3} textAnchor="end">
+            <text className="chart-axis" x={PAD.l - 4} y={y(v) + 4} textAnchor="end">
               {krwShort(v)}
             </text>
           </g>
@@ -119,17 +147,10 @@ export function LifeChart({ yearly }: { yearly: PublicChronicle['yearly'] }) {
             <circle key={`m${i}`} className="chart-mark" cx={x(r.age)} cy={y(r.salary)} r={3.5} />
           ) : null,
         )}
-        {yearly.map((r, i) => (
-          <rect
-            key={`h${i}`}
-            className="chart-hit"
-            x={x(r.age) - colW / 2}
-            y={PAD.t}
-            width={colW}
-            height={H - PAD.t - PAD.b}
-            onClick={() => setSel(i)}
-          />
-        ))}
+        <circle className="chart-sel chart-sel-net" cx={x(cur.age)} cy={y(cur.netWorth)} r={4.5} />
+        {cur.salary !== null && (
+          <circle className="chart-sel chart-sel-salary" cx={x(cur.age)} cy={y(cur.salary)} r={4.5} />
+        )}
       </svg>
       <p className="chart-readout small" aria-live="polite">
         <strong>{cur.age}세</strong> ·{' '}

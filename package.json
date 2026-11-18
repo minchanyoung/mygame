@@ -18,6 +18,7 @@
     "dev:api": "npm run dev -w @company-life/api",
     "dev:web": "npm run dev -w @company-life/web",
     "playtest": "node scripts/playtest.mjs",
+    "playtest:lan": "node scripts/playtest.mjs --lan",
     "simulate": "npm run simulate -w @company-life/game-engine --",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",

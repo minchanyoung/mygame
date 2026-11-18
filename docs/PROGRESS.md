@@ -1,6 +1,6 @@
 # 진행 현황 — 오늘도 출근
 
-> 마지막 갱신: 2026-11-18 · S9 완료 (Phase 1/5)
+> 마지막 갱신: 2026-11-18 · S9 완료, E1 자동 점검 완료·휴대폰 점검 대기 (Phase 2/5)
 > 다음 작업을 시작할 때 이 문서와 각 단계 설계 문서(`docs/DESIGN_*.md`)를 먼저 읽는다.
 
 ## 실행
@@ -8,6 +8,7 @@
 ```bash
 npm run dev          # API + 웹 (http://localhost:5173)
 npm run playtest     # 플레이테스트 도구 켠 상태로 실행 (개발 전용)
+npm run playtest:lan # 같은 와이파이의 휴대폰에서 접속 (docs/DEVICE_CHECK.md)
 npm test             # 전체 테스트 (현재 202개)
 npm run simulate -- 1000   # 자동 플레이 밸런스 리포트
 npm run validate:content   # 콘텐츠 검증
@@ -38,8 +39,8 @@ npm run validate:content   # 콘텐츠 검증
 | 단계 | 내용 | 상태 |
 |---|---|---|
 | Phase 1 · S9 | A1 인생 연대기 엔딩 + A3 별명 | ✅ 완료, 검수 대기 |
-| Phase 2 · E1 | 실제 기기 점검 (휴대폰 접속, 레이아웃·터치·글꼴·노치) | 다음 |
-| Phase 3 · S10 | B1 도감·업적(별명이 첫 수집 항목) + B2 난이도 | |
+| Phase 2 · E1 | 실제 기기 점검 (휴대폰 접속, 레이아웃·터치·글꼴·노치) | 🔶 자동 점검·수정 완료, 휴대폰 점검 대기 (`DEVICE_CHECK.md`) |
+| Phase 3 · S10 | B1 도감·업적(별명이 첫 수집 항목) + B2 난이도 | 다음 |
 | Phase 4 · S11 | D3 월간 행동 선택 | |
 | Phase 5 · S12 | C1 직무별 연재 | |
 
