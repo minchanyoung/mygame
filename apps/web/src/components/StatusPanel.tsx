@@ -311,7 +311,7 @@ export function TrailSheet({
           </button>
         </div>
         {rows.length === 0 ? (
-          <p className="small muted">아직 기록이 없어요. 한 달이 지나면 어디서 오르내렸는지 쌓입니다.</p>
+          <p className="empty">아직 기록이 없어요. 한 달이 지나면 어디서 오르내렸는지 쌓입니다.</p>
         ) : (
           <>
             <p className="small">

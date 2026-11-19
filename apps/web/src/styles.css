@@ -28,6 +28,15 @@
   --trait-soft: #e8f0ff;
   --trait-line: #9db8f2;
   --chat-bg: #e9edf4;
+  /* S15 브랜드 표면 (주 버튼 · 사원증 띠 · 메신저 머리 · 내 말풍선) */
+  --brand-bg: #1f2a44;
+  --brand-bg-hover: #0f1830;
+  --brand-fg: #ffffff;
+  --brand-fg-muted: #c4cbe0;
+  /* S15 움직임 규칙: 등장 200ms ease-out, 사라짐 150ms */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-in: 0.2s;
+  --dur-out: 0.15s;
   /* S15 표면: 그림자는 두 단계만 (카드 · 시트) */
   --elev-1: 0 1px 2px rgba(15, 24, 48, 0.05), 0 4px 14px rgba(15, 24, 48, 0.05);
   --elev-2: 0 -8px 28px rgba(15, 24, 48, 0.14);
@@ -84,9 +93,13 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #12161f;
-    --sheet: #1c2230;
-    --surface: #1a2030;
+    --paper: #0f1420;
+    --sheet: #1a2131;
+    --surface: #171d2b;
+    --brand-bg: #2f4270;
+    --brand-bg-hover: #3a5085;
+    --brand-fg: #ffffff;
+    --brand-fg-muted: #b9c4e4;
     --ink: #e8ebf2;
     --ink-2: #c9cfdc;
     --muted: #a3abbd;
@@ -105,7 +118,7 @@
     --trait: #a8c4ff;
     --trait-soft: #1f2b47;
     --trait-line: #3a5490;
-    --chat-bg: #161b27;
+    --chat-bg: #0b0f18;
     --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     --elev-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.2);
     --elev-2: 0 -8px 28px rgba(0, 0, 0, 0.45);
@@ -264,17 +277,17 @@ h3 {
 
 /* S15 주 버튼: 단색 남색, 본문 글꼴, 그림자 없음 */
 .btn-primary {
-  background: var(--navy);
-  border-color: var(--navy);
-  color: var(--on-navy);
+  background: var(--brand-bg);
+  border-color: var(--brand-bg);
+  color: var(--brand-fg);
   font-weight: 700;
   font-size: var(--fs-md);
   letter-spacing: 0;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--navy-deep);
-  border-color: var(--navy-deep);
+  background: var(--brand-bg-hover);
+  border-color: var(--brand-bg-hover);
 }
 
 .btn:disabled {
@@ -494,8 +507,8 @@ button.card {
   align-items: center;
   gap: var(--sp-2);
   padding: var(--sp-2) var(--sp-4);
-  background: var(--navy);
-  color: var(--on-navy);
+  background: var(--brand-bg);
+  color: var(--brand-fg);
   border-bottom: 3px solid var(--stamp);
 }
 
@@ -512,7 +525,7 @@ button.card {
   font-size: var(--fs-xs);
   font-weight: 600;
   letter-spacing: 0.16em;
-  color: var(--on-navy-muted);
+  color: var(--brand-fg-muted);
   flex: 0 0 auto;
 }
 
@@ -546,8 +559,8 @@ button.card {
 .badge-rank {
   font-size: var(--fs-xs);
   font-weight: 700;
-  color: var(--on-navy);
-  background: var(--navy);
+  color: var(--brand-fg);
+  background: var(--brand-bg);
   border-radius: var(--r-sm);
   padding: 2px 7px;
 }
@@ -588,7 +601,7 @@ button.card {
 
 @media (prefers-reduced-motion: no-preference) {
   .badge .badge-body {
-    animation: badgeFlip 0.2s ease-out;
+    animation: badgeFlip var(--dur-in) var(--ease-out);
   }
 }
 
@@ -643,7 +656,7 @@ button.card {
   display: block;
   height: 100%;
   background: var(--navy);
-  transition: width 0.4s ease;
+  transition: width 0.4s var(--ease-out);
 }
 
 .gauge-danger {
@@ -1000,8 +1013,8 @@ button.card {
   align-items: center;
   gap: 10px;
   padding: 14px 16px 12px;
-  background: var(--navy);
-  color: var(--on-navy);
+  background: var(--brand-bg);
+  color: var(--brand-fg);
 }
 
 .avatar {
@@ -1009,7 +1022,7 @@ button.card {
   height: 40px;
   flex: 0 0 auto;
   border-radius: var(--r-md);
-  background: color-mix(in srgb, var(--on-navy) 18%, var(--navy));
+  background: color-mix(in srgb, var(--brand-fg) 16%, var(--brand-bg));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1021,13 +1034,13 @@ button.card {
   height: 30px;
   border-radius: var(--r-md);
   font-size: var(--fs-xs);
-  background: var(--navy);
-  color: var(--on-navy);
+  background: var(--brand-bg);
+  color: var(--brand-fg);
 }
 
 .msg-sub {
   font-size: var(--fs-xs);
-  color: var(--on-navy-muted);
+  color: var(--brand-fg-muted);
 }
 
 .msg-body {
@@ -1142,8 +1155,8 @@ button.card {
 }
 /* S15 내 말풍선은 브랜드 남색 */
 .bubble-self {
-  background: var(--navy);
-  color: var(--on-navy);
+  background: var(--brand-bg);
+  color: var(--brand-fg);
   border-radius: var(--r-md) var(--r-sm) var(--r-md) var(--r-md);
 }
 .read-mark {
@@ -1477,11 +1490,11 @@ button.card {
   }
 
   .float-up {
-    animation: floatUp 0.7s ease both;
+    animation: floatUp 0.3s var(--ease-out) both;
   }
 
   .flip-in {
-    animation: flipIn 0.5s ease both;
+    animation: flipIn 0.3s var(--ease-out) both;
   }
 }
 
@@ -2956,7 +2969,7 @@ button.gauge:disabled {
 
 @media (prefers-reduced-motion: no-preference) {
   .bottom-sheet {
-    animation: sheetUp 0.22s ease-out;
+    animation: sheetUp var(--dur-in) var(--ease-out);
   }
 }
 
@@ -3048,4 +3061,15 @@ button.gauge:disabled {
 .divider-top {
   border-top: 1px dashed var(--line);
   padding-top: 6px;
+}
+
+/* S15 빈 상태: 점선 상자 + 가운데 정렬 안내 */
+.empty {
+  margin: 0;
+  padding: var(--sp-4);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md);
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  text-align: center;
 }

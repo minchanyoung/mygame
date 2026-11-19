@@ -62,7 +62,7 @@ export function CollectionScreen({ onBack }: Props) {
           <span style={{ width: `${percent}%` }} />
         </div>
         {data.runsFinished === 0 && (
-          <p className="small muted">아직 끝까지 산 인생이 없어요. 한 번 끝까지 가면 여기에 쌓입니다.</p>
+          <p className="empty">아직 끝까지 산 인생이 없어요. 한 번 끝까지 가면 여기에 쌓입니다.</p>
         )}
         <p className="tiny muted">
           이 브라우저에 저장된 기록이에요. 사이트 데이터를 지우면 처음부터 다시 모읍니다.

@@ -119,7 +119,7 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
           <div className="card">
             <strong>발견한 특성</strong>
             {view.skills.length + view.negativeTraits.length === 0 ? (
-              <p className="small muted">아직 없음 — 특별한 사건을 통해 얻게 됩니다.</p>
+              <p className="empty">아직 발견한 특성이 없어요. 특별한 사건에서 얻게 됩니다.</p>
             ) : (
               <ul className="trait-list">
                 {view.skills.map((t) => (

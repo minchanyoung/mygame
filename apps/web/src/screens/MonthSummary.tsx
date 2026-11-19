@@ -259,7 +259,7 @@ export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
                   </span>
                 )}
               </div>
-              <span className="stamp stamp-mid sheet-stamp stamp-slam" aria-hidden="true">
+              <span className="stamp stamp-mid sheet-stamp" aria-hidden="true">
                 발령
               </span>
             </>
