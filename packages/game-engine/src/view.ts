@@ -32,6 +32,7 @@ import {
   type PublicBackgroundTrait,
   type PublicCalendar,
   type PublicHistoryEntry,
+  type PublicResourceTrail,
   type PublicCharacterCard,
   type PublicChoice,
   type PublicEffect,
@@ -342,7 +343,7 @@ function toMonthSummary(state: GameRunState, content: ContentIndex): PublicMonth
     ],
     interest: m.settlement.interest,
     debtRepayment: m.settlement.debtRepayment,
-    annualReview: m.annualReview ? toPublicReview(m.annualReview) : null,
+    annualReview: m.annualReview ? toPublicReview(m.annualReview, content) : null,
     salaryAdjustment: m.salaryAdjustment,
     promotion: m.promotion
       ? {
@@ -375,7 +376,54 @@ const REVIEW_ITEM_LABELS: Record<string, string> = {
   condition: '근태·컨디션',
 };
 
-function toPublicReview(r: ReviewDetail): PublicReview {
+/** S14 장부·평가표에 쓰는 '사건 제목 → 고른 선택' */
+function choiceLabel(eventId: string, choiceId: string, content: ContentIndex): string {
+  const event = content.events.get(eventId);
+  const choice = event?.choices.find((c) => c.id === choiceId);
+  if (!event) return '지난 사건';
+  return choice ? `${event.title} → ${choice.label}` : event.title;
+}
+
+const LEDGER_LABELS = {
+  REVIEW: '연말 인사평가',
+  PROMOTION_MISS: '승진 누락',
+  MONTHLY: '매달 자연 변화',
+} as const;
+
+/** S14 최근 3개월 자원 증감 (지난 달까지 = 장부에 옮겨진 달) */
+function toResourceTrail(state: GameRunState, content: ContentIndex): PublicResourceTrail {
+  const months = 3;
+  const lastTurn = Math.max(...state.resourceLedger.map((e) => e.turnIndex), -1);
+  const recent = state.resourceLedger.filter((e) => e.turnIndex > lastTurn - months);
+  // 최신 달이 위, 같은 달 안에서는 일어난 순서(사건 → 자연 변화)
+  const ordered = [...recent].sort((a, b) => b.turnIndex - a.turnIndex);
+  const entries = ordered.map((e) => {
+    const info = turnInfo(e.turnIndex, content.pack.rules.startAge);
+    return {
+      age: info.age,
+      month: info.monthOfYear,
+      kind: e.source,
+      label:
+        e.source === 'EVENT' && e.eventId && e.choiceId
+          ? choiceLabel(e.eventId, e.choiceId, content)
+          : e.source === 'EVENT'
+            ? '지난 사건'
+            : LEDGER_LABELS[e.source],
+      delta: { ...e.delta },
+    };
+  });
+  const lastMonth: PublicResourceTrail['lastMonth'] = {};
+  for (const e of state.resourceLedger) {
+    if (e.turnIndex !== lastTurn) continue;
+    for (const k of RESOURCE_KEYS) {
+      const v = e.delta[k];
+      if (v) lastMonth[k] = (lastMonth[k] ?? 0) + v;
+    }
+  }
+  return { entries, lastMonth };
+}
+
+function toPublicReview(r: ReviewDetail, content: ContentIndex): PublicReview {
   return {
     grade: r.grade,
     score: r.score,
@@ -387,6 +435,11 @@ function toPublicReview(r: ReviewDetail): PublicReview {
       note: i.note,
     })),
     traitAdjustment: r.traitAdjustment,
+    reputationSources: r.reputationSources.map((x) => ({
+      label: choiceLabel(x.eventId, x.choiceId, content),
+      delta: x.delta,
+      count: x.count,
+    })),
     bonus: r.bonus,
     bossName: r.bossName,
     comment: r.comment,
@@ -750,6 +803,7 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
     playtestModified: state.playtestModified,
     calendar: toCalendar(state, content),
     history: toHistory(state, content),
+    resourceTrail: toResourceTrail(state, content),
     lastStory: (() => {
       const ev = state.currentMonth?.eventResults.at(-1);
       const event = ev ? content.events.get(ev.eventId) : undefined;

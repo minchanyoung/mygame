@@ -8,6 +8,7 @@ import {
 import { levelBonus } from './chance';
 import type { ContentIndex } from './content-index';
 import { clamp, clampStat, roundKrw } from './numbers';
+import { reputationSources } from './ledger';
 import { currentTeamNpcs } from './npcs';
 
 export type ReviewResult = ReviewDetail;
@@ -110,6 +111,7 @@ export function computeAnnualReview(state: GameRunState, content: ContentIndex):
       note: r.note,
     })),
     traitAdjustment: Math.round(traitAdjustment),
+    reputationSources: reputationSources(state),
     bonus,
     bossName: boss?.name ?? null,
     comment,

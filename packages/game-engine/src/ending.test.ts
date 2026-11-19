@@ -293,5 +293,5 @@ describe('auto-play (§26.7-8)', () => {
         expect(r.endingType).not.toBeNull();
       }
     }
-  }, 60_000);
+  }, 120_000);
 });

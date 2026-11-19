@@ -16,6 +16,28 @@ const won = (n: number) => n.toLocaleString('ko-KR');
 const signedWon = (n: number) => (n > 0 ? `+${won(n)}` : n < 0 ? `−${won(-n)}` : '0');
 const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0');
 
+/** S14 올해 평판이 움직인 곳: 깎인 곳 TOP 3 → 오른 곳 TOP 1 */
+function ReputationSources({ sources }: { sources: PublicReview['reputationSources'] }) {
+  return (
+    <div className="rep-sources">
+      <span className="tiny" style={{ fontWeight: 700 }}>
+        올해 평판이 움직인 곳
+      </span>
+      <ul>
+        {sources.map((s) => (
+          <li key={s.label} className="small">
+            <span className="rep-label">{s.label}</span>
+            <span className={`num ${s.delta > 0 ? 'pos' : 'neg'}`}>
+              {s.count > 1 && <span className="tiny muted">×{s.count} </span>}
+              {signed(s.delta)}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function ReviewSheet({ review, age }: { review: PublicReview; age: number }) {
   return (
     <div className="sheet review-sheet">
@@ -36,6 +58,9 @@ function ReviewSheet({ review, age }: { review: PublicReview; age: number }) {
               <span style={{ width: `${Math.max(4, Math.min(100, it.score))}%` }} />
             </div>
             <span className="tiny muted">{it.note}</span>
+            {it.label === '사내 평판' && review.reputationSources.length > 0 && (
+              <ReputationSources sources={review.reputationSources} />
+            )}
           </div>
         ))}
         {review.traitAdjustment !== 0 && (

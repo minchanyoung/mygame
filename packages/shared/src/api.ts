@@ -335,6 +335,8 @@ export interface PublicReview {
   reputationDelta: number;
   items: Array<{ label: string; score: number; grade: ReviewGrade; note: string }>;
   traitAdjustment: number;
+  /** S14 올해 평판이 움직인 곳 (깎인 곳 TOP 3 → 오른 곳 TOP 1) */
+  reputationSources: Array<{ label: string; delta: number; count: number }>;
   bonus: number;
   bossName: string | null;
   comment: string;
@@ -480,8 +482,27 @@ export interface PublicRunView {
   calendar: PublicCalendar;
   /** 최근 인생 기록 (최신순, 내부 판정 수치 제외) */
   history: PublicHistoryEntry[];
+  /** S14 자원 증감 내역 (지난 달까지 최근 3개월) */
+  resourceTrail: PublicResourceTrail;
   /** 방금 끝난 사건의 이야기 (같은 달 안에서 결과 대화를 보여주기 위함) */
   lastStory: PublicStory | null;
+}
+
+/** S14 자원 증감 내역 한 줄 (이미 일어난 일의 숫자만) */
+export interface PublicResourceTrailEntry {
+  age: number;
+  month: number;
+  kind: 'EVENT' | 'REVIEW' | 'PROMOTION_MISS' | 'MONTHLY';
+  /** 사건이면 '사건 제목 → 고른 선택', 아니면 '매달 자연 변화' 등 */
+  label: string;
+  delta: Partial<Resources>;
+}
+
+export interface PublicResourceTrail {
+  /** 최신순 */
+  entries: PublicResourceTrailEntry[];
+  /** 지난 달 전체 변화 (게이지 옆 ▲▼ 표시용, 기록이 없으면 빈 객체) */
+  lastMonth: Partial<Resources>;
 }
 
 export interface CreateRunResponse {

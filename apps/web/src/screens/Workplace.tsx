@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import type { PublicRunView } from '@company-life/shared';
+import type { PublicRunView, ResourceKey } from '@company-life/shared';
 import { Icon, IconBadge, type IconName } from '../components/Icons';
 import {
   CareerCard,
+  CompactGauges,
   EmployeeBadge,
   Gauges,
+  MoneyLine,
   MoneyRow,
+  TrailSheet,
   Warnings,
   YearCalendar,
 } from '../components/StatusPanel';
@@ -28,6 +31,8 @@ const TABS: Array<{ id: Tab; label: string; icon: IconName }> = [
 /** MONTH_START: 사원증 메인 + 하단 탭 (회사 / 사람 / 나 / 기록) */
 export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
   const [tab, setTab] = useState<Tab>('company');
+  /** S14 증감 내역 시트를 연 자원 */
+  const [trail, setTrail] = useState<ResourceKey | null>(null);
 
   const lastStory = view.history.find((h) => h.kind === 'EVENT_RESOLVED');
 
@@ -37,9 +42,9 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
         <>
           <EmployeeBadge view={view} />
           <Warnings view={view} />
-          <Gauges view={view} />
-          <MoneyRow view={view} />
-          <CareerCard view={view} />
+          <CompactGauges view={view} onOpen={setTrail} />
+          <MoneyLine view={view} />
+          <CareerCard view={view} compact />
           {lastStory && (
             <button type="button" className="card last-story" onClick={() => setTab('record')}>
               <IconBadge name="story" color="var(--navy)" size={32} />
@@ -52,11 +57,6 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
             </button>
           )}
           <YearCalendar view={view} />
-          <div className="cta-wrap">
-            <button type="button" className="btn btn-primary" onClick={onStartMonth} disabled={busy}>
-              {busy ? '출근 중…' : `${view.turn.monthOfYear}월 출근하기`}
-            </button>
-          </div>
         </>
       )}
 
@@ -114,7 +114,8 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
       {tab === 'me' && (
         <>
           <h2>나</h2>
-          <Gauges view={view} />
+          <Gauges view={view} onOpen={setTrail} />
+          <p className="tiny muted">게이지를 누르면 최근 3개월 동안 어디서 오르내렸는지 볼 수 있어요.</p>
           <MoneyRow view={view} />
           <CareerCard view={view} />
           <div className="card">
@@ -165,20 +166,32 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
         </>
       )}
 
-      <nav className="tabbar" aria-label="주 메뉴">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            className={`tab ${tab === t.id ? 'tab-on' : ''}`}
-            aria-current={tab === t.id ? 'page' : undefined}
-            onClick={() => setTab(t.id)}
-          >
-            <Icon name={t.icon} size={22} />
-            <span>{t.label}</span>
-          </button>
-        ))}
-      </nav>
+      {trail && <TrailSheet view={view} resource={trail} onClose={() => setTrail(null)} />}
+
+      {/* S14 출근 버튼은 탭 바 위에 붙어 늘 보인다 */}
+      <div className="bottom-dock">
+        {tab === 'company' && (
+          <div className="cta-wrap">
+            <button type="button" className="btn btn-primary" onClick={onStartMonth} disabled={busy}>
+              {busy ? '출근 중…' : `${view.turn.monthOfYear}월 출근하기`}
+            </button>
+          </div>
+        )}
+        <nav className="tabbar" aria-label="주 메뉴">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              className={`tab ${tab === t.id ? 'tab-on' : ''}`}
+              aria-current={tab === t.id ? 'page' : undefined}
+              onClick={() => setTab(t.id)}
+            >
+              <Icon name={t.icon} size={22} />
+              <span>{t.label}</span>
+            </button>
+          ))}
+        </nav>
+      </div>
     </section>
   );
 }

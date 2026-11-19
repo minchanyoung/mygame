@@ -16,6 +16,7 @@ import {
   NpcRelationStatSchema,
   NpcRoleSchema,
   OwnedTraitLevelSchema,
+  ResourceKeySchema,
   PlayerRankSchema,
   ReviewGradeSchema,
   RetirementTierSchema,
@@ -216,6 +217,17 @@ export const ReviewDetailSchema = z
         .strict(),
     ),
     traitAdjustment: z.number().int(),
+    /** S14 올해 평판이 움직인 곳 (깎인 곳 TOP 3 → 오른 곳 TOP 1). 점수 계산과 무관한 설명용 */
+    reputationSources: z.array(
+      z
+        .object({
+          eventId: EventIdSchema,
+          choiceId: z.string(),
+          delta: z.number().int(),
+          count: z.number().int().min(1),
+        })
+        .strict(),
+    ),
     bonus: Krw.nonnegative(),
     bossName: z.string().nullable(),
     comment: z.string(),
@@ -318,6 +330,22 @@ export const MonthLogSchema = z
   })
   .strict();
 export type MonthLog = z.infer<typeof MonthLogSchema>;
+
+/**
+ * S14 자원 증감 장부 한 줄. 달이 끝날 때 그달 기록을 옮긴다 (최근 12개월 보관).
+ * EVENT 사건 결과 · REVIEW 12월 평가 평판 가감 · PROMOTION_MISS 승진 누락 · MONTHLY 나머지(자연 회복·나이 등)
+ */
+export const RESOURCE_LEDGER_SOURCES = ['EVENT', 'REVIEW', 'PROMOTION_MISS', 'MONTHLY'] as const;
+export const ResourceLedgerEntrySchema = z
+  .object({
+    turnIndex: z.number().int().min(0),
+    source: z.enum(RESOURCE_LEDGER_SOURCES),
+    eventId: EventIdSchema.nullable(),
+    choiceId: z.string().nullable(),
+    delta: z.partialRecord(ResourceKeySchema, z.number().int()),
+  })
+  .strict();
+export type ResourceLedgerEntry = z.infer<typeof ResourceLedgerEntrySchema>;
 
 /** S9 연간 기록 (12월 정산 직후 + 엔딩 시점). 인생 연대기 그래프용 */
 export const YearlyRecordSchema = z
@@ -520,6 +548,8 @@ export const GameRunStateSchema = z
     eventHistory: z.array(HistoryEntrySchema),
     annualReviews: z.array(AnnualReviewSchema),
     yearlyRecords: z.array(YearlyRecordSchema),
+    /** S14 자원 증감 장부 (최근 12개월) */
+    resourceLedger: z.array(ResourceLedgerEntrySchema),
     annualReviewProcessedYear: z.number().int().nullable(),
     salaryAdjustedYear: z.number().int().nullable(),
     statistics: z

@@ -1,4 +1,5 @@
-import { RESOURCE_KEYS, RESOURCE_LABELS, type PublicRunView } from '@company-life/shared';
+import { useEffect, useRef } from 'react';
+import { RESOURCE_KEYS, RESOURCE_LABELS, type PublicRunView, type ResourceKey } from '@company-life/shared';
 import { formatKrw } from '../api';
 import { Barcode, Icon, IconBadge, Silhouette, STAT_STYLE } from './Icons';
 
@@ -68,7 +69,7 @@ export function EmployeeBadge({ view }: { view: PublicRunView }) {
 }
 
 /** S5 커리어: 다음 승진까지(근속·포인트) + 인생 목표 진행 */
-export function CareerCard({ view }: { view: PublicRunView }) {
+export function CareerCard({ view, compact = false }: { view: PublicRunView; compact?: boolean }) {
   const p = view.employment.promotion;
   const g = view.lifeGoal;
   if (!p && !g) return null;
@@ -107,7 +108,7 @@ export function CareerCard({ view }: { view: PublicRunView }) {
               </div>
             </div>
           )}
-          {p.nextRankLabel && (
+          {p.nextRankLabel && !compact && (
             <span className="tiny muted">
               연말 평가 등급과 큰 성과로 포인트가 쌓여요. 조건을 채우면 1월에 심사.
             </span>
@@ -125,22 +126,42 @@ export function CareerCard({ view }: { view: PublicRunView }) {
           <div className="mini-bar mini-bar-goal" aria-hidden="true">
             <span style={{ width: `${g.percent}%` }} />
           </div>
-          <span className="tiny muted">{g.progressLabel}</span>
+          {!compact && <span className="tiny muted">{g.progressLabel}</span>}
         </div>
       )}
     </div>
   );
 }
 
-/** 자원 4개. 20 이하는 색과 함께 '위험' 글자로도 표시 (§10.2) */
-export function Gauges({ view }: { view: PublicRunView }) {
+const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0');
+
+/** S14 지난 달 대비 ▲▼ (변화 없으면 표시 안 함) */
+function Trend({ delta }: { delta: number | undefined }) {
+  if (!delta) return null;
+  return (
+    <span className={`trend ${delta > 0 ? 'trend-up' : 'trend-down'}`} aria-label={`지난달 ${signed(delta)}`}>
+      {delta > 0 ? '▲' : '▼'}
+      {Math.abs(delta)}
+    </span>
+  );
+}
+
+/** 자원 4개. 20 이하는 색과 함께 '위험' 글자로도 표시 (§10.2). S14: 누르면 증감 내역 */
+export function Gauges({ view, onOpen }: { view: PublicRunView; onOpen?: (k: ResourceKey) => void }) {
   return (
     <div className="gauges">
       {RESOURCE_KEYS.map((k) => {
         const v = view.resources[k];
         const danger = v <= DANGER;
         return (
-          <div key={k} className={`gauge ${danger ? 'gauge-danger' : ''}`}>
+          <button
+            type="button"
+            key={k}
+            className={`gauge ${danger ? 'gauge-danger' : ''}`}
+            onClick={() => onOpen?.(k)}
+            disabled={!onOpen}
+            aria-label={`${RESOURCE_LABELS[k]} ${v}${onOpen ? ' — 최근 증감 내역 보기' : ''}`}
+          >
             <div className="gauge-head">
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <IconBadge
@@ -157,10 +178,142 @@ export function Gauges({ view }: { view: PublicRunView }) {
             <div className="gauge-bar" aria-hidden="true">
               <span style={{ width: `${v}%`, background: danger ? undefined : STAT_STYLE[k].color }} />
             </div>
-            <span className="gauge-note">{danger ? '위험' : ' '}</span>
-          </div>
+            <span className="gauge-note">
+              {danger ? '위험' : ' '} <Trend delta={view.resourceTrail.lastMonth[k]} />
+            </span>
+          </button>
         );
       })}
+    </div>
+  );
+}
+
+/** S14 출근 화면용 게이지 한 줄: 아이콘 + 숫자 + 얇은 막대 + 지난달 ▲▼. 누르면 증감 내역 */
+export function CompactGauges({ view, onOpen }: { view: PublicRunView; onOpen: (k: ResourceKey) => void }) {
+  return (
+    <div className="cgauges">
+      {RESOURCE_KEYS.map((k) => {
+        const v = view.resources[k];
+        const danger = v <= DANGER;
+        return (
+          <button
+            type="button"
+            key={k}
+            className={`cgauge ${danger ? 'gauge-danger' : ''}`}
+            onClick={() => onOpen(k)}
+            aria-label={`${RESOURCE_LABELS[k]} ${v}${danger ? ' 위험' : ''} — 최근 증감 내역 보기`}
+          >
+            <span className="cgauge-head">
+              <span style={{ color: danger ? 'var(--stamp)' : STAT_STYLE[k].color, display: 'flex' }}>
+                <Icon name={STAT_STYLE[k].icon} size={14} />
+              </span>
+              <span className="cgauge-label">{RESOURCE_LABELS[k]}</span>
+            </span>
+            <span className="cgauge-value">
+              {v}
+              <Trend delta={view.resourceTrail.lastMonth[k]} />
+            </span>
+            <span className="gauge-bar" aria-hidden="true">
+              <span style={{ width: `${v}%`, background: danger ? undefined : STAT_STYLE[k].color }} />
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** S14 출근 화면용 돈 한 줄 요약 */
+export function MoneyLine({ view }: { view: PublicRunView }) {
+  return (
+    <p className="money-line small">
+      <span>
+        <span className="muted">현금</span> <strong className="num">{formatKrw(view.cash)}</strong>
+      </span>
+      <span>
+        <span className="muted">빚</span> <strong className="num">{formatKrw(view.debt)}</strong>
+      </span>
+      <span>
+        <span className="muted">순자산</span>{' '}
+        <strong className={`num ${view.netWorth < 0 ? 'neg' : ''}`}>
+          {view.netWorth < 0 ? `−${formatKrw(-view.netWorth)}` : formatKrw(view.netWorth)}
+        </strong>
+      </span>
+    </p>
+  );
+}
+
+/** S14 게이지 증감 내역 시트: 최근 3개월 */
+export function TrailSheet({
+  view,
+  resource,
+  onClose,
+}: {
+  view: PublicRunView;
+  resource: ResourceKey;
+  onClose: () => void;
+}) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  const rows = view.resourceTrail.entries.filter((e) => (e.delta[resource] ?? 0) !== 0);
+  const total = rows.reduce((s, e) => s + (e.delta[resource] ?? 0), 0);
+  const natural = rows.filter((e) => e.kind === 'MONTHLY').reduce((s, e) => s + (e.delta[resource] ?? 0), 0);
+  return (
+    <div className="sheet-backdrop" onClick={onClose}>
+      <div
+        className="bottom-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="trail-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="bottom-sheet-head">
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <IconBadge name={STAT_STYLE[resource].icon} color={STAT_STYLE[resource].color} size={28} />
+            <strong id="trail-title">
+              {RESOURCE_LABELS[resource]} {view.resources[resource]}
+            </strong>
+          </span>
+          <button ref={closeRef} type="button" className="btn sheet-close" onClick={onClose}>
+            닫기
+          </button>
+        </div>
+        {rows.length === 0 ? (
+          <p className="small muted">아직 기록이 없어요. 한 달이 지나면 어디서 오르내렸는지 쌓입니다.</p>
+        ) : (
+          <>
+            <p className="small">
+              최근 3개월 <strong className="num">{signed(total)}</strong>{' '}
+              <span className="muted">
+                (사건·평가 {signed(total - natural)} · 자연 변화 {signed(natural)})
+              </span>
+            </p>
+            <ul className="trail-list">
+              {rows.map((e, i) => {
+                const d = e.delta[resource] ?? 0;
+                return (
+                  <li key={i} className={e.kind === 'MONTHLY' ? 'trail-natural' : ''}>
+                    <span className="tiny muted trail-when">
+                      {e.age}세 {e.month}월
+                    </span>
+                    <span className="small trail-label">{e.label}</span>
+                    <strong className={`num ${d > 0 ? 'pos' : 'neg'}`}>{signed(d)}</strong>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+        <span className="tiny muted">이미 일어난 일만 보여 줍니다. 앞으로의 확률은 비공개예요.</span>
+      </div>
     </div>
   );
 }

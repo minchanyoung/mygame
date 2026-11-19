@@ -7,6 +7,7 @@ import {
   type GameRunState,
   type ScheduledEvent,
 } from '@company-life/shared';
+import { closeMonthLedger } from './ledger';
 import { processAnnualReview, processSalaryAdjustment } from './annual';
 import type { ContentIndex } from './content-index';
 import { withYearlyRecord } from './chronicle';
@@ -348,6 +349,8 @@ export function nextMonth(state: GameRunState, content: ContentIndex, now: strin
   const advanced: GameRunState = {
     ...state,
     turnIndex: state.turnIndex + 1,
+    // S14 이번 달 자원 변화를 장부로 옮긴다
+    resourceLedger: closeMonthLedger(state, content),
     currentMonth: null,
     transferOffer: null,
   };

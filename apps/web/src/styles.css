@@ -2567,3 +2567,223 @@ details summary {
 .discovery .btn {
   align-self: flex-start;
 }
+
+/* ── S14 출근 화면 압축 · 증감 내역 · 평판 출처 ── */
+button.gauge {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.gauge:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.cgauges {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.cgauge {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  min-height: 44px;
+}
+
+.cgauge-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cgauge-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cgauge-value {
+  font-family: var(--display);
+  font-size: 1.15rem;
+  line-height: 1.1;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.cgauge.gauge-danger .cgauge-label,
+.cgauge.gauge-danger .cgauge-value {
+  color: var(--danger);
+}
+
+.trend {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.trend-up {
+  color: var(--good);
+}
+
+.trend-down {
+  color: var(--danger);
+}
+
+.money-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin: 0;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.bottom-dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin: 0 -16px;
+  background: var(--paper);
+}
+
+.bottom-dock .cta-wrap {
+  padding: 8px 16px 6px;
+  border-top: 1px solid var(--line);
+}
+
+.bottom-dock .tabbar {
+  position: static;
+  margin: 0;
+}
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(15, 24, 48, 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.bottom-sheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: 78dvh;
+  overflow-y: auto;
+  background: var(--sheet);
+  color: var(--ink);
+  border-radius: 16px 16px 0 0;
+  padding: 14px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow);
+}
+
+.bottom-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sheet-close {
+  min-height: 40px;
+  padding: 6px 14px;
+}
+
+.trail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.trail-list li {
+  display: grid;
+  grid-template-columns: 5.2em minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--line);
+}
+
+.trail-natural .trail-label {
+  color: var(--muted);
+}
+
+.rep-sources {
+  margin-top: 4px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--c-reputation) 8%, var(--surface));
+  border: 1px dashed color-mix(in srgb, var(--c-reputation) 45%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rep-sources ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rep-sources li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.rep-label {
+  min-width: 0;
+}
+
+.rep-sources li > .num,
+.trail-list .num {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bottom-sheet {
+    animation: sheetUp 0.22s ease-out;
+  }
+}
+
+@keyframes sheetUp {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}

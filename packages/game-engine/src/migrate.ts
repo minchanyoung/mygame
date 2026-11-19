@@ -43,7 +43,11 @@ export function migrateRunState(raw: unknown): GameRunState {
     m.eventResults ??= [];
     // S13: S11 월간 행동 제거 — 옛 세이브의 행동 기록을 버린다
     delete m.action;
+    // S14 평가표 평판 출처 (옛 평가는 비어 있음)
+    if (isObj(m.annualReview)) m.annualReview.reputationSources ??= [];
   }
+  // S14 자원 증감 장부는 업데이트 이후부터 쌓인다
+  s.resourceLedger ??= [];
   delete s.actionLog;
   s.pendingEvents ??= [];
   // S8: 예약 사건의 참여 동료
