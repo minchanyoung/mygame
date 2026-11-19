@@ -29,7 +29,16 @@ export function useReveal(total: number, resetKey: string, stepMs = 650) {
   return { shown, done: shown >= total, skip: () => setShown(total) };
 }
 
-export function ChatLine({ line, delay = 0 }: { line: PublicChatLine; delay?: number }) {
+/** S15 같은 사람이 이어서 말하면 이름·아바타를 생략한다 (실제 메신저처럼) */
+export function ChatLine({
+  line,
+  delay = 0,
+  continued = false,
+}: {
+  line: PublicChatLine;
+  delay?: number;
+  continued?: boolean;
+}) {
   const style = { animationDelay: `${delay}ms` };
   switch (line.side) {
     case 'system':
@@ -55,12 +64,12 @@ export function ChatLine({ line, delay = 0 }: { line: PublicChatLine; delay?: nu
       );
     default:
       return (
-        <div className="bubble-row float-up" style={style}>
+        <div className={`bubble-row float-up ${continued ? 'bubble-continued' : ''}`} style={style}>
           <span className="avatar avatar-small" aria-hidden="true">
-            {line.initial ?? '?'}
+            {continued ? '' : (line.initial ?? '?')}
           </span>
           <div className="bubble-col">
-            {line.name && <span className="bubble-name">{line.name}</span>}
+            {line.name && !continued && <span className="bubble-name">{line.name}</span>}
             <p className="bubble">{line.text}</p>
           </div>
         </div>
@@ -107,7 +116,13 @@ export function ChatThread({
         aria-label={done ? undefined : '대화 건너뛰기'}
       >
         {lines.slice(0, shown).map((l, i) => (
-          <ChatLine key={i} line={l} />
+          <ChatLine
+            key={i}
+            line={l}
+            continued={
+              l.side === 'other' && i > 0 && lines[i - 1]?.side === 'other' && lines[i - 1]?.name === l.name
+            }
+          />
         ))}
         {!done && lines[shown]?.side === 'other' && <Typing />}
         {!done && <span className="tiny muted chat-skip">탭해서 건너뛰기</span>}

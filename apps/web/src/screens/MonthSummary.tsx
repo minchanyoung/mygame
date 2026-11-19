@@ -39,10 +39,16 @@ function ReputationSources({ sources }: { sources: PublicReview['reputationSourc
 function ReviewSheet({ review, age }: { review: PublicReview; age: number }) {
   return (
     <div className="sheet review-sheet">
-      <div className="sheet-title">
-        <strong>연말 인사평가표</strong>
-        <span className="tiny muted">
-          {age}세 · 종합 {review.score}점
+      {/* S15 도장은 제목 줄 오른쪽에 (항목 등급 칩을 가리지 않게) */}
+      <div className="sheet-title review-title">
+        <span className="col">
+          <strong>연말 인사평가표</strong>
+          <span className="tiny muted">
+            {age}세 · 종합 {review.score}점
+          </span>
+        </span>
+        <span className="stamp stamp-mid stamp-slam" aria-hidden="true">
+          {review.grade}
         </span>
       </div>
       <div className="sheet-rows">
@@ -105,9 +111,6 @@ function ReviewSheet({ review, age }: { review: PublicReview; age: number }) {
           </div>
         </div>
       )}
-      <span className="stamp stamp-mid sheet-stamp stamp-slam" aria-hidden="true">
-        {review.grade}
-      </span>
     </div>
   );
 }

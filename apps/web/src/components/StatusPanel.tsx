@@ -1,70 +1,96 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { RESOURCE_KEYS, RESOURCE_LABELS, type PublicRunView, type ResourceKey } from '@company-life/shared';
 import { formatKrw } from '../api';
 import { Barcode, Icon, IconBadge, Silhouette, STAT_STYLE } from './Icons';
 
 const DANGER = 20;
 
-/** 사원증: 이름·직급·회사·입사·연봉·보유 특성 */
+/**
+ * 사원증 (S15 가로형): 앞면 = 회사 띠 · 사진 · 이름·직급 · 팀 · 칩, 탭하면 뒷면 = 입사·연봉·평가·바코드.
+ * 실제 사원증 비율에 가깝게 줄여 출근 화면 높이를 아낀다.
+ */
 export function EmployeeBadge({ view }: { view: PublicRunView }) {
+  const [back, setBack] = useState(false);
   const e = view.employment;
   const traits = [
     ...view.skills.map((t) => ({ ...t, bad: false })),
     ...view.negativeTraits.map((t) => ({ ...t, bad: true })),
   ];
   return (
-    <div className="card badge">
-      <div className="badge-strap" />
-      <div className="badge-top">
-        <span>EMPLOYEE ID</span>
-        <span className="badge-hole" />
-      </div>
-      <div className="badge-body">
-        <div className="badge-photo navy">
-          <Silhouette />
-        </div>
-        <div className="badge-info">
-          <div>
-            <span className="badge-name">{view.profile.displayName}</span>{' '}
-            {e.rankLabel && <span className="badge-rank">{e.rankLabel}</span>}
-          </div>
-          <span className="small fw-5 ink-2">
-            {e.companyName ?? '무소속'}
-            {e.jobLabel && ` · ${e.jobLabel}팀`}
+    <button
+      type="button"
+      className={`badge ${back ? 'badge-back' : ''}`}
+      onClick={() => setBack((b) => !b)}
+      aria-pressed={back}
+      aria-label={back ? '사원증 앞면 보기' : '사원증 뒷면 보기 (입사·연봉·평가)'}
+    >
+      <span className="badge-band">
+        <span className="badge-company">{e.companyName ?? '무소속'}</span>
+        <span className="badge-kind">{back ? 'DETAILS' : 'EMPLOYEE ID'}</span>
+      </span>
+      {!back ? (
+        <span className="badge-body">
+          <span className="badge-photo" aria-hidden="true">
+            <Silhouette />
           </span>
-          {e.startedAge !== null && (
-            <span className="tiny muted">
-              입사 {e.startedAge}세 {e.startedMonth}월
-              {e.annualSalary !== null && ` · 연봉 ${formatKrw(e.annualSalary)}`}
+          <span className="badge-info">
+            <span className="row gap-2">
+              <span className="badge-name">{view.profile.displayName}</span>
+              {e.rankLabel && <span className="badge-rank">{e.rankLabel}</span>}
+            </span>
+            <span className="small ink-2">
+              {e.jobLabel ? `${e.jobLabel}팀` : '구직 중'}
               {e.lastReviewGrade && ` · 최근 평가 ${e.lastReviewGrade}`}
             </span>
-          )}
-          <div className="badge-chips">
-            {e.grade && <span className={`chip chip-pill grade-chip-${e.grade}`}>{e.grade}등급 회사</span>}
-            {view.difficulty !== 'NORMAL' && (
-              <span className={`chip chip-pill difficulty-${view.difficulty}`}>
-                난이도 {view.difficultyLabel}
-              </span>
-            )}
-            {e.probationMonthsLeft !== null && (
-              <span className="chip chip-pill chip-accent">수습 {e.probationMonthsLeft}개월 남음</span>
-            )}
-            {e.transfers > 0 && <span className="chip chip-pill">이직 {e.transfers}회</span>}
-            {traits.map((t) => (
-              <span key={t.id} className={`chip chip-pill ${t.bad ? 'chip-danger' : 'chip-trait'}`}>
-                {t.name} Lv.{t.level}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="badge-foot">
-        <span className="ink">
-          <Barcode seed={view.runId} />
+            <span className="badge-chips">
+              {e.grade && <span className={`chip chip-pill grade-chip-${e.grade}`}>{e.grade}등급 회사</span>}
+              {view.difficulty !== 'NORMAL' && (
+                <span className={`chip chip-pill difficulty-${view.difficulty}`}>
+                  난이도 {view.difficultyLabel}
+                </span>
+              )}
+              {e.probationMonthsLeft !== null && (
+                <span className="chip chip-pill chip-accent">수습 {e.probationMonthsLeft}개월</span>
+              )}
+              {traits.map((t) => (
+                <span key={t.id} className={`chip chip-pill ${t.bad ? 'chip-danger' : 'chip-trait'}`}>
+                  {t.name} Lv.{t.level}
+                </span>
+              ))}
+            </span>
+          </span>
         </span>
-        <span>NO. {view.runId.slice(0, 8).toUpperCase()}</span>
-      </div>
-    </div>
+      ) : (
+        <span className="badge-body badge-details">
+          <span className="badge-detail-grid">
+            {e.startedAge !== null && (
+              <>
+                <span className="tiny muted">입사</span>
+                <span className="small num">
+                  {e.startedAge}세 {e.startedMonth}월
+                </span>
+              </>
+            )}
+            {e.annualSalary !== null && (
+              <>
+                <span className="tiny muted">연봉</span>
+                <span className="small num">{formatKrw(e.annualSalary)}</span>
+              </>
+            )}
+            <span className="tiny muted">최근 평가</span>
+            <span className="small">{e.lastReviewGrade ?? '아직 없음'}</span>
+            <span className="tiny muted">이직</span>
+            <span className="small num">{e.transfers}회</span>
+          </span>
+          <span className="badge-code">
+            <span className="ink">
+              <Barcode seed={view.runId} />
+            </span>
+            <span className="tiny muted num">NO. {view.runId.slice(0, 8).toUpperCase()}</span>
+          </span>
+        </span>
+      )}
+    </button>
   );
 }
 

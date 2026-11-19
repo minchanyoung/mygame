@@ -470,54 +470,67 @@ button.card {
   list-style: none;
 }
 
-/* ── 사원증 ── */
+/* ── 사원증 (S15 가로형, 탭하면 뒷면) ── */
 .badge {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   overflow: hidden;
   padding: 0;
-  gap: 0;
-  border: 0;
-  box-shadow:
-    0 1px 0 var(--line),
-    var(--shadow);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--elev-1);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
-.badge-strap {
-  height: 8px;
-  background: var(--stamp);
-}
-
-.badge-top {
+.badge-band {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px 0;
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  color: var(--muted);
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  background: var(--navy);
+  color: var(--on-navy);
+  border-bottom: 3px solid var(--stamp);
 }
 
-.badge-hole {
-  width: 44px;
-  height: 8px;
-  border-radius: var(--r-sm);
-  background: var(--line);
+.badge-company {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge-kind {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--on-navy-muted);
+  flex: 0 0 auto;
 }
 
 .badge-body {
   display: flex;
-  gap: 16px;
+  gap: var(--sp-3);
   align-items: center;
-  padding: 12px 16px 14px;
+  padding: var(--sp-3) var(--sp-4);
+  min-height: 92px;
 }
 
 .badge-photo {
-  width: 76px;
-  height: 92px;
+  width: 56px;
+  height: 68px;
   flex: 0 0 auto;
-  border-radius: var(--r-md);
+  border-radius: var(--r-sm);
   background: var(--navy-soft);
+  color: var(--navy);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -525,8 +538,8 @@ button.card {
 }
 
 .badge-name {
-  font-size: var(--fs-xl);
-  line-height: 1.15;
+  font-size: var(--fs-lg);
+  line-height: 1.2;
   font-weight: 700;
 }
 
@@ -537,32 +550,57 @@ button.card {
   background: var(--navy);
   border-radius: var(--r-sm);
   padding: 2px 7px;
-  vertical-align: middle;
 }
 
 .badge-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
 }
 
 .badge-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 4px;
+  gap: var(--sp-1);
+  margin-top: var(--sp-1);
 }
 
-.badge-foot {
-  display: flex;
+.badge-details {
   justify-content: space-between;
-  align-items: center;
-  padding: 8px 16px 12px;
-  border-top: 1px dashed var(--line);
-  color: var(--muted);
-  font-size: var(--fs-xs);
-  letter-spacing: 0.06em;
+  align-items: stretch;
+}
+
+.badge-detail-grid {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-content: center;
+  gap: 2px var(--sp-3);
+}
+
+.badge-code {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--sp-1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .badge .badge-body {
+    animation: badgeFlip 0.2s ease-out;
+  }
+}
+
+@keyframes badgeFlip {
+  from {
+    opacity: 0;
+    transform: rotateX(25deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ── 게이지 ── */
@@ -1030,7 +1068,6 @@ button.card {
   padding: 10px 12px;
   font-size: var(--fs-sm);
   line-height: 1.55;
-  box-shadow: 0 1px 0 var(--line-2);
 }
 
 /* 메신저 대화 */
@@ -1103,15 +1140,25 @@ button.card {
 .bubble-row-self {
   justify-content: flex-end;
 }
+/* S15 내 말풍선은 브랜드 남색 */
 .bubble-self {
-  background: #ffe36e;
-  color: var(--ink);
+  background: var(--navy);
+  color: var(--on-navy);
   border-radius: var(--r-md) var(--r-sm) var(--r-md) var(--r-md);
 }
 .read-mark {
   font-size: var(--fs-xs);
-  font-weight: 700;
-  color: #c9a400;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* 이어서 말하기: 아바타 자리는 비우고 간격을 좁힌다 */
+.bubble-continued {
+  margin-top: calc(var(--sp-2) * -1 + 2px);
+}
+
+.bubble-continued .avatar {
+  visibility: hidden;
 }
 .typing {
   display: inline-flex;
@@ -1149,12 +1196,12 @@ button.card {
     opacity: 0.6;
   }
 }
+/* S15 보낼 답장 미리보기: 노란 상자 대신 왼쪽 선 인용 */
 .choice-reply {
   font-size: var(--fs-sm);
-  color: var(--ink-2);
-  background: color-mix(in srgb, #ffe36e 28%, transparent);
-  border-radius: var(--r-sm);
-  padding: 6px 8px;
+  color: var(--muted);
+  border-left: 2px solid var(--line-2);
+  padding: 0 0 0 10px;
   text-align: left;
 }
 .story-outcome {
@@ -1299,14 +1346,41 @@ button.card {
   flex-shrink: 0;
 }
 
+/* S15 선택지: 리스트 행 + 오른쪽 화살표 */
 .choice {
-  min-height: 64px;
-  border: 1.5px solid var(--line-2);
+  position: relative;
+  min-height: 56px;
+  padding-right: 36px;
+  border: 1px solid var(--line-2);
   cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.choice::after {
+  content: '›';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--fs-xl);
+  line-height: 1;
+  color: var(--muted);
 }
 
 .choice:not(:disabled):hover {
   border-color: var(--navy);
+  background: var(--navy-soft);
+}
+
+.choice:not(:disabled):active {
+  transform: scale(0.99);
+}
+
+.choice-meta .chip {
+  border-color: transparent;
+  background: var(--paper);
 }
 
 .choice-label {
@@ -1509,6 +1583,30 @@ button.card {
   position: absolute;
   right: 16px;
   top: 56px;
+}
+
+.review-title {
+  align-items: center;
+}
+
+/* S15 서류 행: 숫자는 오른쪽 정렬 같은 폭, 행 사이 옅은 선 */
+.sheet-row {
+  align-items: baseline;
+}
+
+.sheet-row > .num:last-child,
+.sheet-row > strong:last-child {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.review-item {
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.review-item:last-of-type {
+  border-bottom: 0;
 }
 
 .deltas {
