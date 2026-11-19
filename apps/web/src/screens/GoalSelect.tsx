@@ -38,9 +38,7 @@ export function GoalSelect({ view, busy, onConfirm }: Props) {
               </span>
               <span className="goal-title">{g.title}</span>
               {g.fitting && <span className="chip chip-trait">내 배경과 어울림</span>}
-              <span className="small" style={{ color: 'var(--ink-2)' }}>
-                {g.description}
-              </span>
+              <span className="small ink-2">{g.description}</span>
             </button>
           );
         })}

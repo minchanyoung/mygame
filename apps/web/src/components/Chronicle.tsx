@@ -34,9 +34,7 @@ export function TitleCard({ titles }: { titles: { main: PublicTitle; subs: Publi
           <span className={`chip chip-pill rarity rarity-${main.rarity}`}>{RARITY_LABEL[main.rarity]}</span>
         </div>
       </div>
-      <p className="small" style={{ lineHeight: 1.7 }}>
-        {main.reason}
-      </p>
+      <p className="small lh-loose">{main.reason}</p>
       {subs.length > 0 && (
         <ul className="title-subs">
           {subs.map((t) => (

@@ -53,7 +53,7 @@ export function EndingScreen({ view, onNewGame, onHome, onCollection }: Props) {
             별명 · <span aria-hidden="true">{e.titles.main.emoji}</span> {e.titles.main.name}
           </span>
         )}
-        <p style={{ lineHeight: 1.7 }}>{e.text}</p>
+        <p className="lh-loose">{e.text}</p>
         <p className="small muted">
           {view.profile.displayName} · {e.age}세 · 사회생활 {years}년 {months}개월
         </p>
@@ -145,9 +145,7 @@ export function EndingScreen({ view, onNewGame, onHome, onCollection }: Props) {
             <strong>노후 · {e.retirement.title}</strong>
             <span className="tiny muted">은퇴 시 순자산 기준</span>
           </div>
-          <p className="small" style={{ lineHeight: 1.7 }}>
-            {e.retirement.text}
-          </p>
+          <p className="small lh-loose">{e.retirement.text}</p>
         </div>
       )}
 
@@ -161,9 +159,7 @@ export function EndingScreen({ view, onNewGame, onHome, onCollection }: Props) {
               {e.goal.achieved ? '달성' : '미달'}
             </span>
           </div>
-          <p className="small" style={{ lineHeight: 1.7 }}>
-            {e.goal.text}
-          </p>
+          <p className="small lh-loose">{e.goal.text}</p>
           {fail && <span className="tiny muted">50세 전에 회사를 떠나 목표 판정 대상이 아니었습니다.</span>}
         </div>
       )}

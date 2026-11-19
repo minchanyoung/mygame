@@ -20,11 +20,11 @@ export function Start({ canResume, busy, onNew, onResume, onCollection }: Props)
           랜덤한 출신, 랜덤한 상사, 그리고 한 달에 한 번의 선택. 50세 전에 회사를 떠나면 끝입니다.
         </p>
       </div>
-      <div className="sheet" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div className="sheet row gap-4">
         <span className="stamp stamp-mid" aria-hidden="true">
           입사
         </span>
-        <p className="small" style={{ color: 'var(--ink-2)' }}>
+        <p className="small ink-2">
           사원증을 받고, 사내 메신저로 오는 사건에 답하고, 매달 급여명세서를 받으세요.
         </p>
       </div>
@@ -34,9 +34,7 @@ export function Start({ canResume, busy, onNew, onResume, onCollection }: Props)
         </span>
         <span>
           <strong>도감 · 업적</strong>
-          <span className="small muted" style={{ display: 'block' }}>
-            지난 인생들에서 모은 별명·엔딩·회사·연재 결말
-          </span>
+          <span className="small muted block">지난 인생들에서 모은 별명·엔딩·회사·연재 결말</span>
         </span>
       </button>
       <div className="action-bar">

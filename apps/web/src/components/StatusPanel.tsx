@@ -20,7 +20,7 @@ export function EmployeeBadge({ view }: { view: PublicRunView }) {
         <span className="badge-hole" />
       </div>
       <div className="badge-body">
-        <div className="badge-photo" style={{ color: 'var(--navy)' }}>
+        <div className="badge-photo navy">
           <Silhouette />
         </div>
         <div className="badge-info">
@@ -28,7 +28,7 @@ export function EmployeeBadge({ view }: { view: PublicRunView }) {
             <span className="badge-name">{view.profile.displayName}</span>{' '}
             {e.rankLabel && <span className="badge-rank">{e.rankLabel}</span>}
           </div>
-          <span className="small" style={{ fontWeight: 500, color: 'var(--ink-2)' }}>
+          <span className="small fw-5 ink-2">
             {e.companyName ?? '무소속'}
             {e.jobLabel && ` · ${e.jobLabel}팀`}
           </span>
@@ -59,7 +59,7 @@ export function EmployeeBadge({ view }: { view: PublicRunView }) {
         </div>
       </div>
       <div className="badge-foot">
-        <span style={{ color: 'var(--ink)' }}>
+        <span className="ink">
           <Barcode seed={view.runId} />
         </span>
         <span>NO. {view.runId.slice(0, 8).toUpperCase()}</span>
@@ -75,7 +75,7 @@ export function CareerCard({ view, compact = false }: { view: PublicRunView; com
   if (!p && !g) return null;
   const pct = (cur: number, max: number) => (max > 0 ? Math.min(100, Math.round((cur / max) * 100)) : 100);
   return (
-    <div className="card career" style={{ gap: 10 }}>
+    <div className="card career gap-3">
       {p && (
         <div className="career-row">
           <div className="career-head">
@@ -163,15 +163,13 @@ export function Gauges({ view, onOpen }: { view: PublicRunView; onOpen?: (k: Res
             aria-label={`${RESOURCE_LABELS[k]} ${v}${onOpen ? ' — 최근 증감 내역 보기' : ''}`}
           >
             <div className="gauge-head">
-              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span className="row gap-2">
                 <IconBadge
                   name={STAT_STYLE[k].icon}
                   color={danger ? 'var(--stamp)' : STAT_STYLE[k].color}
                   size={30}
                 />
-                <span className="small" style={{ fontWeight: 700 }}>
-                  {RESOURCE_LABELS[k]}
-                </span>
+                <span className="small fw-7">{RESOURCE_LABELS[k]}</span>
               </span>
               <span className="gauge-value">{v}</span>
             </div>
@@ -276,7 +274,7 @@ export function TrailSheet({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="bottom-sheet-head">
-          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span className="row gap-2">
             <IconBadge name={STAT_STYLE[resource].icon} color={STAT_STYLE[resource].color} size={28} />
             <strong id="trail-title">
               {RESOURCE_LABELS[resource]} {view.resources[resource]}
@@ -371,11 +369,9 @@ export function YearCalendar({ view }: { view: PublicRunView }) {
   const c = view.calendar;
   const scheduled = c.months.filter((m) => m.scheduled).map((m) => `${m.month}월`);
   return (
-    <div className="card" style={{ gap: 8, padding: '10px 12px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-        <span className="tiny" style={{ fontWeight: 700, color: 'var(--ink-2)' }}>
-          올해 ({c.age}세)
-        </span>
+    <div className="card gap-2 pad-tight">
+      <div className="row-between gap-2">
+        <span className="tiny fw-7 ink-2">올해 ({c.age}세)</span>
         <span className="tiny muted">
           12월 연말 평가{scheduled.length > 0 && ` · ${scheduled.join(', ')} 예정된 일`}
         </span>

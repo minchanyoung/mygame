@@ -17,18 +17,18 @@ export function StoryOutcome({ story }: { story: PublicStory }) {
   const verdict = verdictOf(story);
   return (
     <div className="story-outcome float-up">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div className="row gap-3">
         <span className={`stamp stamp-small ${verdict === '확정' ? 'stamp-navy' : ''}`} aria-hidden="true">
           {verdict}
         </span>
-        <p className="story-result" style={{ margin: 0 }}>
+        <p className="story-result m-0">
           {story.resultText || `${story.verdictLabel} — ${story.choiceLabel}`}
         </p>
       </div>
       {story.factors.length > 0 && (
         <ul className="fx-list" aria-label="판정에 작용한 요인">
           {story.factors.map((f) => (
-            <li key={f.label} className="factor" style={{ flexDirection: 'row' }}>
+            <li key={f.label} className="factor flex-row">
               <span style={{ color: f.positive ? 'var(--good)' : 'var(--danger)' }}>
                 <Icon name={f.positive ? 'thumbUp' : 'thumbDown'} size={14} />
               </span>
@@ -57,7 +57,7 @@ export function StoryOutcome({ story }: { story: PublicStory }) {
         </span>
       ))}
       {story.followUpHint && (
-        <p className="small" style={{ color: 'var(--ink-2)', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <p className="small row gap-2 ink-2">
           <Icon name="warning" size={14} /> {story.followUpHint}
         </p>
       )}
@@ -88,7 +88,7 @@ export function StoryResult({ story, meName, nextLabel, onContinue }: Props) {
           <span className="avatar" aria-hidden="true">
             <Icon name="company" />
           </span>
-          <div style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0 }}>
+          <div className="col grow">
             <strong className="msg-channel">{story.channelName}</strong>
             <span className="msg-sub">{story.title}</span>
           </div>

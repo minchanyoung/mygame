@@ -20,9 +20,7 @@ const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0');
 function ReputationSources({ sources }: { sources: PublicReview['reputationSources'] }) {
   return (
     <div className="rep-sources">
-      <span className="tiny" style={{ fontWeight: 700 }}>
-        올해 평판이 움직인 곳
-      </span>
+      <span className="tiny fw-7">올해 평판이 움직인 곳</span>
       <ul>
         {sources.map((s) => (
           <li key={s.label} className="small">
@@ -70,7 +68,7 @@ function ReviewSheet({ review, age }: { review: PublicReview; age: number }) {
           </div>
         )}
       </div>
-      <div className="bubble-row" style={{ marginTop: 8 }}>
+      <div className="bubble-row mt-2">
         <span className="avatar avatar-small" aria-hidden="true">
           {(review.bossName ?? '팀').slice(0, 1)}
         </span>
@@ -79,7 +77,7 @@ function ReviewSheet({ review, age }: { review: PublicReview; age: number }) {
           <p className="bubble">{review.comment}</p>
         </div>
       </div>
-      <div className="sheet-rows" style={{ marginTop: 8 }}>
+      <div className="sheet-rows mt-2">
         <div className="sheet-row">
           <span>최종 등급</span>
           <span className={`grade review-${review.grade}`}>{review.grade}</span>
@@ -97,7 +95,7 @@ function ReviewSheet({ review, age }: { review: PublicReview; age: number }) {
         <span className="tiny muted">등급은 다음 1월 연봉 조정에 반영됩니다.</span>
       </div>
       {review.warning && (
-        <div className="banner banner-error" role="alert" style={{ marginTop: 8 }}>
+        <div className="banner banner-error mt-2" role="alert">
           <Icon name="warning" />
           <div>
             <strong>성과 개선 대상자 지정</strong>
@@ -128,7 +126,7 @@ export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
 
       {m && m.events.length > 0 && (
         <article className="card story" aria-label="이달의 이야기">
-          <span className="story-label" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span className="story-label row gap-1">
             <Icon name="story" size={14} /> 이달의 이야기
           </span>
           {m.events.map((ev) => (
@@ -140,17 +138,15 @@ export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
                 >
                   {verdictOf(ev)}
                 </span>
-                <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                  <span className="tiny muted" style={{ fontWeight: 700 }}>
+                <span className="col">
+                  <span className="tiny muted fw-7">
                     {ev.slot === 'work' ? '업무' : '일상'} · {ev.channelName}
                   </span>
                   <strong>{ev.title}</strong>
                   <span className="small muted">→ {ev.choiceLabel}</span>
                 </span>
               </summary>
-              <p className="small" style={{ color: 'var(--ink-2)' }}>
-                {ev.situation}
-              </p>
+              <p className="small ink-2">{ev.situation}</p>
               <StoryOutcome story={ev} />
             </details>
           ))}
@@ -369,8 +365,8 @@ export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
       )}
 
       {m && (
-        <div className="card ledger" style={{ gap: 6 }}>
-          <strong className="small" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div className="card ledger gap-2">
+          <strong className="small row gap-2">
             <Icon name="cash" size={16} /> 이달의 가계부
           </strong>
           {m.livingBreakdown.map((l) => (
@@ -391,7 +387,7 @@ export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
               <span className="num">−{won(m.debtRepayment)}</span>
             </div>
           )}
-          <div className="sheet-row small" style={{ borderTop: '1px dashed var(--line)', paddingTop: 6 }}>
+          <div className="sheet-row small divider-top">
             <strong>통장 변화 (사건 지출 포함)</strong>
             <strong className="num">
               <span className={m.cashDelta >= 0 ? 'pos' : 'neg'}>현금 {signedWon(m.cashDelta)}</span>
@@ -431,9 +427,7 @@ export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
       )}
 
       {!ending && <Warnings view={view} />}
-      <p className="tiny muted" style={{ textAlign: 'center' }}>
-        ※ 세율·생활비·이자는 게임용 가상 수치입니다.
-      </p>
+      <p className="tiny muted text-center">※ 세율·생활비·이자는 게임용 가상 수치입니다.</p>
 
       <div className="action-bar">
         <button type="button" className="btn btn-primary" onClick={onNext} disabled={busy}>

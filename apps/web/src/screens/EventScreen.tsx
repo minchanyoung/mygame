@@ -90,9 +90,7 @@ export function EventScreen({ view, busy, onChoose }: Props) {
 
   const choices = (
     <div className="reply-panel">
-      <span className="tiny" style={{ fontWeight: 700, color: 'var(--ink-2)' }}>
-        {isLife ? '어떻게 할까요?' : '답장하기'}
-      </span>
+      <span className="tiny fw-7 ink-2">{isLife ? '어떻게 할까요?' : '답장하기'}</span>
       {event.choices.map((c) => {
         const isArmed = armed === c.id;
         return (
@@ -146,7 +144,7 @@ export function EventScreen({ view, busy, onChoose }: Props) {
           </button>
         );
       })}
-      <span className="tiny muted" style={{ textAlign: 'center' }}>
+      <span className="tiny muted text-center">
         정확한 확률은 공개되지 않아요.
         {!isLife &&
           ' 위험을 감수한 업무에서 성공할수록 연말 평가의 ‘업무 성과’가 올라가요. 확정 선택만 하면 성과는 보통(50점)에 머뭅니다.'}
@@ -168,9 +166,7 @@ export function EventScreen({ view, busy, onChoose }: Props) {
             <Icon name="story" size={14} /> 오늘의 일상
             {event.series && ` · 연재 ${event.series.title} ${event.series.episode}/${event.series.total}화`}
           </span>
-          <h2 className="event-title" style={{ alignSelf: 'flex-start', textAlign: 'left' }}>
-            {event.title}
-          </h2>
+          <h2 className="event-title self-start text-left">{event.title}</h2>
           <p className="life-text">{event.description}</p>
         </div>
         <Warnings view={view} />
@@ -189,7 +185,7 @@ export function EventScreen({ view, busy, onChoose }: Props) {
         <span className="avatar" aria-hidden="true">
           {p ? p.name.slice(0, 1) : <Icon name="company" />}
         </span>
-        <div style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minWidth: 0 }}>
+        <div className="col grow">
           <strong className="msg-channel">{event.channelName}</strong>
           <span className="msg-sub">
             {p
