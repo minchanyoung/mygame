@@ -3852,7 +3852,7 @@
           {
             "type": "RESOURCE_DELTA",
             "key": "reputation",
-            "amount": -12
+            "amount": -6
           }
         ],
         "reply": "…솔직히 말씀드리면, 과장된 부분이 있었습니다.",

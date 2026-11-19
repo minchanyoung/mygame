@@ -105,10 +105,13 @@ describe('S5 승진 심사', () => {
     expect(state.npcs.find((n) => n.npcId === boss.npcId)!.favor).toBe(Math.max(0, boss.favor - 8));
     expect(state.employment.current).toMatchObject({ rank: 'STAFF', promotionPoints: 6, promotionMisses: 1 });
     expect(state.scheduledEvents).toHaveLength(0);
-    // 누락 1회당 +10%p (상한 안쪽에서)
+    // 누락 1회당 missBonus(S13: +3%p)만큼 (상한 안쪽에서)
     const again = { ...state, resources: s.resources };
     expect(promotionChance(again, content)!).toBeCloseTo(
-      Math.min(content.pack.rules.chanceMax, promotionChance(s, content)! + 0.1),
+      Math.min(
+        content.pack.rules.chanceMax,
+        promotionChance(s, content)! + content.pack.rules.promotion.missBonus,
+      ),
       5,
     );
   });

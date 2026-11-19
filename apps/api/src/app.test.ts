@@ -491,8 +491,8 @@ describe('playtest tools over HTTP', () => {
     );
 
     const debug = (await app.inject({ url: `/api/playtest/runs/${body.runId}/debug`, headers })).json();
-    // 기본 40% ± 배경 특성 보정(천재형 +10, 압박에 약함 −10) + 보통 난이도 보정(−3)
-    expect([27, 37, 47]).toContain(
+    // 기본 40% ± 배경 특성 보정(천재형 +10, 압박에 약함 −10) + 보통 난이도 보정(−4)
+    expect([26, 36, 46]).toContain(
       debug.activeEventChoices.find((c: { id: string }) => c.id === 'first_response').exactChancePercent,
     );
   });

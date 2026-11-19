@@ -236,9 +236,9 @@
         "from": "DEPUTY_HEAD",
         "to": "DEPARTMENT_HEAD",
         "minYears": 6,
-        "points": 22,
+        "points": 8,
         "raisePermille": 150,
-        "chanceAdjust": -0.35
+        "chanceAdjust": -0.8
       }
     ],
     "pointsByGrade": {
@@ -250,7 +250,7 @@
     },
     "baseChance": 0.55,
     "perExtraPoint": 0.08,
-    "maxExtraBonus": 0.24,
+    "maxExtraBonus": 0.08,
     "policy": {
       "seniorityPerYear": 0.05,
       "performanceByGrade": {
@@ -273,7 +273,7 @@
       }
     },
     "blockedByFlag": "performance_warning",
-    "missBonus": 0.1,
+    "missBonus": 0.03,
     "missPenalty": {
       "mental": 8,
       "reputation": 5,
@@ -325,7 +325,7 @@
       "livingCostPermille": 950,
       "startCashBonus": 3000000
     },
-    "NORMAL": { "chanceShift": -0.03, "lossPermille": 1000, "livingCostPermille": 1000, "startCashBonus": 0 },
+    "NORMAL": { "chanceShift": -0.04, "lossPermille": 1000, "livingCostPermille": 1000, "startCashBonus": 0 },
     "REAL": { "chanceShift": -0.05, "lossPermille": 1100, "livingCostPermille": 1100, "startCashBonus": 0 }
   },
   "retirement": {

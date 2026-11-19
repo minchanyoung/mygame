@@ -285,7 +285,7 @@ export const GameRulesSchema = z
                 points: z.number().int().min(1).max(50),
                 raisePermille: z.number().int().min(0).max(1000),
                 /** 이 단계의 심사 확률 보정 (위로 갈수록 자리가 적다) */
-                chanceAdjust: z.number().min(-0.5).max(0.5),
+                chanceAdjust: z.number().min(-0.9).max(0.5),
               })
               .strict(),
           )

@@ -22,8 +22,11 @@ import { toPublicActiveEvent } from './view';
  * - random: 고를 수 있는 선택지 중 무작위
  * - cautious: 확정 비용으로 실직하는 선택지를 피하고, 자원 변화 기댓값(성공·실패 확률 반영,
  *   위험 구간 자원 손실 가중)이 가장 큰 선택지. 사람보다 정보가 많다(정확한 확률을 안다)는 점에 유의.
+ *   승진 포인트·특성·관계는 0으로 보는 '근시안' 플레이어라 난이도 목표의 기준으로 쓴다.
+ * - expert (S13 노련 봇): cautious + 자원이 아닌 장기 보상(승진 포인트·특성·상사·동료 관계)도 따지고,
+ *   최대치를 넘어 버려질 회복은 계산하지 않는다. 사람이 잘 둘 때의 상한선.
  */
-export type AutoPlayPolicy = 'random' | 'cautious';
+export type AutoPlayPolicy = 'random' | 'cautious' | 'expert';
 
 export interface AutoPlayResult {
   seed: string;
@@ -80,9 +83,30 @@ function pickChoice(
   const safe = selectable.filter((c) => !fatal.has(c.choice.id));
   const pool = safe.length > 0 ? safe : selectable;
 
+  const expert = policy === 'expert';
   // 자원 변화의 기댓값. 위험 구간(30 이하) 자원의 손실은 3배로 무겁게 본다.
+  // 노련 봇은 최대치(100)를 넘어 버려질 증가분을 계산하지 않는다
   const weight = (key: keyof GameRunState['resources'], amount: number) =>
-    amount < 0 && state.resources[key] <= 30 ? amount * 3 : amount;
+    amount < 0
+      ? state.resources[key] <= 30
+        ? amount * 3
+        : amount
+      : expert
+        ? Math.min(amount, 100 - state.resources[key])
+        : amount;
+  /** 노련 봇만: 자원이 아닌 장기 보상의 점수 */
+  const longTerm = (e: Effect) =>
+    !expert
+      ? 0
+      : e.type === 'PROMOTION_POINT_DELTA'
+        ? e.amount * 6
+        : e.type === 'SKILL_SET_LEVEL'
+          ? 6
+          : e.type === 'NEGATIVE_TRAIT_SET_LEVEL'
+            ? (e.from - e.to) * 8
+            : e.type === 'NPC_RELATION_DELTA'
+              ? e.amount * (e.target === 'BOSS' ? 0.3 : 0.15)
+              : 0;
   // 실직은 게임오버이므로 어떤 자원 손실보다 무겁게 본다
   const JOB_LOSS_PENALTY = -600;
   // 돈: 월 실수령 한 달 치 = 자원 8점으로 환산. 빚이 있거나 현금이 바닥이면 지출을 2배로 무겁게
@@ -112,7 +136,7 @@ function pickChoice(
                     ? 25
                     : e.type === 'EXECUTIVE_PROMOTION'
                       ? 120
-                      : 0),
+                      : longTerm(e)),
       0,
     );
   const expected = (c: ChoiceEvaluation) => {
