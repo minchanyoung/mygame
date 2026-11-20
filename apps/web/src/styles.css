@@ -3305,36 +3305,6 @@ fieldset:disabled {
   color: var(--gold);
 }
 
-/* S24 고위험 선택: 길게 누르는 동안 아래에서 차오르는 띠 */
-.choice {
-  position: relative;
-  overflow: hidden;
-  -webkit-touch-callout: none;
-  user-select: none;
-}
-.hold-bar {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 4px;
-  width: 100%;
-  background: var(--stamp);
-  transform-origin: left;
-  animation: hold-fill 0.6s linear forwards;
-}
-@keyframes hold-fill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-.hold-hint {
-  color: var(--danger);
-  font-weight: 600;
-}
-
 /* D2 인맥 지도 */
 .relation-map svg {
   width: 100%;
