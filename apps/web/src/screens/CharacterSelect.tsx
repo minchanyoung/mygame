@@ -182,6 +182,25 @@ export function CharacterSelect({ view, busy, onConfirm }: Props) {
         </p>
       </div>
 
+      {view.legacy && (
+        <div className="card legacy-card" role="note">
+          <span className="legacy-emoji" aria-hidden="true">
+            {view.legacy.emoji}
+          </span>
+          <span className="col">
+            <strong className="small">선배의 유산 · {view.legacy.name}</strong>
+            <span className="tiny muted">
+              지난 인생({view.legacy.fromAge}세)의 노하우로 어떤 카드를 골라도 {view.legacy.perkLabel}
+            </span>
+          </span>
+        </div>
+      )}
+      {view.daily && (
+        <p className="tiny muted">
+          📅 오늘의 출근 — 오늘은 모두 이 세 장으로 시작해요. (선배의 유산은 적용되지 않아요)
+        </p>
+      )}
+
       <div className="spec-pager" role="tablist" aria-label="스펙 바로가기">
         {cards.map((card, i) => (
           <button

@@ -18,7 +18,8 @@ import type { ContentIndex } from './content-index';
 
 /** S10 도감: 한 판에서 발견한 것 → 플레이어 도감에 합치고 업적을 판정한다. 모두 순수 함수. */
 
-export type RunFinds = Record<CollectionKind, string[]>;
+/** 판 하나에서 찾은 것 (+ S22 엔딩 나이: 다음 판 유산 표시용) */
+export type RunFinds = Record<CollectionKind, string[]> & { age?: number };
 
 const NORMAL_TYPES: readonly EndingType[] = ['RETIREMENT', 'EXECUTIVE_PROMOTION', 'EARLY_RETIREMENT'];
 export const endingCategoryOf = (type: string): 'FAILURE' | 'NORMAL' =>
@@ -48,9 +49,11 @@ function seriesEndingDefs(content: ContentIndex) {
 export function collectRun(state: GameRunState, content: ContentIndex): RunFinds {
   const ending = state.ending;
   if (!ending) return { titles: [], endings: [], goals: [], companies: [], seriesEndings: [], traits: [] };
+  const age = ending.age;
   const finales = new Set(seriesEndingDefs(content).map((d) => d.key));
   const uniq = (xs: string[]) => [...new Set(xs)];
   return {
+    age,
     titles: uniq(ending.titles ?? []),
     endings: [ending.type],
     goals: ending.goal?.achieved ? [ending.goal.goalId] : [],
@@ -160,6 +163,9 @@ export function mergeRun(
     }
   }
   next.runsFinished += 1;
+  // S22 대표 별명(첫 번째)을 다음 판의 유산으로 기억한다
+  next.lastRun =
+    finds.titles[0] && finds.age !== undefined ? { titleId: finds.titles[0], age: finds.age } : null;
   next.runIds = [...next.runIds, runId].slice(-RUN_ID_LIMIT);
   const achievements = content.pack.achievements
     .filter((a) => !next.achievements[a.id] && matchesAchievement(a.rule, next, content))

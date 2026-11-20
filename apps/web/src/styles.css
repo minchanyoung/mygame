@@ -3258,3 +3258,15 @@ fieldset:disabled {
 .daily-me {
   background: var(--navy-soft);
 }
+
+/* S22 선배의 유산 */
+.legacy-card {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--sp-3);
+  border-left: 4px solid var(--gold);
+}
+.legacy-emoji {
+  font-size: 28px;
+  line-height: 1;
+}

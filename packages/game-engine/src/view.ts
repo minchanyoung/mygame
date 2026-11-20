@@ -58,6 +58,7 @@ import { requireFrom, type ContentIndex } from './content-index';
 import { applyEffects } from './effects';
 import { buildChronicle } from './chronicle';
 import { dailyScore } from './daily';
+import { legacyPerkLabel } from './legacy';
 import { SEASON_INFO, seasonProgress } from './season';
 import { echoSource } from './echo';
 import { buildEnding, debtLimit, detectJobLossCause } from './ending';
@@ -755,6 +756,13 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
     },
     difficulty: state.difficulty,
     daily: state.daily ?? null,
+    legacy: (() => {
+      const l = state.legacy;
+      const title = l ? content.pack.titles.find((t) => t.id === l.titleId) : undefined;
+      return l && title
+        ? { name: title.name, emoji: title.emoji, fromAge: l.fromAge, perkLabel: legacyPerkLabel(l) }
+        : null;
+    })(),
     difficultyLabel: DIFFICULTY_LABELS[state.difficulty],
     characterCards: state.characterCards.map((c) => toPublicCard(c, content)),
     selectedCardId: state.selectedCharacter?.cardId ?? null,

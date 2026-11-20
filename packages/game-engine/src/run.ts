@@ -1,3 +1,4 @@
+import { applyLegacy, legacyFrom, type LegacySource } from './legacy';
 import { ENGINE_VERSION, type Difficulty, type GameRunState, type PlayerProfile } from '@company-life/shared';
 import { generateCharacterCards } from './characters';
 import type { ContentIndex } from './content-index';
@@ -20,6 +21,8 @@ export interface CreateRunInput {
   playerId?: string | null;
   /** S21 오늘의 출근 날짜 (시드는 호출하는 쪽이 같은 날 같은 값으로 준다) */
   daily?: string | null;
+  /** S22 지난 판 대표 별명 (오늘의 출근에는 붙지 않는다) */
+  legacy?: LegacySource | null;
 }
 
 /**
@@ -95,6 +98,7 @@ export function createRun(input: CreateRunInput, content: ContentIndex): GameRun
     difficulty,
     playerId: input.playerId ?? null,
     daily: input.daily ?? null,
+    legacy: input.daily ? null : legacyFrom(input.legacy, content),
     playtestModified: false,
     createdAt: input.now,
     finishedAt: null,
@@ -128,10 +132,11 @@ export function chooseCharacter(state: GameRunState, cardId: string, content: Co
       { turnIndex: state.turnIndex, kind: 'CHARACTER_SELECTED', summary: '캐릭터 확정', data: { cardId } },
     ],
   };
+  const withLegacy = applyLegacy(selected);
   return {
-    ...selected,
-    lifeGoalOffers: offerLifeGoals(selected, content),
-    jobOffers: generateJobOffers(selected, content),
+    ...withLegacy,
+    lifeGoalOffers: offerLifeGoals(withLegacy, content),
+    jobOffers: generateJobOffers(withLegacy, content),
   };
 }
 

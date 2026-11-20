@@ -487,6 +487,8 @@ export interface PublicRunView {
   difficultyLabel: string;
   /** S21 오늘의 출근 날짜 (일반 판은 null) */
   daily: string | null;
+  /** S22 선배의 유산 (지난 판 대표 별명의 출발 보너스) */
+  legacy: { name: string; emoji: string; fromAge: number; perkLabel: string } | null;
   characterCards: PublicCharacterCard[];
   selectedCardId: string | null;
   jobOffers: PublicJobOffer[];

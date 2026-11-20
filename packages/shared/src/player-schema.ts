@@ -57,6 +57,8 @@ export const PlayerCollectionSchema = z
     runIds: z.array(z.string()),
     /** 최근 판의 새 발견 (엔딩 화면이 가져간다, 최대 10개) */
     recent: z.array(RunDiscoverySchema),
+    /** S22 마지막으로 끝낸 판의 대표 별명 (다음 판의 '선배의 유산') */
+    lastRun: z.object({ titleId: z.string(), age: z.number().int() }).strict().nullable().optional(),
   })
   .strict();
 export type PlayerCollection = z.infer<typeof PlayerCollectionSchema>;

@@ -200,6 +200,18 @@ export const SeasonStateSchema = z
   .strict();
 export type SeasonState = z.infer<typeof SeasonStateSchema>;
 
+/** S22 선배의 유산: 지난 판 대표 별명으로 받는 출발 보너스 */
+export const LegacyStateSchema = z
+  .object({
+    titleId: ContentIdSchema,
+    fromAge: z.number().int(),
+    cash: z.number().int().min(0),
+    reputation: z.number().int().min(0),
+    mental: z.number().int().min(0),
+  })
+  .strict();
+export type LegacyState = z.infer<typeof LegacyStateSchema>;
+
 export const SeasonRecordSchema = z
   .object({
     kind: SeasonKindSchema,
@@ -618,6 +630,8 @@ export const GameRunStateSchema = z
     difficulty: DifficultySchema,
     /** S10 도감을 쌓는 플레이어 (없으면 기록하지 않음) */
     playerId: z.string().nullable(),
+    /** S22 선배의 유산 (없으면 없음) */
+    legacy: LegacyStateSchema.nullable().optional(),
     /** S21 오늘의 출근 날짜 (YYYY-MM-DD, 한국 시간). 일반 판은 없음 */
     daily: z
       .string()

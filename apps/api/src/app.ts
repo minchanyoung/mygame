@@ -362,6 +362,8 @@ export function buildApp(options: AppOptions): FastifyInstance {
         difficulty: difficulty.data,
         playerId: player.playerId,
         daily: isDaily ? today : null,
+        // S22 지난 판 대표 별명 → 출발 보너스 (오늘의 출근에는 엔진이 붙이지 않는다)
+        legacy: player.collection.lastRun ?? null,
       },
       latestContent,
     );

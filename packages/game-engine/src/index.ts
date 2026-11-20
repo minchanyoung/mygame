@@ -28,3 +28,4 @@ export * from './playtest';
 export * from './view';
 export * from './background-effects';
 export * from './daily';
+export * from './legacy';
