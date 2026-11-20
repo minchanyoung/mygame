@@ -56,6 +56,22 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, max
   return lines;
 }
 
+/** 띄어쓰기에서 두 줄로 (한 단어가 너무 길면 글자 단위로) */
+function wrapWords(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const words = text.split(' ');
+  let best: string[] | null = null;
+  for (let i = 1; i < words.length; i++) {
+    const a = words.slice(0, i).join(' ');
+    const b = words.slice(i).join(' ');
+    if (ctx.measureText(a).width <= maxWidth && ctx.measureText(b).width <= maxWidth) {
+      const diff = Math.abs(ctx.measureText(a).width - ctx.measureText(b).width);
+      if (!best || diff < Math.abs(ctx.measureText(best[0]!).width - ctx.measureText(best[1]!).width))
+        best = [a, b];
+    }
+  }
+  return best ?? wrap(ctx, text, maxWidth, 2);
+}
+
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, r);
@@ -109,10 +125,17 @@ export async function drawShareImage(view: PublicRunView): Promise<Blob> {
 
   // 엔딩 제목
   ctx.fillStyle = C.ink;
-  ctx.font = `88px ${DISPLAY}`;
-  const titleLines = wrap(ctx, e.title, CW - 40, 2);
-  titleLines.forEach((l, i) => ctx.fillText(l, W / 2, 470 + i * 104));
-  let y = 470 + (titleLines.length - 1) * 104;
+  // 도장(오른쪽 위)과 겹치지 않게 가운데 폭만 쓴다. 길면 글자를 줄이고, 그래도 넘치면 띄어쓰기에서 두 줄
+  const titleWidth = CW - 320;
+  const size = [88, 76, 64].find((px) => {
+    ctx.font = `${px}px ${DISPLAY}`;
+    return ctx.measureText(e.title).width <= titleWidth;
+  });
+  ctx.font = `${size ?? 64}px ${DISPLAY}`;
+  const titleLines = size ? [e.title] : wrapWords(ctx, e.title, titleWidth);
+  const lineH = Math.round((size ?? 64) * 1.18);
+  titleLines.forEach((l, i) => ctx.fillText(l, W / 2, 470 + i * lineH));
+  let y = 470 + (titleLines.length - 1) * lineH;
 
   // 이름 · 나이
   const years = Math.floor(view.turn.turnIndex / 12);
@@ -120,6 +143,18 @@ export async function drawShareImage(view: PublicRunView): Promise<Blob> {
   ctx.fillStyle = C.muted;
   ctx.fillText(`${view.profile.displayName} · ${e.age}세 · 사회생활 ${years}년`, W / 2, y + 80);
   y += 80;
+  // S21 오늘의 출근이면 날짜와 점수
+  if (view.daily && e.dailyScore) {
+    const [, m, d] = view.daily.split('-');
+    ctx.fillStyle = C.navy;
+    ctx.font = `800 34px ${BODY}`;
+    ctx.fillText(
+      `📅 ${Number(m)}월 ${Number(d)}일 오늘의 출근 · ${e.dailyScore.total.toLocaleString('ko-KR')}점`,
+      W / 2,
+      y + 56,
+    );
+    y += 56;
+  }
 
   // 도장
   ctx.save();

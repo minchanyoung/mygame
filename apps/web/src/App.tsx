@@ -136,11 +136,12 @@ export function App() {
     displayName: string,
     gender: Parameters<typeof api.createRun>[1],
     difficulty: Parameters<typeof api.createRun>[2],
+    daily: boolean,
   ) => {
     setBusy(true);
     setError(null);
     try {
-      const res = await api.createRun(displayName, gender, difficulty);
+      const res = await api.createRun(displayName, gender, difficulty, daily);
       const session = { runId: res.runId, guestToken: res.guestToken };
       saveSession(session);
       setSavedSession(session);

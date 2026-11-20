@@ -229,3 +229,80 @@ export class FilePlayerStore implements PlayerStore {
     });
   }
 }
+
+// ───────── S21 오늘의 출근 순위 ─────────
+
+export interface DailyRecord {
+  playerId: string;
+  name: string;
+  score: number;
+  endingTitle: string;
+  age: number;
+  rankLabel: string | null;
+  runId: string;
+  at: string;
+}
+
+/** 날짜별 순위 기록. 플레이어당 하루 첫 판만 남긴다 (같은 플레이어의 두 번째 판은 무시) */
+export interface DailyStore {
+  /** 새로 남겼으면 true, 그날 이미 기록이 있으면 false */
+  record(date: string, entry: DailyRecord): Promise<boolean>;
+  list(date: string): Promise<DailyRecord[]>;
+}
+
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+export class MemoryDailyStore implements DailyStore {
+  #days = new Map<string, DailyRecord[]>();
+  #mutex = new KeyedMutex();
+
+  record(date: string, entry: DailyRecord): Promise<boolean> {
+    return this.#mutex.run(date, async () => {
+      const day = this.#days.get(date) ?? [];
+      if (day.some((d) => d.playerId === entry.playerId)) return false;
+      this.#days.set(date, [...day, entry]);
+      return true;
+    });
+  }
+
+  async list(date: string): Promise<DailyRecord[]> {
+    return [...(this.#days.get(date) ?? [])];
+  }
+}
+
+/** 로컬 개발용: 날짜마다 JSON 파일 하나 */
+export class FileDailyStore implements DailyStore {
+  #dir: string;
+  #mutex = new KeyedMutex();
+
+  constructor(dir: string) {
+    this.#dir = dir;
+  }
+
+  #file(date: string): string {
+    if (!DATE_PATTERN.test(date)) throw new NotFoundError(date);
+    return path.join(this.#dir, `${date}.json`);
+  }
+
+  async list(date: string): Promise<DailyRecord[]> {
+    try {
+      return JSON.parse(await readFile(this.#file(date), 'utf8')) as DailyRecord[];
+    } catch (err) {
+      if (err instanceof NotFoundError || (err as NodeJS.ErrnoException).code === 'ENOENT') return [];
+      throw err;
+    }
+  }
+
+  record(date: string, entry: DailyRecord): Promise<boolean> {
+    return this.#mutex.run(date, async () => {
+      const day = await this.list(date);
+      if (day.some((d) => d.playerId === entry.playerId)) return false;
+      await mkdir(this.#dir, { recursive: true });
+      const file = this.#file(date);
+      const tmp = `${file}.${process.pid}.tmp`;
+      await writeFile(tmp, JSON.stringify([...day, entry]), 'utf8');
+      await rename(tmp, file);
+      return true;
+    });
+  }
+}

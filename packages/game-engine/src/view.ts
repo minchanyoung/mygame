@@ -57,6 +57,7 @@ import { matchesConditions } from './conditions';
 import { requireFrom, type ContentIndex } from './content-index';
 import { applyEffects } from './effects';
 import { buildChronicle } from './chronicle';
+import { dailyScore } from './daily';
 import { SEASON_INFO, seasonProgress } from './season';
 import { echoSource } from './echo';
 import { buildEnding, debtLimit, detectJobLossCause } from './ending';
@@ -262,6 +263,7 @@ function toPublicEnding(
     // 별명·연대기는 확정된 엔딩에서만 공개 (예고 단계에서 미리 보이지 않게)
     titles: final && main ? { main, subs } : null,
     chronicle: final ? buildChronicle(state, content) : null,
+    dailyScore: final && state.daily ? dailyScore(state, content) : null,
   };
 }
 
@@ -752,6 +754,7 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
       genderLabel: GENDER_LABELS[state.profile.gender],
     },
     difficulty: state.difficulty,
+    daily: state.daily ?? null,
     difficultyLabel: DIFFICULTY_LABELS[state.difficulty],
     characterCards: state.characterCards.map((c) => toPublicCard(c, content)),
     selectedCardId: state.selectedCharacter?.cardId ?? null,

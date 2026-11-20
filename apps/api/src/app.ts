@@ -2,6 +2,8 @@ import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypt
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import {
   ApplyJobRequestSchema,
+  RANK_LABELS,
+  type DailyBoard,
   PlaytestForceEventRequestSchema,
   PlaytestPatchRequestSchema,
   ChooseCharacterRequestSchema,
@@ -24,6 +26,9 @@ import {
 } from '@company-life/shared';
 import {
   applyForJob,
+  dailyDate,
+  dailyScore,
+  dailySeed,
   chooseCharacter,
   chooseGoal,
   acceptTransfer,
@@ -46,8 +51,11 @@ import {
   type ContentIndex,
 } from '@company-life/game-engine';
 import {
+  MemoryDailyStore,
   MemoryPlayerStore,
   NotFoundError,
+  type DailyRecord,
+  type DailyStore,
   type PlayerRecord,
   type PlayerStore,
   type RunRecord,
@@ -58,6 +66,8 @@ export interface AppOptions {
   store: RunStore;
   /** S10 플레이어(도감·업적) 저장소. 생략 시 메모리 */
   players?: PlayerStore;
+  /** S21 오늘의 출근 순위 저장소. 생략 시 메모리 */
+  daily?: DailyStore;
   /** 버전별 콘텐츠. 진행 중 run은 생성 시 고정된 버전으로만 처리한다 (§23.1). */
   contents: ContentPack[];
   logger?: boolean;
@@ -109,6 +119,7 @@ function engineErrorStatus(err: EngineError): number {
 export function buildApp(options: AppOptions): FastifyInstance {
   const { store } = options;
   const players = options.players ?? new MemoryPlayerStore();
+  const daily = options.daily ?? new MemoryDailyStore();
   const now = options.now ?? (() => new Date());
   const contents = new Map<string, ContentIndex>(
     options.contents.map((c) => [c.contentVersion, indexContent(c)]),
@@ -179,6 +190,23 @@ export function buildApp(options: AppOptions): FastifyInstance {
   /** S10 엔딩이 확정된 판을 플레이어 도감에 반영 (서버가 직접 판정, 조작된 판 제외, 중복 반영 없음) */
   const recordFinishedRun = async (state: GameRunState, content: ContentIndex, req: FastifyRequest) => {
     if (!state.playerId || state.playtestModified || !state.ending) return;
+    // S21 오늘의 출근: 그날 첫 판만 순위에 (실패해도 게임 진행은 막지 않는다)
+    const score = state.daily ? dailyScore(state, content) : null;
+    if (state.daily && score) {
+      const best = state.statistics.highestRank;
+      await daily
+        .record(state.daily, {
+          playerId: state.playerId,
+          name: state.profile.displayName,
+          score: score.total,
+          endingTitle: state.ending.title,
+          age: state.ending.age,
+          rankLabel: best ? RANK_LABELS[best] : null,
+          runId: state.runId,
+          at: now().toISOString(),
+        })
+        .catch((err) => req.log.error({ err, runId: state.runId }, 'daily record failed'));
+    }
     try {
       await players.update(state.playerId, (p) => ({
         ...p,
@@ -301,8 +329,13 @@ export function buildApp(options: AppOptions): FastifyInstance {
     const profile = validateProfileInput(req.body, latest.policy.bannedWords);
     if (!profile.ok) throw new ApiError(400, 'VALIDATION_FAILED', 'invalid profile', profile.issues);
     // S10 난이도 (생략 시 보통)
-    const rawDifficulty = (req.body as Record<string, unknown> | null)?.['difficulty'] ?? 'NORMAL';
+    // S21 오늘의 출근: 같은 날 같은 시드, 난이도는 보통 고정
+    const isDaily = (req.body as Record<string, unknown> | null)?.['daily'] === true;
+    const rawDifficulty = isDaily
+      ? 'NORMAL'
+      : ((req.body as Record<string, unknown> | null)?.['difficulty'] ?? 'NORMAL');
     const difficulty = DifficultySchema.safeParse(rawDifficulty);
+    const today = dailyDate(now());
     if (!difficulty.success) throw new ApiError(400, 'VALIDATION_FAILED', 'invalid difficulty');
     // S10 플레이어: 받은 토큰이 유효하면 이어서, 아니면 새로 만든다
     let player = await findPlayer(req);
@@ -323,11 +356,12 @@ export function buildApp(options: AppOptions): FastifyInstance {
       {
         runId: randomUUID(),
         guestOwnerId: `guest_${randomUUID()}`,
-        seed: randomBytes(16).toString('hex'),
+        seed: isDaily ? dailySeed(today) : randomBytes(16).toString('hex'),
         profile: profile.profile,
         now: now().toISOString(),
         difficulty: difficulty.data,
         playerId: player.playerId,
+        daily: isDaily ? today : null,
       },
       latestContent,
     );
@@ -344,6 +378,26 @@ export function buildApp(options: AppOptions): FastifyInstance {
   });
 
   app.get<{ Params: { id: string } }>('/api/runs/:id', async (req) => loadView(req));
+
+  // S21 오늘의 출근 순위 (?date= 생략 시 오늘). 내 기록은 플레이어 토큰으로 찾는다
+  app.get<{ Querystring: { date?: string } }>('/api/daily', async (req): Promise<DailyBoard> => {
+    const date = req.query.date ?? dailyDate(now());
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new ApiError(400, 'VALIDATION_FAILED', 'invalid date');
+    const ranked = (await daily.list(date))
+      .sort((a, b) => b.score - a.score || a.at.localeCompare(b.at))
+      .map((r, i) => ({ ...r, rank: i + 1 }));
+    const pub = ({ name, score, endingTitle, age, rankLabel, rank }: DailyRecord & { rank: number }) => ({
+      name,
+      score,
+      endingTitle,
+      age,
+      rankLabel,
+      rank,
+    });
+    const player = await findPlayer(req);
+    const mine = player ? ranked.find((r) => r.playerId === player.playerId) : undefined;
+    return { date, total: ranked.length, top: ranked.slice(0, 10).map(pub), mine: mine ? pub(mine) : null };
+  });
 
   // S10 도감·업적. 토큰이 없거나 맞지 않으면 빈 도감 (?run= 이 판의 새 발견 포함)
   app.get<{ Querystring: { run?: string } }>('/api/player', async (req): Promise<PublicCollection> => {

@@ -18,6 +18,8 @@ export interface CreateRunInput {
   difficulty?: Difficulty;
   /** S10 도감을 쌓을 플레이어 */
   playerId?: string | null;
+  /** S21 오늘의 출근 날짜 (시드는 호출하는 쪽이 같은 날 같은 값으로 준다) */
+  daily?: string | null;
 }
 
 /**
@@ -92,6 +94,7 @@ export function createRun(input: CreateRunInput, content: ContentIndex): GameRun
     ending: null,
     difficulty,
     playerId: input.playerId ?? null,
+    daily: input.daily ?? null,
     playtestModified: false,
     createdAt: input.now,
     finishedAt: null,

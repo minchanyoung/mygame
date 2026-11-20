@@ -3,6 +3,7 @@ import type { PublicCollection, PublicRunView } from '@company-life/shared';
 import { api, formatKrw } from '../api';
 import { Bonds, CareerBand, EraTimeline, LifeChart, TitleCard } from '../components/Chronicle';
 import { ShareCard } from '../components/ShareCard';
+import { DailyBoardCard } from '../components/DailyBoardCard';
 
 interface Props {
   view: PublicRunView;
@@ -64,6 +65,8 @@ export function EndingScreen({ view, onNewGame, onHome, onCollection }: Props) {
       </div>
 
       {e.titles && <TitleCard titles={e.titles} />}
+
+      {view.daily && e.dailyScore && <DailyBoardCard date={view.daily} score={e.dailyScore} />}
 
       {chronicle && <ShareCard view={view} />}
 

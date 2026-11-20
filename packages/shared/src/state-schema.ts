@@ -618,6 +618,12 @@ export const GameRunStateSchema = z
     difficulty: DifficultySchema,
     /** S10 도감을 쌓는 플레이어 (없으면 기록하지 않음) */
     playerId: z.string().nullable(),
+    /** S21 오늘의 출근 날짜 (YYYY-MM-DD, 한국 시간). 일반 판은 없음 */
+    daily: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .nullable()
+      .optional(),
     /** 플레이테스트 도구로 조작된 적이 있는 run (기록·랭킹 제외 대상) */
     playtestModified: z.boolean(),
     createdAt: z.string(),

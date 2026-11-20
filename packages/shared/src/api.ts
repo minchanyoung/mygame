@@ -212,6 +212,26 @@ export interface PublicEnding {
   titles: { main: PublicTitle; subs: PublicTitle[] } | null;
   /** S9 인생 연대기 (확정된 엔딩에만, 예고 단계에서는 null) */
   chronicle: PublicChronicle | null;
+  /** S21 오늘의 출근 점수 (확정된 엔딩·오늘의 출근 판에만) */
+  dailyScore: { total: number; parts: { label: string; points: number }[] } | null;
+}
+
+/** S21 오늘의 출근 순위표 한 줄 */
+export interface DailyEntry {
+  name: string;
+  score: number;
+  endingTitle: string;
+  age: number;
+  rankLabel: string | null;
+}
+
+export interface DailyBoard {
+  date: string;
+  /** 순위에 든 사람 수 */
+  total: number;
+  top: (DailyEntry & { rank: number })[];
+  /** 요청한 플레이어의 기록 (없으면 null) */
+  mine: (DailyEntry & { rank: number }) | null;
 }
 
 export interface PublicTitle {
@@ -465,6 +485,8 @@ export interface PublicRunView {
   /** S10 난이도 */
   difficulty: Difficulty;
   difficultyLabel: string;
+  /** S21 오늘의 출근 날짜 (일반 판은 null) */
+  daily: string | null;
   characterCards: PublicCharacterCard[];
   selectedCardId: string | null;
   jobOffers: PublicJobOffer[];

@@ -27,3 +27,4 @@ export * from './simulation';
 export * from './playtest';
 export * from './view';
 export * from './background-effects';
+export * from './daily';

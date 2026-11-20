@@ -19,7 +19,7 @@ const DIFFICULTY_HELP: Record<Difficulty, string> = {
 
 interface Props {
   busy: boolean;
-  onSubmit: (displayName: string, gender: Gender, difficulty: Difficulty) => void;
+  onSubmit: (displayName: string, gender: Gender, difficulty: Difficulty, daily: boolean) => void;
   onBack: () => void;
 }
 
@@ -28,12 +28,13 @@ export function ProfileForm({ busy, onSubmit, onBack }: Props) {
   const [name, setName] = useState('');
   const [gender, setGender] = useState<Gender | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty>('NORMAL');
+  const [daily, setDaily] = useState(false);
   const length = Array.from(name.trim()).length;
   const nameOk = length >= DISPLAY_NAME_MIN && length <= DISPLAY_NAME_MAX;
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    if (nameOk && gender) onSubmit(name, gender, difficulty);
+    if (nameOk && gender) onSubmit(name, gender, daily ? 'NORMAL' : difficulty, daily);
   };
 
   return (
@@ -77,7 +78,17 @@ export function ProfileForm({ busy, onSubmit, onBack }: Props) {
         </div>
       </fieldset>
 
-      <fieldset className="field">
+      <label className={`card daily-toggle ${daily ? 'daily-on' : ''}`}>
+        <input type="checkbox" checked={daily} onChange={(e) => setDaily(e.target.checked)} />
+        <span className="col">
+          <strong className="small">📅 오늘의 출근으로 하기</strong>
+          <span className="tiny muted">
+            오늘은 모두 같은 카드·같은 동료로 시작해요. 난이도는 보통, 하루 첫 판의 결과로 순위를 겨뤄요.
+          </span>
+        </span>
+      </label>
+
+      <fieldset className="field" disabled={daily}>
         <legend className="field-label">난이도</legend>
         <div className="segmented segmented-3">
           {DIFFICULTIES.map((d) => (

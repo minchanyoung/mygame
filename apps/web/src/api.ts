@@ -3,6 +3,7 @@ import {
   PLAYER_TOKEN_HEADER,
   type ApiErrorBody,
   type CreateRunResponse,
+  type DailyBoard,
   type Difficulty,
   type Gender,
   type PublicCollection,
@@ -80,11 +81,11 @@ async function request<T>(
 }
 
 export const api = {
-  createRun: async (displayName: string, gender: Gender, difficulty: Difficulty) => {
+  createRun: async (displayName: string, gender: Gender, difficulty: Difficulty, daily = false) => {
     const res = await request<CreateRunResponse>('/api/runs', {
       method: 'POST',
       player: true,
-      body: JSON.stringify({ displayName, gender, difficulty }),
+      body: JSON.stringify({ displayName, gender, difficulty, daily }),
     });
     savePlayerToken(res.playerToken);
     return res;
@@ -95,6 +96,10 @@ export const api = {
     request<PublicCollection>(`/api/player${runId ? `?run=${encodeURIComponent(runId)}` : ''}`, {
       player: true,
     }),
+
+  /** S21 오늘의 출근 순위 (내 기록은 플레이어 토큰으로) */
+  getDaily: (date?: string) =>
+    request<DailyBoard>(`/api/daily${date ? `?date=${encodeURIComponent(date)}` : ''}`, { player: true }),
 
   getRun: (s: Session) => request<PublicRunView>(`/api/runs/${s.runId}`, { token: s.guestToken }),
 

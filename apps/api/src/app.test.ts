@@ -5,7 +5,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { loadContentPack } from '@company-life/content';
 import type { CreateRunResponse, PublicChoice, PublicRunView } from '@company-life/shared';
 import { buildApp } from './app';
-import { FileRunStore, MemoryRunStore, type RunStore } from './store';
+import { FileRunStore, MemoryDailyStore, MemoryRunStore, type RunStore } from './store';
 
 const contents = [loadContentPack()];
 const makeApp = (store: RunStore = new MemoryRunStore()) => buildApp({ store, contents });
@@ -607,4 +607,58 @@ describe('S10 플레이어 도감·난이도 over HTTP', () => {
     expect(anon.found).toBe(0);
     expect(anon.total).toBe(108);
   }, 30_000);
+});
+
+describe('S21 오늘의 출근', () => {
+  const NOW = new Date('2026-11-20T16:30:00.000Z'); // 한국 시간 11월 21일 01:30
+  const dailyApp = (daily = new MemoryDailyStore()) =>
+    buildApp({ store: new MemoryRunStore(), contents, daily, now: () => NOW });
+  const create = (app: ReturnType<typeof dailyApp>, payload: Record<string, unknown>) =>
+    app.inject({ method: 'POST', url: '/api/runs', payload });
+
+  it('같은 날에는 누구나 같은 카드, 난이도는 보통으로 고정', async () => {
+    const app = dailyApp();
+    const a = (
+      await create(app, { displayName: '김하늘', gender: 'FEMALE', daily: true })
+    ).json() as CreateRunResponse;
+    const b = (
+      await create(app, { displayName: '박바다', gender: 'MALE', daily: true, difficulty: 'EASY' })
+    ).json() as CreateRunResponse;
+    expect(a.view.daily).toBe('2026-11-21');
+    expect(b.view.difficulty).toBe('NORMAL');
+    const traits = (v: PublicRunView) =>
+      v.characterCards.map((c) => [c.university.id, c.major.id, c.strength.id, c.weakness.id, c.resources]);
+    expect(traits(a.view)).toEqual(traits(b.view));
+    const normal = (
+      await create(app, { displayName: '최구름', gender: 'FEMALE' })
+    ).json() as CreateRunResponse;
+    expect(normal.view.daily).toBeNull();
+  });
+
+  it('순위표: 점수 순, 내 기록은 플레이어 토큰으로, 하루 첫 판만', async () => {
+    const store = new MemoryDailyStore();
+    const rec = (playerId: string, name: string, score: number) => ({
+      playerId,
+      name,
+      score,
+      endingTitle: '정년 퇴직',
+      age: 60,
+      rankLabel: '부장',
+      runId: playerId,
+      at: NOW.toISOString(),
+    });
+    await store.record('2026-11-21', rec('p1', '하나', 500));
+    await store.record('2026-11-21', rec('p2', '둘', 900));
+    expect(await store.record('2026-11-21', rec('p1', '하나', 999))).toBe(false);
+    const app = dailyApp(store);
+    const board = (await app.inject({ url: '/api/daily' })).json();
+    expect(board.date).toBe('2026-11-21');
+    expect(board.top.map((e: { name: string; rank: number }) => [e.name, e.rank])).toEqual([
+      ['둘', 1],
+      ['하나', 2],
+    ]);
+    expect(board.top[0]).not.toHaveProperty('playerId');
+    expect(board.mine).toBeNull();
+    expect((await app.inject({ url: '/api/daily?date=../../x' })).statusCode).toBe(400);
+  });
 });

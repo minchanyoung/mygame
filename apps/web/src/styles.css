@@ -3215,3 +3215,46 @@ button.gauge:disabled {
 .avatar-small .av-mood {
   font-size: 11px;
 }
+
+/* S21 오늘의 출근 */
+.daily-toggle {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  cursor: pointer;
+}
+.daily-toggle input {
+  margin-top: 4px;
+  accent-color: var(--navy);
+}
+.daily-on {
+  border-color: var(--navy);
+  background: var(--navy-soft);
+}
+fieldset:disabled {
+  opacity: 0.45;
+}
+.daily-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.daily-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 6px var(--sp-2);
+  border-radius: var(--r-sm);
+}
+.daily-rank {
+  width: 1.6em;
+  text-align: center;
+  font-weight: 700;
+  color: var(--muted);
+}
+.daily-me {
+  background: var(--navy-soft);
+}
