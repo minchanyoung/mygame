@@ -116,6 +116,116 @@ function ReviewSheet({ review, age }: { review: PublicReview; age: number }) {
 }
 
 /** MONTH_SUMMARY — 이달의 이야기들 + 급여명세서 + 가계부 */
+type Summary = NonNullable<PublicRunView['monthSummary']>;
+
+const pct = (from: number, to: number) => {
+  const p = Math.round(((to - from) / from) * 1000) / 10;
+  return `${p > 0 ? '+' : p < 0 ? '−' : ''}${Math.abs(p).toFixed(1)}%`;
+};
+
+/**
+ * S18 1월 정기 인사 통지: 지난해 평가 등급 → 연봉 조정 → 승진 심사를 한 장의 사내 공문으로.
+ * 연봉 조정이 먼저, 승진 연봉이 그 위에 붙는다 (엔진 순서와 같다).
+ */
+function PersonnelNotice({
+  name,
+  age,
+  companyName,
+  promotion,
+  salary,
+}: {
+  name: string;
+  age: number;
+  companyName: string | null;
+  promotion: Summary['promotion'];
+  salary: Summary['salaryAdjustment'];
+}) {
+  const promoted = promotion?.success === true;
+  const finalSalary = (promoted ? promotion?.salaryTo : null) ?? salary?.to ?? null;
+  const startSalary = salary?.from ?? promotion?.salaryFrom ?? null;
+  const stamp = promoted ? '발령' : promotion ? '보류' : '확정';
+  return (
+    <div
+      className={`sheet notice ${promotion && !promoted ? 'appointment-held' : ''}`}
+      aria-label="정기 인사 통지"
+    >
+      <div className="notice-head">
+        <span className="tiny muted">
+          {companyName ?? '회사'} 인사팀 · {age}세 1월
+        </span>
+        <strong className="notice-title">정 기 인 사 통 지</strong>
+        <span className="small">
+          수신 <strong>{name}</strong>
+        </span>
+      </div>
+      <ol className="notice-items">
+        {salary?.grade && (
+          <li>
+            <span className="notice-label">지난해 평가</span>
+            <span className={`notice-grade review-${salary.grade}`}>{salary.grade}</span>
+          </li>
+        )}
+        {salary && (
+          <li>
+            <span className="notice-label">연봉 조정</span>
+            <span className="num">
+              {formatKrw(salary.from)} → <strong>{formatKrw(salary.to)}</strong>{' '}
+              <span className={salary.to >= salary.from ? 'pos' : 'neg'}>
+                ({pct(salary.from, salary.to)})
+              </span>
+            </span>
+          </li>
+        )}
+        {promotion && (
+          <li>
+            <span className="notice-label">승진 심사</span>
+            {promoted ? (
+              <span>
+                {promotion.fromLabel} → <strong className="display">{promotion.toLabel}</strong>에 임함
+                {promotion.salaryFrom !== null && promotion.salaryTo !== null && (
+                  <span className="tiny muted notice-sub">
+                    승진 가산 {formatKrw(promotion.salaryFrom)} → {formatKrw(promotion.salaryTo)}
+                  </span>
+                )}
+              </span>
+            ) : (
+              <span>
+                {promotion.toLabel} 승진 <strong>누락</strong>
+                {promotion.misses >= 2 ? ` (${promotion.misses}년 연속)` : ''}
+                <span className="tiny muted notice-sub">
+                  정신력·평판·상사 호감이 떨어졌어요. 포인트는 유지되고, 다음 심사에서는 조금 유리해집니다.
+                </span>
+              </span>
+            )}
+          </li>
+        )}
+      </ol>
+      {finalSalary !== null && (
+        <div className="sheet-total">
+          <strong className="small">올해 연봉</strong>
+          <span className="amount num">
+            {formatKrw(finalSalary)}
+            {startSalary !== null && startSalary !== finalSalary && (
+              <span className="tiny pos notice-total-pct"> {pct(startSalary, finalSalary)}</span>
+            )}
+          </span>
+        </div>
+      )}
+      {promoted && promotion?.newBossName && (
+        <span className="tiny muted">
+          직급 조정으로 {promotion.newBossName}이(가) 새 직속 상사가 되었습니다.
+        </span>
+      )}
+      <span
+        className={`stamp stamp-mid sheet-stamp ${promotion && !promoted ? 'stamp-navy' : ''}`}
+        aria-hidden="true"
+      >
+        {stamp}
+      </span>
+    </div>
+  );
+}
+
 export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
   const m = view.monthSummary;
   const ending = view.pendingEnding;
@@ -231,53 +341,14 @@ export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
           </div>
         </div>
       )}
-      {m?.promotion && (
-        <div className={`sheet appointment ${m.promotion.success ? '' : 'appointment-held'}`}>
-          <div className="sheet-title">
-            <strong>{m.promotion.success ? '인 사 발 령' : '승진 심사 결과'}</strong>
-            <span className="tiny muted">{view.turn.age}세 1월</span>
-          </div>
-          {m.promotion.success ? (
-            <>
-              <p className="appointment-line">
-                <strong>{view.profile.displayName}</strong> — {m.promotion.fromLabel}
-                {' → '}
-                <strong className="display">{m.promotion.toLabel}</strong>에 임함
-              </p>
-              <div className="sheet-rows">
-                {m.promotion.salaryFrom !== null && m.promotion.salaryTo !== null && (
-                  <div className="sheet-row">
-                    <span>승진 연봉</span>
-                    <strong className="num pos">
-                      {formatKrw(m.promotion.salaryFrom)} → {formatKrw(m.promotion.salaryTo)}
-                    </strong>
-                  </div>
-                )}
-                {m.promotion.newBossName && (
-                  <span className="tiny muted">
-                    직급 조정으로 {m.promotion.newBossName}이(가) 새 직속 상사가 되었습니다.
-                  </span>
-                )}
-              </div>
-              <span className="stamp stamp-mid sheet-stamp" aria-hidden="true">
-                발령
-              </span>
-            </>
-          ) : (
-            <>
-              <p className="appointment-line">
-                {m.promotion.toLabel} 승진 심사에서 <strong>누락</strong>되었습니다.
-                {m.promotion.misses >= 2 ? ` (${m.promotion.misses}년 연속)` : ''}
-              </p>
-              <p className="tiny muted">
-                정신력·평판·상사 호감이 떨어졌어요. 포인트는 유지되고, 다음 심사에서는 조금 유리해집니다.
-              </p>
-              <span className="stamp stamp-mid stamp-navy sheet-stamp" aria-hidden="true">
-                보류
-              </span>
-            </>
-          )}
-        </div>
+      {m && (m.promotion || m.salaryAdjustment) && (
+        <PersonnelNotice
+          name={view.profile.displayName}
+          age={view.turn.age}
+          companyName={view.employment.companyName}
+          promotion={m.promotion}
+          salary={m.salaryAdjustment}
+        />
       )}
 
       {m?.goalMilestone && view.lifeGoal && (
@@ -290,28 +361,6 @@ export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
               인생 목표 {m.goalMilestone}% 돌파 · {view.lifeGoal.title}
             </strong>
             <p className="tiny muted">{view.lifeGoal.progressLabel} · 정신력 +3</p>
-          </div>
-        </div>
-      )}
-
-      {m?.salaryAdjustment && (
-        <div className="sheet">
-          <div className="sheet-title">
-            <strong>연봉계약서</strong>
-            <span className="tiny muted">{view.turn.age}세 1월</span>
-          </div>
-          <div className="sheet-rows">
-            <div className="sheet-row">
-              <span>이전 연봉</span>
-              <span className="num">{formatKrw(m.salaryAdjustment.from)}</span>
-            </div>
-            <div className="sheet-row">
-              <strong>새 연봉</strong>
-              <strong className="num pos">{formatKrw(m.salaryAdjustment.to)}</strong>
-            </div>
-            {m.salaryAdjustment.grade && (
-              <span className="tiny muted">지난해 {m.salaryAdjustment.grade}등급 평가 반영</span>
-            )}
           </div>
         </div>
       )}

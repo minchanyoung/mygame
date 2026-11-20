@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { PublicCollection, PublicRunView } from '@company-life/shared';
 import { api, formatKrw } from '../api';
 import { Bonds, CareerBand, EraTimeline, LifeChart, TitleCard } from '../components/Chronicle';
+import { ShareCard } from '../components/ShareCard';
 
 interface Props {
   view: PublicRunView;
@@ -63,6 +64,8 @@ export function EndingScreen({ view, onNewGame, onHome, onCollection }: Props) {
       </div>
 
       {e.titles && <TitleCard titles={e.titles} />}
+
+      {chronicle && <ShareCard view={view} />}
 
       {discovery && (discovery.items.length > 0 || discovery.achievements.length > 0) && (
         <div className="card discovery">

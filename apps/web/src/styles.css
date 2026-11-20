@@ -3093,3 +3093,80 @@ button.gauge:disabled {
   font-size: var(--fs-sm);
   text-align: center;
 }
+
+/* S18 1월 정기 인사 통지: 사내 공문 한 장 (평가 → 연봉 → 승진) */
+.notice {
+  gap: var(--sp-3);
+}
+.notice-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-bottom: var(--sp-3);
+  border-bottom: 2px solid var(--ink);
+  text-align: center;
+}
+.notice-title {
+  font-size: var(--fs-lg);
+  letter-spacing: 0.12em;
+}
+.notice-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: notice;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.notice-items li {
+  counter-increment: notice;
+  display: grid;
+  grid-template-columns: 6.5em 1fr;
+  align-items: baseline;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+}
+.notice-label {
+  color: var(--muted);
+}
+.notice-label::before {
+  content: counter(notice) '. ';
+}
+.notice-grade {
+  justify-self: start;
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+}
+.notice-sub {
+  display: block;
+  margin-top: 2px;
+}
+.notice-total-pct {
+  margin-left: 4px;
+  font-weight: 700;
+}
+
+/* S19 엔딩 공유 이미지 (9:16) */
+.share-card {
+  gap: var(--sp-3);
+}
+.share-preview {
+  display: block;
+  width: min(100%, 260px);
+  height: auto;
+  aspect-ratio: 9 / 16;
+  margin: 0 auto;
+  border-radius: var(--r-md);
+  box-shadow: var(--elev-1);
+  border: 1px solid var(--line);
+}
+.share-loading {
+  background: var(--navy-soft);
+}
