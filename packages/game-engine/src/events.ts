@@ -162,6 +162,8 @@ export function getEligibleEvents(
 export interface EventSelection {
   eventId: string;
   participantNpcId: string | null;
+  /** S16 예약 사건이면 예약을 만든 사건 기록 */
+  sourceOccurrenceId?: string | null;
 }
 
 /** 가중치 추첨 (가중치 ≠ 발생 확률). 후보가 없으면 항상 가능한 폴백 이벤트를 반환한다 (§21.3). */
@@ -200,6 +202,7 @@ export function openEvent(
       eventVersion: event.version,
       participantNpcId: selection.participantNpcId,
       presentedTurn: state.turnIndex,
+      sourceOccurrenceId: selection.sourceOccurrenceId ?? null,
     },
   };
 }
@@ -313,6 +316,7 @@ export function resolveChoice(
     chance: chance?.chance ?? null,
     roll,
     highRisk: event.highRisk ?? false,
+    sourceOccurrenceId: active.sourceOccurrenceId ?? null,
   });
   // 연속 고위험 개월 수는 한 달(사건 2개)이 끝날 때 chooseInMonth가 갱신한다
   draft.eventHistory.push({

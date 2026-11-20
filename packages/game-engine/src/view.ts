@@ -54,6 +54,7 @@ import { matchesConditions } from './conditions';
 import { requireFrom, type ContentIndex } from './content-index';
 import { applyEffects } from './effects';
 import { buildChronicle } from './chronicle';
+import { echoSource } from './echo';
 import { buildEnding, debtLimit, detectJobLossCause } from './ending';
 import { evaluateChoices } from './events';
 import { currentTeamNpcs } from './npcs';
@@ -631,6 +632,16 @@ export function toPublicActiveEvent(state: GameRunState, content: ContentIndex):
     series: event.series
       ? { title: event.series.title, episode: event.series.episode, total: event.series.total }
       : null,
+    echo: (() => {
+      const src = echoSource(state, event, active.sourceOccurrenceId, content);
+      return src
+        ? {
+            monthsAgo: state.turnIndex - src.turnIndex,
+            eventTitle: src.eventTitle,
+            choiceLabel: src.choiceLabel,
+          }
+        : null;
+    })(),
     participantName: participant?.name ?? null,
     participant: participant ? (({ npcId: _id, ...rest }) => rest)(toPublicNpc(participant, content)) : null,
     choices,

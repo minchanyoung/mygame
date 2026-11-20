@@ -2384,6 +2384,26 @@ details summary {
   border-radius: var(--r-full);
   padding: 3px 10px;
 }
+/* S16 그때 그 선택: 메신저 답장 인용처럼 */
+.echo-quote {
+  align-self: stretch;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--navy-soft);
+  border-left: 3px solid var(--navy);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+}
+.echo-when {
+  color: var(--muted);
+}
+.echo-choice {
+  color: var(--ink);
+  font-weight: 600;
+}
 .news-card {
   gap: 6px;
   border-left: 6px solid var(--c-reputation);

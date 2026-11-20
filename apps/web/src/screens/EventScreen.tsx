@@ -91,6 +91,7 @@ export function EventScreen({ view, busy, onChoose }: Props) {
   const choices = (
     <div className="reply-panel">
       <span className="tiny fw-7 ink-2">{isLife ? '어떻게 할까요?' : '답장하기'}</span>
+      <EchoQuote echo={event.echo} />
       {event.choices.map((c) => {
         const isArmed = armed === c.id;
         return (
@@ -220,5 +221,25 @@ export function EventScreen({ view, busy, onChoose }: Props) {
 
       {choices}
     </section>
+  );
+}
+
+function agoLabel(months: number): string {
+  if (months < 12) return `${months}개월 전`;
+  const y = Math.floor(months / 12);
+  const m = months % 12;
+  return m === 0 ? `${y}년 전` : `${y}년 ${m}개월 전`;
+}
+
+/** S16 '그때 그 선택': 예약으로 돌아온 사건이면 원인이 된 선택을 답장 인용처럼 보여 준다 */
+function EchoQuote({ echo }: { echo: PublicActiveEvent['echo'] }) {
+  if (!echo) return null;
+  return (
+    <blockquote className="echo-quote">
+      <span className="echo-when">
+        ↩ {agoLabel(echo.monthsAgo)} · {echo.eventTitle}
+      </span>
+      <span className="echo-choice">내가 고른 답: ‘{echo.choiceLabel}’</span>
+    </blockquote>
   );
 }

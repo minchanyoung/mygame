@@ -61,7 +61,7 @@ export function applyEffects(
   const findNpc = (id: string | null): Npc | undefined =>
     id === null ? undefined : draft.npcs.find((n) => n.npcId === id);
 
-  effects.forEach((effect, index) => {
+  effects.forEach((effect) => {
     switch (effect.type) {
       case 'RESOURCE_DELTA':
         draft.resources[effect.key] = clampStat(
@@ -245,7 +245,8 @@ export function applyEffects(
 
       case 'SCHEDULE_EVENT':
         draft.scheduledEvents.push({
-          scheduleId: `${ctx.occurrenceId}_s${index}`,
+          // 확정·판정·조건부 효과가 따로 적용돼도 겹치지 않게 지금까지의 예약 수로 번호를 붙인다
+          scheduleId: `${ctx.occurrenceId}_s${draft.scheduledEvents.length}`,
           eventId: effect.eventId,
           dueTurn: draft.turnIndex + effect.delayMonths,
           priority: effect.priority ?? 0,

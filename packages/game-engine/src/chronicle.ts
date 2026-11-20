@@ -8,6 +8,7 @@ import {
   type YearlyRecord,
 } from '@company-life/shared';
 import type { ContentIndex } from './content-index';
+import { echoSource } from './echo';
 
 /**
  * S9 연간 기록: 12월 인사평가 직후와 엔딩 확정 직전에 한 줄씩 남긴다.
@@ -146,12 +147,26 @@ function collectItems(state: GameRunState, content: ContentIndex): Item[] {
   for (const o of state.eventOccurrences) {
     if (!o.highRisk || o.success === null) continue;
     const ev = content.events.get(o.eventId);
-    if (!ev || ev.series) continue;
+    // 돌아온 사건은 아래 '그때 그 선택'으로 한 번만 적는다
+    if (!ev || ev.series || echoSource(state, ev, o.sourceOccurrenceId, content)) continue;
     items.push({
       turnIndex: o.turnIndex,
       kind: 'RISK',
       text: `${ev.title} — ${o.success ? '위기를 넘겼다' : '크게 흔들렸다'}`,
       weight: o.success ? 40 : 35,
+    });
+  }
+  // S16 그때 그 선택: 몇 달·몇 년 뒤 돌아온 사건과 그 원인이 된 선택
+  for (const o of state.eventOccurrences) {
+    const ev = content.events.get(o.eventId);
+    const src = ev && echoSource(state, ev, o.sourceOccurrenceId, content);
+    if (!ev || !src) continue;
+    const srcAge = turnInfo(src.turnIndex, content.pack.rules.startAge).age;
+    items.push({
+      turnIndex: o.turnIndex,
+      kind: 'ECHO',
+      text: `「${ev.title}」 ← ${srcAge}세에 고른 '${src.choiceLabel}'`,
+      weight: 52,
     });
   }
   // 같은 문구(예: '번아웃' 극복)가 되풀이되면 처음 것만 제 무게, 다시 나온 것은 맨 뒤로 밀린다

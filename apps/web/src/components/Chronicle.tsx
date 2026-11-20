@@ -208,6 +208,7 @@ const KIND_ICON: Record<ChronicleItemKind, string> = {
   RECOVER: '🌤',
   REVIEW: '📋',
   RISK: '⚡',
+  ECHO: '↩',
   ENDING: '🏁',
 };
 

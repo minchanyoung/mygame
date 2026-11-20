@@ -246,7 +246,17 @@ export interface PublicChronicle {
 }
 
 export type ChronicleItemKind =
-  'JOIN' | 'TRANSFER' | 'PROMOTION' | 'SERIES' | 'SKILL' | 'SCAR' | 'RECOVER' | 'REVIEW' | 'RISK' | 'ENDING';
+  | 'JOIN'
+  | 'TRANSFER'
+  | 'PROMOTION'
+  | 'SERIES'
+  | 'SKILL'
+  | 'SCAR'
+  | 'RECOVER'
+  | 'REVIEW'
+  | 'RISK'
+  | 'ECHO'
+  | 'ENDING';
 
 /** S5 인생 목표 카드 */
 export interface PublicLifeGoal {
@@ -398,6 +408,8 @@ export interface PublicActiveEvent {
   dialogue: PublicChatLine[];
   /** S8 연재 표시 (예: 라이벌 동기 2/4화) */
   series: { title: string; episode: number; total: number } | null;
+  /** S16 예약으로 돌아온 사건이면 그 원인 (몇 달 전 어떤 사건에서 무엇을 골랐는지) */
+  echo: { monthsAgo: number; eventTitle: string; choiceLabel: string } | null;
   participantName: string | null;
   participant: Omit<PublicNpc, 'npcId'> | null;
   choices: PublicChoice[];

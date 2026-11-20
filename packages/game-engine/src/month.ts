@@ -163,6 +163,7 @@ function pickMonthlyEvents(
       selections.push({
         eventId: !stillHere && farewell ? farewell : scheduled.eventId,
         participantNpcId: scheduled.participantNpcId,
+        sourceOccurrenceId: scheduled.sourceOccurrenceId,
       });
       scheduledEvents = scheduledEvents.map((x) =>
         x.scheduleId === scheduled.scheduleId ? { ...x, status: 'DONE' as const } : x,

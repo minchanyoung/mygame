@@ -8,6 +8,7 @@ import {
 } from '@company-life/shared';
 import type { ContentIndex } from './content-index';
 import { inflate, priceIndex } from './economy';
+import { matchesConditions } from './conditions';
 import { EngineError } from './errors';
 import { evaluateChoices, type ChoiceEvaluation } from './events';
 import { applyForJob } from './jobs';
@@ -117,7 +118,7 @@ function pickChoice(
     const pts = (won / monthly) * 8;
     return pts < 0 && tight ? pts * 2 : pts;
   };
-  const sum = (effects: readonly Effect[] | undefined) =>
+  const sum = (effects: readonly Effect[] | undefined, depth = 0): number =>
     (effects ?? []).reduce(
       (s, e) =>
         s +
@@ -136,15 +137,43 @@ function pickChoice(
                     ? 25
                     : e.type === 'EXECUTIVE_PROMOTION'
                       ? 120
-                      : longTerm(e)),
+                      : e.type === 'SCHEDULE_EVENT' && expert && depth === 0
+                        ? followUpValue(e.eventId)
+                        : longTerm(e)),
       0,
     );
+  /**
+   * S16 노련 봇만: 예약될 후속 사건을 기억한다. 그 사건에서 가장 나은 선택의 기댓값(기본 확률)을
+   * 먼 미래라 0.7배로 본다. 후속의 후속은 따지지 않는다.
+   */
+  const followUpValue = (eventId: string): number => {
+    const ev = content.events.get(eventId);
+    if (!ev) return 0;
+    const values = ev.choices.map((c) => {
+      const p = c.outcome?.baseChance ?? 1;
+      const outcome = c.outcome
+        ? p * sum(c.onSuccess?.effects, 1) + (1 - p) * sum(c.onFailure?.effects, 1)
+        : 0;
+      return sum(c.guaranteedEffects, 1) + outcome;
+    });
+    return Math.max(...values) * 0.7;
+  };
+  // 노련 봇만: 조건부 효과 가운데 지금 조건이 맞는 것 (on: 판정 결과별). 신중 봇은 S13 기준 그대로 둔다
+  const conditional = (c: ChoiceEvaluation, on: 'ALWAYS' | 'SUCCESS' | 'FAILURE') =>
+    !expert
+      ? 0
+      : sum(
+          (c.choice.conditionalEffects ?? [])
+            .filter((ce) => ce.on === on && matchesConditions(state, ce.when, { participant }, content))
+            .flatMap((ce) => ce.effects),
+        );
   const expected = (c: ChoiceEvaluation) => {
     const p = c.chance?.chance ?? 1;
     const outcome = c.chance
-      ? p * sum(c.choice.onSuccess?.effects) + (1 - p) * sum(c.choice.onFailure?.effects)
+      ? p * (sum(c.choice.onSuccess?.effects) + conditional(c, 'SUCCESS')) +
+        (1 - p) * (sum(c.choice.onFailure?.effects) + conditional(c, 'FAILURE'))
       : 0;
-    return sum(c.choice.guaranteedEffects) + outcome;
+    return sum(c.choice.guaranteedEffects) + conditional(c, 'ALWAYS') + outcome;
   };
   return [...pool].sort((a, b) => expected(b) - expected(a))[0]!.choice.id;
 }

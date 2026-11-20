@@ -365,7 +365,12 @@ export type YearlyRecord = z.infer<typeof YearlyRecordSchema>;
 
 /** 이번 달 아직 열리지 않은 사건 (업무 다음 일상) */
 export const PendingEventSchema = z
-  .object({ eventId: EventIdSchema, participantNpcId: z.string().nullable() })
+  .object({
+    eventId: EventIdSchema,
+    participantNpcId: z.string().nullable(),
+    /** S16 예약으로 열린 사건이면 그 예약을 만든 사건 기록 (옛 세이브에는 없음) */
+    sourceOccurrenceId: z.string().nullable().optional(),
+  })
   .strict();
 
 export const NpcSchema = z
@@ -448,6 +453,8 @@ export const ActiveEventSchema = z
     eventVersion: z.number().int().min(1),
     participantNpcId: z.string().nullable(),
     presentedTurn: z.number().int().min(0),
+    /** S16 예약으로 열린 사건이면 그 예약을 만든 사건 기록 (옛 세이브에는 없음) */
+    sourceOccurrenceId: z.string().nullable().optional(),
   })
   .strict();
 export type ActiveEvent = z.infer<typeof ActiveEventSchema>;
@@ -465,6 +472,8 @@ export const EventOccurrenceSchema = z
     chance: z.number().nullable(),
     roll: z.number().nullable(),
     highRisk: z.boolean(),
+    /** S16 예약으로 열린 사건이면 그 예약을 만든 사건 기록 (옛 세이브에는 없음) */
+    sourceOccurrenceId: z.string().nullable().optional(),
   })
   .strict();
 export type EventOccurrence = z.infer<typeof EventOccurrenceSchema>;
