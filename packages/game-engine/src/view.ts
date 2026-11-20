@@ -8,6 +8,9 @@ import {
   type LifeGoalDefinition,
   type PublicLifeGoal,
   type PublicLifeGoalProgress,
+  type PublicSeason,
+  type PublicSeasonResult,
+  type SeasonRecord,
   type PublicPromotionStatus,
   RESOURCE_ENDING_CAUSE,
   RESOURCE_KEYS,
@@ -54,6 +57,7 @@ import { matchesConditions } from './conditions';
 import { requireFrom, type ContentIndex } from './content-index';
 import { applyEffects } from './effects';
 import { buildChronicle } from './chronicle';
+import { SEASON_INFO, seasonProgress } from './season';
 import { echoSource } from './echo';
 import { buildEnding, debtLimit, detectJobLossCause } from './ending';
 import { evaluateChoices } from './events';
@@ -282,6 +286,44 @@ function toPublicGoal(def: LifeGoalDefinition, state: GameRunState): PublicLifeG
   };
 }
 
+function toPublicSeason(state: GameRunState, content: ContentIndex): PublicSeason | null {
+  const season = state.season;
+  if (!season || state.employment.status !== 'EMPLOYED') return null;
+  const info = SEASON_INFO[season.kind];
+  const p = seasonProgress(state, season);
+  const won = (n: number) => `${n === 0 ? '' : n < 0 ? '−' : '+'}${krwShort(Math.abs(n))}`;
+  const progressLabel =
+    season.kind === 'PROMOTION'
+      ? `${RANK_LABELS[PLAYER_RANKS[season.baseline]!]} → ${RANK_LABELS[PLAYER_RANKS[season.target]!]}`
+      : season.kind === 'SAVINGS'
+        ? `순자산 ${won(p.current - season.baseline)} / ${won(season.target - season.baseline)}`
+        : season.kind === 'REVIEW'
+          ? `평가 ${p.current} / ${season.target}번 (C·D 없이)`
+          : `${p.current} / ${season.target}개월 (체력·정신력 ${content.pack.rules.season.wellbeingFloor} 이상)`;
+  return {
+    title: info.title,
+    emoji: info.emoji,
+    percent: p.percent,
+    progressLabel,
+    monthsLeft: Math.max(0, season.deadlineTurn - state.turnIndex),
+  };
+}
+
+function toPublicSeasonResult(r: SeasonRecord, content: ContentIndex): PublicSeasonResult {
+  const info = SEASON_INFO[r.kind];
+  const { reward, failMental } = content.pack.rules.season;
+  const bonus =
+    r.kind !== 'PROMOTION' && reward.promotionPoints > 0 ? ` · 승진 포인트 +${reward.promotionPoints}` : '';
+  return {
+    title: info.title,
+    emoji: info.emoji,
+    achieved: r.achieved,
+    text: r.achieved
+      ? `정신력 +${reward.mental} · 평판 +${reward.reputation}${bonus}`
+      : `기한을 넘겼다. 정신력 ${failMental}`,
+  };
+}
+
 function toPublicGoalProgress(state: GameRunState, content: ContentIndex): PublicLifeGoalProgress | null {
   if (!state.lifeGoal) return null;
   const def = goalDef(content, state.lifeGoal.goalId);
@@ -358,6 +400,7 @@ function toMonthSummary(state: GameRunState, content: ContentIndex): PublicMonth
         }
       : null,
     goalMilestone: m.goalMilestone,
+    seasonResult: m.seasonResult ? toPublicSeasonResult(m.seasonResult, content) : null,
     news: m.news.map((n) => ({ kind: n.kind, text: n.text })),
     resourceDelta,
     cashDelta: state.cash - m.start.cash,
@@ -782,6 +825,7 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
         ? state.lifeGoalOffers.map((id) => toPublicGoal(goalDef(content, id), state))
         : [],
     lifeGoal: toPublicGoalProgress(state, content),
+    season: toPublicSeason(state, content),
     resources: { ...state.resources },
     cash: state.cash,
     debt: state.debt,

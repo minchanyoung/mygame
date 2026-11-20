@@ -60,6 +60,8 @@ export interface AutoPlayResult {
   jobId: string | null;
   jobSeriesStartTurn: number | null;
   jobSeriesFinished: boolean;
+  /** S19 시즌 목표 (종류별 시도·달성) */
+  seasons: { kind: string; achieved: boolean }[];
 }
 
 function pickChoice(
@@ -214,6 +216,7 @@ function careerStats(
       const s = content.events.get(o.eventId)?.series;
       return s?.job !== undefined && s.episode === s.total;
     }),
+    seasons: (state.seasonHistory ?? []).map((r) => ({ kind: r.kind, achieved: r.achieved })),
   };
 }
 

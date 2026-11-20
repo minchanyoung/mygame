@@ -209,6 +209,7 @@ const KIND_ICON: Record<ChronicleItemKind, string> = {
   REVIEW: '📋',
   RISK: '⚡',
   ECHO: '↩',
+  SEASON: '📅',
   ENDING: '🏁',
 };
 

@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import type { PublicChatLine } from '@company-life/shared';
+import { Avatar } from './Avatar';
 
 const prefersReducedMotion = () => {
   try {
@@ -65,9 +66,13 @@ export function ChatLine({
     default:
       return (
         <div className={`bubble-row float-up ${continued ? 'bubble-continued' : ''}`} style={style}>
-          <span className="avatar avatar-small" aria-hidden="true">
-            {continued ? '' : (line.initial ?? '?')}
-          </span>
+          {continued || !line.name ? (
+            <span className="avatar avatar-small" aria-hidden="true">
+              {continued ? '' : (line.initial ?? '?')}
+            </span>
+          ) : (
+            <Avatar name={line.name} initial={line.initial ?? undefined} small />
+          )}
           <div className="bubble-col">
             {line.name && !continued && <span className="bubble-name">{line.name}</span>}
             <p className="bubble">{line.text}</p>

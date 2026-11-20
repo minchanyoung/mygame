@@ -95,6 +95,10 @@ export function applyEffects(
         // 회사·연봉 추첨에 콘텐츠와 RNG가 필요해 resolveChoice가 효과 적용 뒤에 처리한다
         break;
 
+      case 'SEASON_START':
+        // S19 기한·목표치에 규칙이 필요해 resolveChoice가 효과 적용 뒤에 처리한다
+        break;
+
       case 'COUNTER_OFFER':
         if (draft.employment.current) {
           const cur = draft.employment.current;

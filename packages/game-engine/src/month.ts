@@ -1,3 +1,4 @@
+import { markSeasonAfterEvent, processSeason, seasonOfferDue } from './season';
 import {
   eventSlot,
   RESOURCE_KEYS,
@@ -170,6 +171,11 @@ function pickMonthlyEvents(
       );
       continue;
     }
+    // S19 1월 일상 칸은 '새해 계획' (시즌 목표가 없고 조건이 맞을 때)
+    if (slot === 'life' && seasonOfferDue(state, content)) {
+      selections.push({ eventId: content.pack.rules.season.eventId, participantNpcId: null });
+      continue;
+    }
     const taken = new Set(selections.map((s) => s.eventId));
     const candidates = getEligibleEvents(state, content, slot).filter((c) => !taken.has(c.event.id));
     // S12 보장 사건(직무 연재 1화): 기한이 지났고 조건이 맞으면 추첨 없이 연다
@@ -207,7 +213,9 @@ export function startMonth(
     : reviewed0;
   // S8 동료의 인생: 소식과 그에 따른 후속 사건 예약 (사건 선정 전)
   const life = rollNpcLife(annual.state, content);
-  const reviewed = { state: life.state, review: annual.review };
+  // S19 시즌 목표 판정 (승진·연봉·평가가 반영된 뒤)
+  const season = processSeason(life.state, content);
+  const reviewed = { state: season.state, review: annual.review };
   const rng = new SeededRng(reviewed.state.rngState);
   // forced는 플레이테스트 도구 전용 (추첨을 건너뛰고 지정 사건 1개만 연다)
   const { selections, scheduledEvents } = forced
@@ -231,6 +239,7 @@ export function startMonth(
       promotion: promoted.result,
       news: life.news,
       goalMilestone: null,
+      seasonResult: season.result,
       eventResults: [],
     },
   };
@@ -248,7 +257,7 @@ export function chooseInMonth(
   const participantNpcId = state.activeEvent?.participantNpcId ?? null;
   const resolved = resolveChoice(state, choiceId, content);
   const r = resolved.result;
-  const after = resolved.state;
+  const after = markSeasonAfterEvent(resolved.state, content);
 
   // 이 사건만으로 생긴 변화 (정산은 이미 startMonth에서 반영됨)
   const resourceDelta: Record<string, number> = {};

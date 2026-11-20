@@ -1,3 +1,4 @@
+import { newSeason, seasonAvailable } from './season';
 import {
   eventSlot,
   type Choice,
@@ -300,6 +301,11 @@ export function resolveChoice(
   // S7 이직 제안서: 회사·연봉 추첨은 시드 고정 스트림 (주 판정 RNG와 분리)
   if (applied.some((e) => e.type === 'TRANSFER_OFFER')) {
     draft.transferOffer = generateTransferOffer(draft, content);
+  }
+  // S19 시즌 목표 시작 (진행 중이면 그대로)
+  const season = applied.find((e) => e.type === 'SEASON_START');
+  if (season?.type === 'SEASON_START' && !draft.season && seasonAvailable(draft, season.kind)) {
+    draft.season = newSeason(draft, season.kind, content);
   }
 
   draft.rngState = rng.state;

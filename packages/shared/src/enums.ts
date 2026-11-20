@@ -189,3 +189,8 @@ export type OwnedTraitLevel = z.infer<typeof OwnedTraitLevelSchema>;
 export const RETIREMENT_TIERS = ['COMFORTABLE', 'MODEST', 'TIGHT'] as const;
 export const RetirementTierSchema = z.enum(RETIREMENT_TIERS);
 export type RetirementTier = z.infer<typeof RetirementTierSchema>;
+
+/** S19 3~5년 시즌 목표 종류 */
+export const SEASON_KINDS = ['PROMOTION', 'SAVINGS', 'REVIEW', 'WELLBEING'] as const;
+export const SeasonKindSchema = z.enum(SEASON_KINDS);
+export type SeasonKind = z.infer<typeof SeasonKindSchema>;

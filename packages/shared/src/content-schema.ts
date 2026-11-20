@@ -392,6 +392,30 @@ export const GameRulesSchema = z
         milestoneMental: z.number().int().min(0).max(20),
       })
       .strict(),
+    /** S19 3~5년 시즌 목표: 1월 '새해 계획' 사건으로 고르고, 기한 안에 이루면 보상 */
+    season: z
+      .object({
+        eventId: z.string().min(1),
+        ageMin: z.number().int().min(0),
+        ageMax: z.number().int().min(0),
+        /** 입사 뒤 최소 재직 개월 */
+        tenureMonths: z.number().int().min(0),
+        /** 지난 시즌이 끝난 뒤 다음 제안까지 최소 개월 */
+        gapMonths: z.number().int().min(0),
+        /** 종류별 기한(개월) */
+        months: z.record(z.string(), z.number().int().min(1).max(120)),
+        /** 버티기(WELLBEING) 기준: 체력·정신력 중 낮은 쪽이 이 아래로 내려가면 실패 */
+        wellbeingFloor: z.number().int().min(0).max(100),
+        reward: z
+          .object({
+            mental: z.number().int(),
+            reputation: z.number().int(),
+            promotionPoints: z.number().int(),
+          })
+          .strict(),
+        failMental: z.number().int(),
+      })
+      .strict(),
   })
   .strict()
   .refine((r) => r.chanceMin < r.chanceMax, 'chanceMin < chanceMax')

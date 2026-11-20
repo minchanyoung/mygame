@@ -14,6 +14,7 @@ import {
   PlayerRankSchema,
   RaritySchema,
   ResourceKeySchema,
+  SeasonKindSchema,
 } from './enums';
 
 /**
@@ -133,6 +134,8 @@ export const EffectSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('TRANSFER_OFFER') }).strict(),
   /** S7 카운터 오퍼: 현 연봉 ‰ 인상 */
   z.object({ type: z.literal('COUNTER_OFFER'), raisePermille: z.number().int().min(1).max(500) }).strict(),
+  /** S19 시즌 목표 시작 (진행 중이면 무시) */
+  z.object({ type: z.literal('SEASON_START'), kind: SeasonKindSchema }).strict(),
   /** S7 임원 승진 확정 → '별을 달다' 정상 엔딩 */
   z.object({ type: z.literal('EXECUTIVE_PROMOTION') }).strict(),
   /** S5 승진 포인트 증감 (현 직급, 0 미만으로 내려가지 않음) */

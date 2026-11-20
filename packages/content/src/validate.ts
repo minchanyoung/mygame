@@ -364,6 +364,10 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
   // 예약 전용 사건은 반드시 어떤 사건(또는 승진 누락 규칙)이 예약해야 한다 (고아 콘텐츠 방지)
   const scheduledTargets = new Set([...scheduleEdges.values()].flat());
   scheduledTargets.add(promo.consecutiveMissEvent.eventId);
+  // S19 1월 '새해 계획' 사건은 엔진이 직접 연다
+  if (!eventIds.has(pack.rules.season.eventId))
+    add('rules.season.eventId', `알 수 없는 사건: ${pack.rules.season.eventId}`);
+  scheduledTargets.add(pack.rules.season.eventId);
   // S8 사내 소식 후속 사건과 연재 정리 화도 예약 대상
   const life = pack.rules.npcLife.followUps;
   for (const id of [life.wedding, life.farewell, life.peerPromoted]) {

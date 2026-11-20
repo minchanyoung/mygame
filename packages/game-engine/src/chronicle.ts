@@ -9,6 +9,7 @@ import {
 } from '@company-life/shared';
 import type { ContentIndex } from './content-index';
 import { echoSource } from './echo';
+import { SEASON_INFO } from './season';
 
 /**
  * S9 연간 기록: 12월 인사평가 직후와 엔딩 확정 직전에 한 줄씩 남긴다.
@@ -154,6 +155,16 @@ function collectItems(state: GameRunState, content: ContentIndex): Item[] {
       kind: 'RISK',
       text: `${ev.title} — ${o.success ? '위기를 넘겼다' : '크게 흔들렸다'}`,
       weight: o.success ? 40 : 35,
+    });
+  }
+  // S19 시즌 목표 (이룬 것만 굵게, 놓친 것은 가볍게)
+  for (const r of state.seasonHistory ?? []) {
+    const info = SEASON_INFO[r.kind];
+    items.push({
+      turnIndex: r.endTurn,
+      kind: 'SEASON',
+      text: `시즌 목표 '${info.title}' ${r.achieved ? '달성' : '놓침'}`,
+      weight: r.achieved ? 48 : 20,
     });
   }
   // S16 그때 그 선택: 몇 달·몇 년 뒤 돌아온 사건과 그 원인이 된 선택

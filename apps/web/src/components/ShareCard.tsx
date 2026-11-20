@@ -24,7 +24,18 @@ const DISPLAY = `'Black Han Sans', ${BODY}`;
 /** 인생 목표 줄은 늘 같은 자리 (위 내용이 길면 연대기 줄을 덜 그린다) */
 const GOAL_Y = H - 215;
 
-const KIND_ORDER = ['PROMOTION', 'SERIES', 'ECHO', 'TRANSFER', 'SKILL', 'RECOVER', 'RISK', 'REVIEW', 'SCAR'];
+const KIND_ORDER = [
+  'PROMOTION',
+  'SERIES',
+  'ECHO',
+  'SEASON',
+  'TRANSFER',
+  'SKILL',
+  'RECOVER',
+  'RISK',
+  'REVIEW',
+  'SCAR',
+];
 
 function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number): string[] {
   const lines: string[] = [];

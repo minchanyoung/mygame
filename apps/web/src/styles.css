@@ -3170,3 +3170,48 @@ button.gauge:disabled {
 .share-loading {
   background: var(--navy-soft);
 }
+
+/* S19 시즌 목표: 진행 막대는 남색, 놓친 결과는 회색 띠 */
+.mini-bar-season span {
+  background: var(--navy);
+}
+.season-missed {
+  border-left-color: var(--line-2);
+}
+
+/* S20 동료 아바타: 이름으로 정해지는 6색(남색 계열을 벗어나지 않게 채도 낮게) + 표정 배지 */
+.av-tone {
+  position: relative;
+  color: #ffffff;
+}
+.av-0 {
+  background: #3a4f7a;
+}
+.av-1 {
+  background: #4f6b5a;
+}
+.av-2 {
+  background: #7a5a4a;
+}
+.av-3 {
+  background: #5d4f7a;
+}
+.av-4 {
+  background: #3f6a75;
+}
+.av-5 {
+  background: #7a4f62;
+}
+.av-mood {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  font-size: 14px;
+  line-height: 1;
+  background: var(--surface);
+  border-radius: var(--r-full);
+  padding: 1px;
+}
+.avatar-small .av-mood {
+  font-size: 11px;
+}

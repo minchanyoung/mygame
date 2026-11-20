@@ -256,6 +256,7 @@ export type ChronicleItemKind =
   | 'REVIEW'
   | 'RISK'
   | 'ECHO'
+  | 'SEASON'
   | 'ENDING';
 
 /** S5 인생 목표 카드 */
@@ -272,6 +273,26 @@ export interface PublicLifeGoalProgress extends PublicLifeGoal {
   percent: number;
   /** 예: "순자산 4,200만 / 3억" */
   progressLabel: string;
+}
+
+/** S19 진행 중인 3~5년 시즌 목표 */
+export interface PublicSeason {
+  title: string;
+  emoji: string;
+  percent: number;
+  /** 예: "순자산 +1,200만 / +4,800만" */
+  progressLabel: string;
+  /** 기한까지 남은 개월 */
+  monthsLeft: number;
+}
+
+/** S19 이번 달 끝난 시즌 목표 */
+export interface PublicSeasonResult {
+  title: string;
+  emoji: string;
+  achieved: boolean;
+  /** 보상·실망 효과 요약 */
+  text: string;
 }
 
 /** 메인 화면 승진 진행 (확률은 비공개, 근속·포인트만) */
@@ -330,6 +351,7 @@ export interface PublicMonthSummary {
   promotion: PublicPromotionResult | null;
   /** 이번 달 새로 넘은 인생 목표 진행 구간 */
   goalMilestone: number | null;
+  seasonResult: PublicSeasonResult | null;
   resourceDelta: Resources;
   cashDelta: number;
   debtDelta: number;
@@ -474,6 +496,7 @@ export interface PublicRunView {
   /** GOAL_SELECTION에서 고를 인생 목표 후보 */
   lifeGoalOffers: PublicLifeGoal[];
   lifeGoal: PublicLifeGoalProgress | null;
+  season: PublicSeason | null;
   resources: Resources;
   cash: number;
   debt: number;

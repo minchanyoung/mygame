@@ -3,6 +3,7 @@ import type { PublicActiveEvent, PublicChatLine, PublicChoice, PublicRunView } f
 import { ChatThread } from '../components/Chat';
 import { Icon } from '../components/Icons';
 import { Gauges, Warnings } from '../components/StatusPanel';
+import { Avatar } from '../components/Avatar';
 
 interface Props {
   view: PublicRunView;
@@ -183,9 +184,13 @@ export function EventScreen({ view, busy, onChoose }: Props) {
   return (
     <section className="messenger messenger-split">
       <header className="msg-head">
-        <span className="avatar" aria-hidden="true">
-          {p ? p.name.slice(0, 1) : <Icon name="company" />}
-        </span>
+        {p ? (
+          <Avatar name={p.name} relation={p.relationLabel} />
+        ) : (
+          <span className="avatar" aria-hidden="true">
+            <Icon name="company" />
+          </span>
+        )}
         <div className="col grow">
           <strong className="msg-channel">{event.channelName}</strong>
           <span className="msg-sub">

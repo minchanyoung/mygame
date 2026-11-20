@@ -1,3 +1,4 @@
+import { Avatar } from '../components/Avatar';
 import { useState } from 'react';
 import type { PublicRunView, ResourceKey } from '@company-life/shared';
 import { Icon, IconBadge, type IconName } from '../components/Icons';
@@ -67,9 +68,7 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
             {view.npcs.map((n) => (
               <li key={n.npcId} className="card">
                 <div className="npc-row">
-                  <span className="avatar avatar-small" aria-hidden="true">
-                    {n.name.slice(0, 1)}
-                  </span>
+                  <Avatar name={n.name} relation={n.relationLabel} />
                   <div className="min-w-0">
                     <strong>{n.name}</strong>{' '}
                     <span className="chip">
@@ -91,9 +90,7 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
                 {view.formerColleagues.map((p, i) => (
                   <li key={`${p.name}-${i}`} className="card former">
                     <div className="npc-row">
-                      <span className="avatar avatar-small" aria-hidden="true">
-                        {p.name.slice(0, 1)}
-                      </span>
+                      <Avatar name={p.name} small />
                       <div className="min-w-0">
                         <strong>{p.name}</strong> <span className="chip">{p.rankLabel}</span>
                         <p className="small muted">

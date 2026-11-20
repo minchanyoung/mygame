@@ -98,7 +98,8 @@ export function EmployeeBadge({ view }: { view: PublicRunView }) {
 export function CareerCard({ view, compact = false }: { view: PublicRunView; compact?: boolean }) {
   const p = view.employment.promotion;
   const g = view.lifeGoal;
-  if (!p && !g) return null;
+  const season = view.season;
+  if (!p && !g && !season) return null;
   const pct = (cur: number, max: number) => (max > 0 ? Math.min(100, Math.round((cur / max) * 100)) : 100);
   return (
     <div className="card career gap-3">
@@ -153,6 +154,24 @@ export function CareerCard({ view, compact = false }: { view: PublicRunView; com
             <span style={{ width: `${g.percent}%` }} />
           </div>
           {!compact && <span className="tiny muted">{g.progressLabel}</span>}
+        </div>
+      )}
+      {season && (
+        <div className="career-row">
+          <div className="career-head">
+            <strong className="small">
+              <span aria-hidden="true">{season.emoji}</span> 시즌 목표 · {season.title}
+            </strong>
+            <span className="tiny muted">
+              {season.monthsLeft >= 12
+                ? `${Math.floor(season.monthsLeft / 12)}년 ${season.monthsLeft % 12}개월 남음`
+                : `${season.monthsLeft}개월 남음`}
+            </span>
+          </div>
+          <div className="mini-bar mini-bar-season" aria-hidden="true">
+            <span style={{ width: `${season.percent}%` }} />
+          </div>
+          {!compact && <span className="tiny muted">{season.progressLabel}</span>}
         </div>
       )}
     </div>

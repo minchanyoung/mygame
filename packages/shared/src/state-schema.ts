@@ -9,6 +9,7 @@ import {
   EndingTypeSchema,
   EventIdSchema,
   FlagScopeSchema,
+  SeasonKindSchema,
   JobIdSchema,
   JobLossReasonSchema,
   NpcAssignmentRoleSchema,
@@ -185,6 +186,30 @@ export const LifeGoalStateSchema = z
   .strict();
 export type LifeGoalState = z.infer<typeof LifeGoalStateSchema>;
 
+/** S19 진행 중인 시즌 목표. baseline·target은 시작 때 고정한다 (직급 순서·원화·횟수) */
+export const SeasonStateSchema = z
+  .object({
+    kind: SeasonKindSchema,
+    startTurn: z.number().int().min(0),
+    deadlineTurn: z.number().int().min(0),
+    baseline: z.number().int(),
+    target: z.number().int(),
+    /** WELLBEING: 사건 직후 기준 아래로 내려간 적이 있다 (다음 판정에서 실패) */
+    broken: z.boolean().optional(),
+  })
+  .strict();
+export type SeasonState = z.infer<typeof SeasonStateSchema>;
+
+export const SeasonRecordSchema = z
+  .object({
+    kind: SeasonKindSchema,
+    startTurn: z.number().int().min(0),
+    endTurn: z.number().int().min(0),
+    achieved: z.boolean(),
+  })
+  .strict();
+export type SeasonRecord = z.infer<typeof SeasonRecordSchema>;
+
 const MoneySnapshot = z.object({ resources: ResourcesSchema, cash: Krw, debt: Krw }).strict();
 
 /** §20.1 연말 인사평가 기록 (승진 심사 등에서 참조) */
@@ -325,6 +350,8 @@ export const MonthLogSchema = z
     news: z.array(NewsItemSchema),
     /** 이번 달 새로 넘은 인생 목표 진행 구간 (25/50/75) */
     goalMilestone: z.number().int().nullable(),
+    /** S19 이번 달 끝난 시즌 목표 (옛 기록에는 없음) */
+    seasonResult: SeasonRecordSchema.nullable().optional(),
     /** 이번 달 사건 결과 (업무 → 일상 순) */
     eventResults: z.array(EventResultSchema),
   })
@@ -533,6 +560,9 @@ export const GameRunStateSchema = z
     /** 인생 목표 후보 3장 (GOAL_SELECTION에서 고정) */
     lifeGoalOffers: z.array(ContentIdSchema),
     lifeGoal: LifeGoalStateSchema.nullable(),
+    /** S19 시즌 목표 (옛 세이브에는 없음) */
+    season: SeasonStateSchema.nullable().optional(),
+    seasonHistory: z.array(SeasonRecordSchema).optional(),
     jobOffers: z.array(JobOfferSchema),
     /** S7 이직 제안서 (헤드헌터 사건 성공 시, 그달 결산에서만 유효) */
     transferOffer: TransferOfferSchema.nullable(),

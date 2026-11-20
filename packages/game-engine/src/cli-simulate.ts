@@ -162,6 +162,14 @@ for (const policy of POLICIES) {
   console.log(
     `  ${mark(newsPerYear >= 1 && newsPerYear <= 2)} 사내 소식 연 ${newsPerYear.toFixed(2)}건 (목표 1~2) · 연재 시작 판당 ${(started / runs).toFixed(2)}편, 완결률 ${started ? ((finished / started) * 100).toFixed(0) : 0}%`,
   );
+  // S19 시즌 목표: 판당 시도 수와 종류별 달성률
+  const seasons = results.flatMap((r) => r.seasons);
+  const byKind = ['PROMOTION', 'SAVINGS', 'REVIEW', 'WELLBEING'].map((k) => {
+    const xs = seasons.filter((x) => x.kind === k);
+    const ok = xs.filter((x) => x.achieved).length;
+    return `${k} ${xs.length ? ((ok / xs.length) * 100).toFixed(0) : '-'}%(${xs.length})`;
+  });
+  console.log(`  시즌 목표 판당 ${(seasons.length / runs).toFixed(2)}개 · 달성률 ${byKind.join(' · ')}`);
   // S12 직무 연재: 직무별 시작률(1화)·완결률·시작 시점. S13 직무별 실패율·부장 도달은 평균 ±10%p 목표
   const jobRows = JOB_IDS.map((job) => {
     const rs = results.filter((r) => r.jobId === job);

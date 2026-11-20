@@ -290,6 +290,17 @@
     "milestones": [25, 50, 75],
     "milestoneMental": 3
   },
+  "season": {
+    "eventId": "evt_season_plan",
+    "ageMin": 25,
+    "ageMax": 54,
+    "tenureMonths": 12,
+    "gapMonths": 12,
+    "months": { "PROMOTION": 48, "SAVINGS": 36, "REVIEW": 35, "WELLBEING": 36 },
+    "wellbeingFloor": 75,
+    "reward": { "mental": 10, "reputation": 4, "promotionPoints": 1 },
+    "failMental": -4
+  },
   "transfer": {
     "raisePermille": {
       "min": 150,

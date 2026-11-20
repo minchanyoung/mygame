@@ -18469,5 +18469,1286 @@
         "text": "그때 베끼자고 했던 게 나였던가… 아무튼 잘됐네요."
       }
     ]
+  },
+  {
+    "id": "evt_head_take_blame",
+    "version": 1,
+    "status": "published",
+    "title": "부하의 사고, 누구 책임인가",
+    "description": "팀원이 고객 데이터를 잘못 보내는 사고를 쳤다. 임원 회의에서 \"그래서 책임자가 누구냐\"는 질문이 나왔다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 5,
+    "cooldownMonths": 18,
+    "maxOccurrencesPerRun": 2,
+    "highRisk": true,
+    "tags": ["head"],
+    "channel": "임원 회의",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "ranks": ["DEPUTY_HEAD", "DEPARTMENT_HEAD"]
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "전무",
+        "text": "이번 고객 데이터 오발송 건, 책임자가 누굽니까?"
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "회의실의 모든 시선이 당신에게 왔다. 사고를 친 팀원은 회의실 밖에서 떨고 있을 것이다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "shield",
+        "label": "관리 책임은 내게 있다고 한다",
+        "reply": "팀 관리 책임은 저에게 있습니다. 재발 방지안 제가 가져오겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -3
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "trust",
+            "amount": 8
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_head_echo_loyal",
+            "delayMonths": 12
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "전무",
+            "text": "…좋습니다. 다음 주까지 재발 방지안 가져오세요."
+          },
+          {
+            "speaker": "PEER",
+            "text": "(개인 메시지) 부장님… 정말 죄송하고, 감사합니다."
+          }
+        ]
+      },
+      {
+        "id": "by_the_book",
+        "label": "규정대로 징계 절차를 밟는다",
+        "reply": "규정에 따라 인사위원회에 회부하겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 1
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": -6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "절차는 깔끔했다. 팀 회식 자리가 조용해졌다."
+          }
+        ]
+      },
+      {
+        "id": "scapegoat",
+        "label": "실무자의 실수라고 보고한다",
+        "reply": "담당 실무자의 단순 실수였습니다. 관리 체계는 문제없습니다.",
+        "outcome": {
+          "baseChance": 0.6
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 2
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "전무",
+              "text": "실무 실수라면 교육 강화로 마무리합시다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -7
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "전무",
+              "text": "실무자 탓만 하는 관리자는 필요 없어요."
+            }
+          ]
+        },
+        "guaranteedEffects": [
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_head_echo_blame",
+            "delayMonths": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_head_headcount",
+    "version": 1,
+    "status": "published",
+    "title": "TO 한 자리",
+    "description": "본부에 정규직 전환 TO가 딱 한 자리 나왔다. 후보는 둘. 성과가 좋은 신입 계약직과, 5년을 버틴 계약직.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 5,
+    "cooldownMonths": 18,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["head"],
+    "channel": "인사팀",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "ranks": ["DEPUTY_HEAD", "DEPARTMENT_HEAD"]
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "인사팀",
+        "text": "정규직 전환 TO 1명 확정됐습니다. 본부장님 추천으로 결정합니다."
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "두 사람 다 오늘따라 자리에 일찍 와 있었다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "merit",
+        "label": "성과대로 신입을 고른다",
+        "reply": "올해 성과 기준으로 추천하겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -5
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "5년 차 계약직은 다음 달 조용히 이력서를 고치기 시작했다."
+          }
+        ]
+      },
+      {
+        "id": "loyalty",
+        "label": "5년을 버틴 사람을 고른다",
+        "reply": "5년 동안 이 팀을 지켜 온 사람입니다. 이번엔 그 사람 차례예요.",
+        "guaranteedEffects": [
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": 6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PEER",
+            "text": "부장님이 그분 챙기는 거 보고, 다들 여기서 오래 일해도 되겠다고 해요."
+          }
+        ]
+      },
+      {
+        "id": "fight_for_two",
+        "label": "두 자리를 만들어 오겠다고 버틴다",
+        "reply": "둘 다 필요한 사람입니다. TO 하나 더 받아 오겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -8
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.4,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.2
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 7
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PEERS",
+              "stat": "trust",
+              "amount": 10
+            },
+            {
+              "type": "PROMOTION_POINT_DELTA",
+              "amount": 1
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "인사팀",
+              "text": "본부 예산에서 한 자리 더 열었습니다. 이번만입니다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -6
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "인사팀",
+              "text": "TO는 1명입니다. 금요일까지 한 명만 추천해 주세요."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_head_poach",
+    "version": 1,
+    "status": "published",
+    "title": "경쟁사가 내 팀을 통째로",
+    "description": "경쟁사가 우리 팀 핵심 세 명에게 동시에 제안을 넣었다. 그리고 네 번째 메일은 당신에게 왔다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 4,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["head"],
+    "channel": "개인 메시지",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "ranks": ["DEPUTY_HEAD", "DEPARTMENT_HEAD"],
+      "age": {
+        "max": 54
+      }
+    },
+    "dialogue": [
+      {
+        "speaker": "PEER",
+        "text": "(개인 메시지) 부장님, 저희 셋 다 같은 데서 연락 받았어요. 솔직히 흔들려요."
+      },
+      {
+        "speaker": "NAMED",
+        "name": "헤드헌터",
+        "text": "팀 전체를 모시고 싶습니다. 부장님 자리도 준비돼 있습니다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "counter",
+        "label": "윗선과 싸워 처우를 올려 붙잡는다",
+        "reply": "셋 다 붙잡겠습니다. 처우 개선안 오늘 올립니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 7
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PEERS",
+              "stat": "trust",
+              "amount": 10
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "PEER",
+              "text": "부장님이 위에서 그렇게 싸우셨다면서요. 저희 남을게요."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -4
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PEERS",
+              "stat": "favor",
+              "amount": -4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "두 명이 떠났다. 남은 한 명의 업무량이 두 배가 됐다."
+            }
+          ]
+        }
+      },
+      {
+        "id": "bless",
+        "label": "보내 주고 새로 꾸린다",
+        "reply": "좋은 기회면 가야지. 대신 인수인계는 확실히 해 줘.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -10
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": 6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PEER",
+            "text": "부장님 같은 분은 어디서도 못 만날 것 같아요."
+          }
+        ]
+      },
+      {
+        "id": "listen_too",
+        "label": "나에게 온 제안도 들어 본다",
+        "description": "이직 제안서를 받는다",
+        "reply": "(헤드헌터에게) 저도 조건을 한번 들어 보죠.",
+        "guaranteedEffects": [
+          {
+            "type": "TRANSFER_OFFER"
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "trust",
+            "amount": -5
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "헤드헌터",
+            "text": "조건 정리해서 보내 드리겠습니다. 팀분들과 함께 오시면 더 좋고요."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_head_weekend_order",
+    "version": 1,
+    "status": "published",
+    "title": "임원의 금요일 밤 지시",
+    "description": "금요일 밤 10시, 전무가 월요일 아침까지 본부 전략 보고서를 요구했다. 팀원들은 이미 퇴근했다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 5,
+    "cooldownMonths": 12,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["head"],
+    "channel": "전무님",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "ranks": ["DEPUTY_HEAD", "DEPARTMENT_HEAD"]
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "전무",
+        "text": "월요일 8시 회의 전까지 본부 전략 보고서 부탁해요. 30장 정도."
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "팀 단톡방은 조용하다. 다들 주말 계획이 있다고 했었다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "alone",
+        "label": "팀원은 쉬게 두고 혼자 쓴다",
+        "reply": "(팀 단톡방에는 아무 말도 하지 않는다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -9
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -5
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": 6
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PEER",
+            "text": "(월요일) 부장님 주말에 혼자 이거 다 하신 거예요…?"
+          }
+        ]
+      },
+      {
+        "id": "call_team",
+        "label": "팀 전체를 주말 출근시킨다",
+        "reply": "[공지] 죄송하지만 내일 오전 10시 전원 출근 부탁합니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": -8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "보고서는 훌륭했다. 월요일 팀 분위기는 그렇지 못했다."
+          }
+        ]
+      },
+      {
+        "id": "negotiate",
+        "label": "화요일까지로 일정을 협상한다",
+        "reply": "전무님, 제대로 된 보고서로 화요일 오전에 드리겠습니다.",
+        "outcome": {
+          "baseChance": 0.45,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "socialSkill",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PEERS",
+              "stat": "trust",
+              "amount": 4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "전무",
+              "text": "그래요, 대충 30장보다 제대로 10장이 낫죠."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -6
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "BOSS",
+              "stat": "trust",
+              "amount": -5
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "전무",
+              "text": "월요일이라고 했습니다."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_head_successor",
+    "version": 1,
+    "status": "published",
+    "title": "내 자리를 이어받을 사람",
+    "description": "인사팀이 \"차기 부장 후보\" 한 명을 추천하라고 했다. 실력은 최고지만 차가운 사람과, 당신을 십 년 따라온 사람.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 4,
+    "cooldownMonths": 36,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["head"],
+    "channel": "인사팀",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "ranks": ["DEPARTMENT_HEAD"]
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "인사팀",
+        "text": "승계 계획 수립 차원에서 차기 리더 후보 1명 추천 부탁드립니다."
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "추천서는 한 장이다. 이름도 하나다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "best",
+        "label": "실력이 가장 좋은 사람을 쓴다",
+        "reply": "역량 평가 1위를 추천하겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 3
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": -4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "십 년을 따라온 사람은 축하한다고 말했다. 눈은 웃지 않았다."
+          }
+        ]
+      },
+      {
+        "id": "my_person",
+        "label": "십 년 따라온 사람을 쓴다",
+        "reply": "저와 오래 일하며 이 본부를 가장 잘 아는 사람입니다.",
+        "guaranteedEffects": [
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "trust",
+            "amount": 8
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PEER",
+            "text": "(개인 메시지) 부장님… 실망시켜 드리지 않을게요."
+          }
+        ]
+      },
+      {
+        "id": "both_grow",
+        "label": "둘을 공동 리더로 키우는 안을 낸다",
+        "reply": "두 사람을 공동 리더로 키우는 1년 육성안을 드리겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -6
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.5,
+          "modifiers": [
+            {
+              "source": "SKILL",
+              "id": "observation",
+              "levels": {
+                "1": 0.1,
+                "2": 0.15
+              }
+            }
+          ]
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 6
+            },
+            {
+              "type": "PROMOTION_POINT_DELTA",
+              "amount": 1
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PEERS",
+              "stat": "trust",
+              "amount": 5
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "인사팀",
+              "text": "육성안이 좋네요. 다른 본부에도 적용하겠습니다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "인사팀",
+              "text": "후보는 1명입니다. 다시 부탁드립니다."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_head_inflated",
+    "version": 1,
+    "status": "published",
+    "title": "내 팀의 숫자",
+    "description": "분기 실적 보고 직전, 우리 본부 숫자 일부가 부풀려졌다는 걸 알았다. 아끼는 팀원이 한 일이다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 4,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "highRisk": true,
+    "tags": ["head"],
+    "channel": "개인 메시지",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "ranks": ["DEPARTMENT_HEAD"]
+    },
+    "dialogue": [
+      {
+        "speaker": "PEER",
+        "text": "(개인 메시지) 부장님… 그 숫자, 제가 좀 맞췄어요. 이번 분기만 넘기면 다음 분기에 채울 수 있어요."
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "보고는 내일 아침 9시다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "self_report",
+        "label": "바로잡아 보고하고 내가 책임진다",
+        "reply": "실적 보고 전에 정정합니다. 관리 책임은 제게 있습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 2
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "trust",
+            "amount": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "감사실",
+            "text": "스스로 정정한 건 높이 삽니다. 내부 감사는 형식만 거치죠."
+          }
+        ]
+      },
+      {
+        "id": "fix_quietly",
+        "label": "조용히 숫자를 바로잡고 넘어간다",
+        "reply": "(팀원에게) 오늘 밤에 원래 숫자로 다시 맞추자. 이번 한 번이야.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -6
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.6
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -1
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "분기 실적은 평범했다. 아무도 이유를 묻지 않았다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "전무",
+              "text": "보고 직전에 숫자가 바뀐 이유를 설명해 주시죠."
+            }
+          ]
+        }
+      },
+      {
+        "id": "let_it_go",
+        "label": "이번 분기만 그대로 둔다",
+        "reply": "…이번 분기만이다. 다음 분기엔 반드시 채워.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_head_echo_cover",
+            "delayMonths": 9
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "보고는 박수 속에 끝났다. 당신만 박수를 치지 않았다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_head_echo_loyal",
+    "version": 1,
+    "status": "published",
+    "scheduledOnly": true,
+    "title": "그때 지켜 준 사람",
+    "description": "임원 회의에서 책임을 대신 졌던 그 팀원. 이번엔 그가 당신의 가장 어려운 프로젝트를 밤새 붙잡았다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "tags": ["head"],
+    "channel": "본부 단톡방",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "ranks": ["DEPUTY_HEAD", "DEPARTMENT_HEAD"]
+    },
+    "dialogue": [
+      {
+        "speaker": "PEER",
+        "text": "부장님, 그 건 제가 마무리했어요. 그때 저 지켜 주셨잖아요."
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "보고서 마지막 장에는 팀 전원의 이름이 적혀 있었다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "credit_team",
+        "label": "임원 보고에서 그의 이름을 먼저 말한다",
+        "reply": "이번 성과는 이 친구가 다 했습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "trust",
+            "amount": 6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "전무",
+            "text": "좋은 사람을 키웠네요."
+          }
+        ]
+      },
+      {
+        "id": "push_bigger",
+        "label": "이 기세로 더 큰 과제를 따 온다",
+        "reply": "이 팀이면 다음 분기 전략 과제도 맡을 수 있습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -5
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.65
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 7
+            },
+            {
+              "type": "PROMOTION_POINT_DELTA",
+              "amount": 1
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "전무",
+              "text": "좋습니다. 그 과제, 본부에 맡기죠."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "과제는 다른 본부로 갔다. 팀은 그래도 웃었다."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_head_echo_blame",
+    "version": 1,
+    "status": "published",
+    "scheduledOnly": true,
+    "title": "블라인드에 올라온 글",
+    "description": "실무자 탓으로 보고했던 그 사고. 사내 익명 커뮤니티에 \"책임은 아래로, 공은 위로\"라는 글이 올라왔다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "tags": ["head"],
+    "channel": "사내 익명 게시판",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "ranks": ["DEPUTY_HEAD", "DEPARTMENT_HEAD"]
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "익명",
+        "text": "[블라인드] ○○본부 부장, 사고 나니까 바로 실무자 이름 대더라. 이게 리더냐"
+      },
+      {
+        "speaker": "PEER",
+        "text": "(팀 단톡방이 하루 종일 조용하다)"
+      }
+    ],
+    "choices": [
+      {
+        "id": "apologize",
+        "label": "팀원 앞에서 사과한다",
+        "reply": "그때 내가 잘못했다. 미안하다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -3
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "trust",
+            "amount": 5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PEER",
+            "text": "…말씀해 주셔서 다행이에요."
+          }
+        ]
+      },
+      {
+        "id": "ignore",
+        "label": "익명 글은 무시한다",
+        "reply": "(아무 말도 하지 않는다)",
+        "outcome": {
+          "baseChance": 0.5
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -2
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "글은 일주일 만에 묻혔다. 팀의 기억은 묻히지 않았다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -8
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PEERS",
+              "stat": "favor",
+              "amount": -6
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "인사팀",
+              "text": "본부 조직 진단을 다시 하겠습니다."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_head_echo_cover",
+    "version": 1,
+    "status": "published",
+    "scheduledOnly": true,
+    "title": "덮어 둔 실적",
+    "description": "이번 분기만이라며 그대로 뒀던 그 숫자. 다음 분기에도 채워지지 않았고, 감사실이 찾아냈다.",
+    "category": "work",
+    "rarity": "uncommon",
+    "weight": 1,
+    "highRisk": true,
+    "tags": ["head"],
+    "channel": "감사실",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "ranks": ["DEPARTMENT_HEAD"]
+    },
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "감사실",
+        "text": "○분기 본부 실적에 근거 없는 매출이 잡혀 있습니다. 보고 당시 알고 계셨습니까?"
+      },
+      {
+        "speaker": "NARRATION",
+        "text": "그 팀원은 이미 회의실 앞에 불려 와 있었다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "take_it",
+        "label": "알고 있었다고, 내 책임이라고 한다",
+        "reply": "알고 있었습니다. 제 판단이었고 제 책임입니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -8
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "trust",
+            "amount": 6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "감사실",
+            "text": "솔직하게 말씀해 주셨으니 징계는 경고로 마무리하겠습니다."
+          }
+        ]
+      },
+      {
+        "id": "deny",
+        "label": "몰랐다고 한다",
+        "reply": "저는 보고받지 못했습니다.",
+        "outcome": {
+          "baseChance": 0.4
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -2
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PEERS",
+              "stat": "trust",
+              "amount": -10
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "팀원 혼자 징계를 받았다. 그는 다음 달 회사를 떠났다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -10
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -8
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NAMED",
+              "name": "감사실",
+              "text": "메신저 기록에 보고하신 정황이 있네요. 징계위원회에 회부합니다."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_season_plan",
+    "version": 1,
+    "status": "published",
+    "scheduledOnly": true,
+    "title": "새해 계획",
+    "description": "새 다이어리 첫 장. 올해부터 몇 년 동안 붙잡고 갈 목표를 하나 적는다. 이루면 기운이 나고, 놓치면 조금 씁쓸하다.",
+    "category": "daily",
+    "slot": "life",
+    "rarity": "common",
+    "weight": 1,
+    "tags": ["season"],
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "choices": [
+      {
+        "id": "promotion",
+        "label": "4년 안에 다음 직급을 단다",
+        "description": "승진 심사를 네 번 안에 통과하기",
+        "visibleIf": {
+          "ranks": ["STAFF", "ASSISTANT_MANAGER", "MANAGER", "DEPUTY_HEAD"]
+        },
+        "reply": "(다이어리에) 4년 안에 한 단계 위로.",
+        "guaranteedEffects": [
+          {
+            "type": "SEASON_START",
+            "kind": "PROMOTION"
+          }
+        ]
+      },
+      {
+        "id": "savings",
+        "label": "3년 안에 연봉 1년 치를 모은다",
+        "description": "순자산(현금 − 빚)을 지금 연봉만큼 늘리기",
+        "reply": "(다이어리에) 3년 동안 연봉 하나만큼 모으기.",
+        "guaranteedEffects": [
+          {
+            "type": "SEASON_START",
+            "kind": "SAVINGS"
+          }
+        ]
+      },
+      {
+        "id": "review",
+        "label": "3년 연속 B 이상을 받는다",
+        "description": "연말 평가 세 번 모두 C·D 없이",
+        "reply": "(다이어리에) 3년 동안 C 없이.",
+        "guaranteedEffects": [
+          {
+            "type": "SEASON_START",
+            "kind": "REVIEW"
+          }
+        ]
+      },
+      {
+        "id": "wellbeing",
+        "label": "3년 동안 좋은 컨디션을 지킨다",
+        "description": "체력·정신력 둘 다 75 아래로 내려가지 않기",
+        "reply": "(다이어리에) 3년 동안 나를 먼저 챙기기.",
+        "guaranteedEffects": [
+          {
+            "type": "SEASON_START",
+            "kind": "WELLBEING"
+          }
+        ]
+      }
+    ]
   }
 ]

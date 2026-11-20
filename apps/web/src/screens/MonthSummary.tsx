@@ -3,6 +3,7 @@ import { formatKrw } from '../api';
 import { Icon } from '../components/Icons';
 import { Warnings } from '../components/StatusPanel';
 import { StoryOutcome, verdictOf } from './StoryResult';
+import { Avatar } from '../components/Avatar';
 
 interface Props {
   view: PublicRunView;
@@ -75,9 +76,7 @@ function ReviewSheet({ review, age }: { review: PublicReview; age: number }) {
         )}
       </div>
       <div className="bubble-row mt-2">
-        <span className="avatar avatar-small" aria-hidden="true">
-          {(review.bossName ?? '팀').slice(0, 1)}
-        </span>
+        <Avatar name={review.bossName ?? '팀장'} small />
         <div className="bubble-col">
           <span className="bubble-name">{review.bossName ?? '팀장'} · 평가 코멘트</span>
           <p className="bubble">{review.comment}</p>
@@ -349,6 +348,23 @@ export function MonthSummary({ view, busy, onNext, onTransfer }: Props) {
           promotion={m.promotion}
           salary={m.salaryAdjustment}
         />
+      )}
+
+      {m?.seasonResult && (
+        <div
+          className={`card goal-milestone flip-in ${m.seasonResult.achieved ? '' : 'season-missed'}`}
+          role="status"
+        >
+          <span className="goal-emoji" aria-hidden="true">
+            {m.seasonResult.emoji}
+          </span>
+          <div>
+            <strong>
+              시즌 목표 {m.seasonResult.achieved ? '달성' : '놓침'} · {m.seasonResult.title}
+            </strong>
+            <p className="tiny muted">{m.seasonResult.text}</p>
+          </div>
+        </div>
       )}
 
       {m?.goalMilestone && view.lifeGoal && (
