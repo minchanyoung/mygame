@@ -169,6 +169,12 @@ for (const policy of POLICIES) {
     const ok = xs.filter((x) => x.achieved).length;
     return `${k} ${xs.length ? ((ok / xs.length) * 100).toFixed(0) : '-'}%(${xs.length})`;
   });
+  const seasonalPerYear =
+    results.reduce((s, r) => s + r.seasonal, 0) / Math.max(1, results.reduce((s, r) => s + r.months, 0) / 12);
+  console.log(
+    `  휴직 판당 ${(results.reduce((s, r) => s + r.leaves, 0) / runs).toFixed(2)}번 · 엔딩 때 능력 레벨 합 평균 ${(results.reduce((s, r) => s + r.skillLevels, 0) / runs).toFixed(2)} (최대 6)`,
+  );
+  console.log(`  계절·연례 사건 연 ${seasonalPerYear.toFixed(2)}건 (사건 10개, 목표 3~5)`);
   console.log(`  시즌 목표 판당 ${(seasons.length / runs).toFixed(2)}개 · 달성률 ${byKind.join(' · ')}`);
   // S12 직무 연재: 직무별 시작률(1화)·완결률·시작 시점. S13 직무별 실패율·부장 도달은 평균 ±10%p 목표
   const jobRows = JOB_IDS.map((job) => {

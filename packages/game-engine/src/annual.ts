@@ -1,3 +1,4 @@
+import { onLeave } from './leave';
 import {
   eventSlot,
   turnInfo,
@@ -132,6 +133,8 @@ export function processAnnualReview(
   if (info.monthOfYear !== 12 || !job || state.employment.status !== 'EMPLOYED')
     return { state, review: null };
   if (state.annualReviewProcessedYear === info.yearIndex) return { state, review: null };
+  // C4 휴직 중인 해는 평가하지 않는다
+  if (onLeave(state)) return { state, review: null };
 
   const review = computeAnnualReview(state, content);
   const wf = content.pack.rules.annualReview.warningFlag;

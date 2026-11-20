@@ -117,6 +117,9 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
     Object.keys(c.negativeTraitLevels ?? {}).forEach((id) => traitRef(path, id, 'NEGATIVE'));
     c.backgroundTraitsAny?.forEach((id) => backgrounds.has(id) || add(path, `알 수 없는 배경 특성: ${id}`));
     personalityRefs(path, c.npc?.personalityAny);
+    c.companies?.forEach(
+      (id) => pack.companies.some((x) => x.id === id) || add(path, `알 수 없는 회사: ${id}`),
+    );
   };
 
   const transitions = new Map<string, Set<string>>();
@@ -364,6 +367,10 @@ export function validateContentReferences(pack: ContentPack): ContentIssue[] {
   // 예약 전용 사건은 반드시 어떤 사건(또는 승진 누락 규칙)이 예약해야 한다 (고아 콘텐츠 방지)
   const scheduledTargets = new Set([...scheduleEdges.values()].flat());
   scheduledTargets.add(promo.consecutiveMissEvent.eventId);
+  // C4 휴직 중 사건도 엔진이 직접 연다
+  if (!eventIds.has(pack.rules.leave.eventId))
+    add('rules.leave.eventId', `알 수 없는 사건: ${pack.rules.leave.eventId}`);
+  scheduledTargets.add(pack.rules.leave.eventId);
   // S19 1월 '새해 계획' 사건은 엔진이 직접 연다
   if (!eventIds.has(pack.rules.season.eventId))
     add('rules.season.eventId', `알 수 없는 사건: ${pack.rules.season.eventId}`);

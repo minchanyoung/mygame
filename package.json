@@ -27,7 +27,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build": "npm run build --workspaces --if-present",
-    "validate:content": "npm run validate -w @company-life/content"
+    "validate:content": "npm run validate -w @company-life/content",
+    "stats": "tsx apps/api/src/cli-stats.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

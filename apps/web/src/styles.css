@@ -3304,3 +3304,113 @@ fieldset:disabled {
 .cert-PROMOTION {
   color: var(--gold);
 }
+
+/* S24 고위험 선택: 길게 누르는 동안 아래에서 차오르는 띠 */
+.choice {
+  position: relative;
+  overflow: hidden;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+.hold-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  width: 100%;
+  background: var(--stamp);
+  transform-origin: left;
+  animation: hold-fill 0.6s linear forwards;
+}
+@keyframes hold-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.hold-hint {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* D2 인맥 지도 */
+.relation-map svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.rm-ring {
+  fill: none;
+  stroke: var(--line);
+  stroke-dasharray: 3 4;
+}
+.rm-ring-label {
+  font-size: 9px;
+  fill: var(--muted);
+}
+.rm-link {
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+.rm-me {
+  fill: var(--navy);
+}
+.rm-me-text {
+  fill: var(--on-navy);
+  font-size: 13px;
+  font-weight: 700;
+}
+.rm-node {
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+.rm-initial {
+  fill: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+.rm-name {
+  fill: var(--ink-2);
+  font-size: 10px;
+}
+.rm-former {
+  opacity: 0.4;
+}
+.av-fill-0 {
+  fill: #3a4f7a;
+}
+.av-fill-1 {
+  fill: #4f6b5a;
+}
+.av-fill-2 {
+  fill: #7a5a4a;
+}
+.av-fill-3 {
+  fill: #5d4f7a;
+}
+.av-fill-4 {
+  fill: #3f6a75;
+}
+.av-fill-5 {
+  fill: #7a4f62;
+}
+
+/* C4 휴직 */
+.leave-banner {
+  gap: 4px;
+  border-left: 4px solid var(--navy);
+  background: var(--navy-soft);
+}
+
+/* D1 능력 연습 */
+.practice-row {
+  display: grid;
+  grid-template-columns: 6.5em 1fr 3em;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.practice-row .num {
+  text-align: right;
+}

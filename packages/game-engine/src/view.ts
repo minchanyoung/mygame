@@ -58,6 +58,8 @@ import { requireFrom, type ContentIndex } from './content-index';
 import { applyEffects } from './effects';
 import { buildChronicle } from './chronicle';
 import { dailyScore } from './daily';
+import { practiceProgress } from './practice';
+import { leaveMonthsLeft, onLeave } from './leave';
 import { legacyPerkLabel } from './legacy';
 import { SEASON_INFO, seasonProgress } from './season';
 import { echoSource } from './echo';
@@ -781,6 +783,10 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
     },
     difficulty: state.difficulty,
     daily: state.daily ?? null,
+    practice: practiceProgress(state, content),
+    leave: onLeave(state)
+      ? { monthsLeft: leaveMonthsLeft(state), payPercent: Math.round(state.leave!.payPermille / 10) }
+      : null,
     legacy: (() => {
       const l = state.legacy;
       const title = l ? content.pack.titles.find((t) => t.id === l.titleId) : undefined;

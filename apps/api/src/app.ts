@@ -50,8 +50,11 @@ import {
   toPublicView,
   type ContentIndex,
 } from '@company-life/game-engine';
+import { buildPlayStats, summarizeRun } from './stats';
 import {
   MemoryDailyStore,
+  MemoryStatsStore,
+  type StatsStore,
   MemoryPlayerStore,
   NotFoundError,
   type DailyRecord,
@@ -68,6 +71,10 @@ export interface AppOptions {
   players?: PlayerStore;
   /** S21 오늘의 출근 순위 저장소. 생략 시 메모리 */
   daily?: DailyStore;
+  /** E4 끝난 판 요약 저장소. 생략 시 메모리 */
+  stats?: StatsStore;
+  /** E4 플레이 통계 조회 토큰 (x-stats-token). 없으면 플레이테스트 도구가 켜졌을 때만 조회 가능 */
+  statsToken?: string;
   /** 버전별 콘텐츠. 진행 중 run은 생성 시 고정된 버전으로만 처리한다 (§23.1). */
   contents: ContentPack[];
   logger?: boolean;
@@ -120,6 +127,7 @@ export function buildApp(options: AppOptions): FastifyInstance {
   const { store } = options;
   const players = options.players ?? new MemoryPlayerStore();
   const daily = options.daily ?? new MemoryDailyStore();
+  const stats = options.stats ?? new MemoryStatsStore();
   const now = options.now ?? (() => new Date());
   const contents = new Map<string, ContentIndex>(
     options.contents.map((c) => [c.contentVersion, indexContent(c)]),
@@ -189,7 +197,14 @@ export function buildApp(options: AppOptions): FastifyInstance {
 
   /** S10 엔딩이 확정된 판을 플레이어 도감에 반영 (서버가 직접 판정, 조작된 판 제외, 중복 반영 없음) */
   const recordFinishedRun = async (state: GameRunState, content: ContentIndex, req: FastifyRequest) => {
-    if (!state.playerId || state.playtestModified || !state.ending) return;
+    if (state.playtestModified || !state.ending) return;
+    // E4 사람 플레이 기록 (게임 진행은 막지 않는다)
+    const summary = summarizeRun(state, now().toISOString());
+    if (summary)
+      await stats
+        .append(summary)
+        .catch((err) => req.log.error({ err, runId: state.runId }, 'stats append failed'));
+    if (!state.playerId) return;
     // S21 오늘의 출근: 그날 첫 판만 순위에 (실패해도 게임 진행은 막지 않는다)
     const score = state.daily ? dailyScore(state, content) : null;
     if (state.daily && score) {
@@ -519,6 +534,15 @@ export function buildApp(options: AppOptions): FastifyInstance {
   });
 
   // ── 플레이테스트 도구: 옵션으로 켤 때만 라우트가 존재한다 (꺼져 있으면 404) ──
+  // E4 플레이 통계: 토큰이 맞거나 플레이테스트 도구가 켜졌을 때만
+  app.get('/api/stats', async (req) => {
+    const token = req.headers['x-stats-token'];
+    const allowed =
+      (options.statsToken !== undefined && token === options.statsToken) || options.playtestTools === true;
+    if (!allowed) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    return buildPlayStats(await stats.all(), latestContent);
+  });
+
   app.get('/api/playtest/status', async () => ({ enabled: options.playtestTools === true }));
 
   if (options.playtestTools) {

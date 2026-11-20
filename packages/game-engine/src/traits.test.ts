@@ -87,7 +87,8 @@ describe('level bonuses are per-event and replace, not stack (§7.5, §23.2)', (
     expect(lv2.choices.find((c) => c.id === 'negotiate')!.appliedTraits).toEqual(['처세술 Lv.2']);
     // 정확한 확률은 공개 뷰에 없다
     expect(JSON.stringify(lv2)).not.toMatch(/chance|0\.45/);
-    expect(lv2.choices.find((c) => c.id === 'negotiate')!.risk).toBe('MEDIUM');
+    // 기본 45% − 보통 난이도 6%p = 39% → 보통(40%) 아래라 '높음'
+    expect(lv2.choices.find((c) => c.id === 'negotiate')!.risk).toBe('HIGH');
   });
 
   it('negative trait modifiers apply only at their defined level (burnout Lv.2 −10%p)', () => {
@@ -179,7 +180,8 @@ describe('positive skills: special-event success only (§4.2)', () => {
     ]);
   });
 
-  it('100 successes on a normal event never change skills', () => {
+  // D1(2026-11-20)부터: 일반 사건 성공은 그 능력이 돕는 선택지일 때만 '연습'으로 쌓여 기준에서 한 단계씩 자란다
+  it('100 successes on a normal event grow a skill only through practice thresholds (D1)', () => {
     let s = base;
     for (let i = 0; i < 100; i++) {
       s = resolve(
@@ -189,8 +191,15 @@ describe('positive skills: special-event success only (§4.2)', () => {
         ALWAYS_SUCCEED,
       ).state;
     }
-    expect(s.skills).toEqual({});
-    expect(s.skillHistory).toEqual([]);
+    const { lv1, lv2 } = content.pack.rules.practice;
+    expect(s.skills).toEqual({ socialSkill: 2 });
+    expect(s.skillHistory.map((h) => [h.from, h.to])).toEqual([
+      [0, 1],
+      [1, 2],
+    ]);
+    // 기준 횟수째 성공에서 정확히 올랐다
+    expect(s.skillHistory.map((h) => h.turnIndex)).toHaveLength(2);
+    expect(lv1).toBeLessThan(lv2);
     expect(s.eventOccurrences.filter((o) => o.success)).toHaveLength(100);
   });
 

@@ -56,6 +56,8 @@ export const ConditionsSchema = z
   .object({
     employment: z.union([EmploymentStatusSchema, z.array(EmploymentStatusSchema).min(1)]).optional(),
     age: IntRangeSchema.optional(),
+    /** C3 이 달(1~12월)에만 (계절·연례 사건) */
+    months: z.array(z.number().int().min(1).max(12)).min(1).optional(),
     /** 현재 회사 재직 개월 수 (입사 턴 기준) */
     tenureMonths: IntRangeSchema.optional(),
     /** S8 진행 중인 연재가 없을 때만 (동시에 한 편) */
@@ -63,6 +65,8 @@ export const ConditionsSchema = z
     /** S7 지금까지 이직 횟수 */
     transfers: IntRangeSchema.optional(),
     companyGrades: z.array(CompanyGradeSchema).min(1).optional(),
+    /** C2 이 회사에 다닐 때만 (회사별 개성 사건) */
+    companies: z.array(ContentIdSchema).min(1).optional(),
     jobs: z.array(JobIdSchema).min(1).optional(),
     ranks: z.array(PlayerRankSchema).min(1).optional(),
     resources: z.partialRecord(ResourceKeySchema, IntRangeSchema).optional(),
@@ -134,6 +138,14 @@ export const EffectSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('TRANSFER_OFFER') }).strict(),
   /** S7 카운터 오퍼: 현 연봉 ‰ 인상 */
   z.object({ type: z.literal('COUNTER_OFFER'), raisePermille: z.number().int().min(1).max(500) }).strict(),
+  /** C4 휴직 시작 (다음 달부터 months개월, 월급 payPermille‰). 이미 휴직 중이면 무시 */
+  z
+    .object({
+      type: z.literal('LEAVE_START'),
+      months: z.number().int().min(1).max(12),
+      payPermille: z.number().int().min(0).max(1000),
+    })
+    .strict(),
   /** S19 시즌 목표 시작 (진행 중이면 무시) */
   z.object({ type: z.literal('SEASON_START'), kind: SeasonKindSchema }).strict(),
   /** S7 임원 승진 확정 → '별을 달다' 정상 엔딩 */

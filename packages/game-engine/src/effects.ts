@@ -95,6 +95,10 @@ export function applyEffects(
         // 회사·연봉 추첨에 콘텐츠와 RNG가 필요해 resolveChoice가 효과 적용 뒤에 처리한다
         break;
 
+      case 'LEAVE_START':
+        // C4 휴직은 resolveChoice가 효과 적용 뒤에 처리한다 (근속 조정과 함께)
+        break;
+
       case 'SEASON_START':
         // S19 기한·목표치에 규칙이 필요해 resolveChoice가 효과 적용 뒤에 처리한다
         break;

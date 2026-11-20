@@ -1,3 +1,5 @@
+import { applyPractice } from './practice';
+import { startLeave } from './leave';
 import { newSeason, seasonAvailable } from './season';
 import {
   eventSlot,
@@ -302,6 +304,9 @@ export function resolveChoice(
   if (applied.some((e) => e.type === 'TRANSFER_OFFER')) {
     draft.transferOffer = generateTransferOffer(draft, content);
   }
+  // C4 휴직 시작
+  const leave = applied.find((e) => e.type === 'LEAVE_START');
+  if (leave?.type === 'LEAVE_START') Object.assign(draft, startLeave(draft, leave.months, leave.payPermille));
   // S19 시즌 목표 시작 (진행 중이면 그대로)
   const season = applied.find((e) => e.type === 'SEASON_START');
   if (season?.type === 'SEASON_START' && !draft.season && seasonAvailable(draft, season.kind)) {
@@ -331,6 +336,8 @@ export function resolveChoice(
     summary: `${event.title} — ${choice.label}${success === null ? '' : success ? ' (성공)' : ' (실패)'}`,
     data: { eventId: event.id, choiceId, success },
   });
+  // D1 반복으로 자라는 능력 (이번 성공까지 센다)
+  if (success === true) traitChanges.push(...applyPractice(draft, content, effectCtx));
 
   const resultText =
     (success === true

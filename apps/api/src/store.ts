@@ -1,4 +1,4 @@
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { appendFile, mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { PlayerCollectionSchema, type GameRunState, type PlayerCollection } from '@company-life/shared';
 import { migrateRunState } from '@company-life/game-engine';
@@ -303,6 +303,67 @@ export class FileDailyStore implements DailyStore {
       await writeFile(tmp, JSON.stringify([...day, entry]), 'utf8');
       await rename(tmp, file);
       return true;
+    });
+  }
+}
+
+// ───────── E4 플레이 기록 (사람 플레이 데이터로 밸런스를 다시 보기 위한 요약) ─────────
+
+export interface RunSummaryRecord {
+  runId: string;
+  at: string;
+  contentVersion: string;
+  difficulty: string;
+  daily: boolean;
+  jobId: string | null;
+  endingType: string;
+  category: 'FAILURE' | 'NORMAL';
+  age: number;
+  highestRank: string | null;
+  /** 고른 선택 `eventId:choiceId:결과(S/F/-)` */
+  choices: string[];
+}
+
+export interface StatsStore {
+  append(record: RunSummaryRecord): Promise<void>;
+  all(): Promise<RunSummaryRecord[]>;
+}
+
+export class MemoryStatsStore implements StatsStore {
+  #records: RunSummaryRecord[] = [];
+  async append(record: RunSummaryRecord): Promise<void> {
+    if (!this.#records.some((r) => r.runId === record.runId)) this.#records.push(record);
+  }
+  async all(): Promise<RunSummaryRecord[]> {
+    return [...this.#records];
+  }
+}
+
+/** 로컬 개발용: 한 줄에 판 하나 (JSON Lines) */
+export class FileStatsStore implements StatsStore {
+  #file: string;
+  #mutex = new KeyedMutex();
+  constructor(dir: string) {
+    this.#file = path.join(dir, 'runs.jsonl');
+  }
+  async all(): Promise<RunSummaryRecord[]> {
+    try {
+      const raw = await readFile(this.#file, 'utf8');
+      return raw
+        .split('\n')
+        .filter((l) => l.trim())
+        .map((l) => JSON.parse(l) as RunSummaryRecord);
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') return [];
+      throw err;
+    }
+  }
+  append(record: RunSummaryRecord): Promise<void> {
+    return this.#mutex.run('stats', async () => {
+      const existing = await this.all();
+      if (existing.some((r) => r.runId === record.runId)) return;
+      await mkdir(path.dirname(this.#file), { recursive: true });
+      await appendFile(this.#file, `${JSON.stringify(record)}\n`, 'utf8');
     });
   }
 }

@@ -5,6 +5,9 @@ import { Icon } from '../components/Icons';
 import { Gauges, Warnings } from '../components/StatusPanel';
 import { Avatar } from '../components/Avatar';
 
+/** S24 고위험 선택 길게 누르기 확정 시간 */
+const HOLD_MS = 600;
+
 interface Props {
   view: PublicRunView;
   busy: boolean;
@@ -43,6 +46,9 @@ export function EventScreen({ view, busy, onChoose }: Props) {
   const event = view.activeEvent;
   // 실직 경고가 붙은 선택지는 두 번 눌러야 확정 (실수 방지)
   const [armed, setArmed] = useState<string | null>(null);
+  const [holding, setHolding] = useState<string | null>(null);
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const held = useRef(false);
   // 위아래 분할: 대화 영역이 따로 스크롤되므로, 새 메시지가 올라오면 대화 영역 맨 아래로 따라간다
   const bodyRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -68,13 +74,39 @@ export function EventScreen({ view, busy, onChoose }: Props) {
   const p = event.participant;
   const isLife = event.slot === 'life';
 
+  // 고위험·실직 경고 선택지: 길게 누르면 바로, 짧게 누르면 한 번 더 눌러야 확정
+  const guarded = (c: PublicChoice) => c.fatalWarning !== undefined || c.risk === 'HIGH';
+  const confirm = (c: PublicChoice) => {
+    // 진동을 지원하는 휴대폰에서만 짧게 (실직 경고는 조금 길게)
+    if (guarded(c)) navigator.vibrate?.(c.fatalWarning ? 60 : 25);
+    setHolding(null);
+    onChoose(event.occurrenceId, c.id);
+  };
   const pick = (c: PublicChoice) => {
-    if (!c.enabled || busy) return;
-    if (c.fatalWarning && armed !== c.id) {
+    if (!c.enabled || busy || held.current) return;
+    if (guarded(c) && armed !== c.id) {
       setArmed(c.id);
+      navigator.vibrate?.(10);
       return;
     }
-    onChoose(event.occurrenceId, c.id);
+    confirm(c);
+  };
+  const startHold = (c: PublicChoice) => {
+    if (!c.enabled || busy || !guarded(c)) return;
+    held.current = false;
+    setHolding(c.id);
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+    holdTimer.current = setTimeout(() => {
+      held.current = true;
+      confirm(c);
+    }, HOLD_MS);
+  };
+  const cancelHold = () => {
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+    holdTimer.current = null;
+    setHolding(null);
+    // 길게 눌러 확정한 직후의 click은 무시하고, 다음 누름부터 다시 받는다
+    setTimeout(() => (held.current = false), 0);
   };
 
   const progress = (
@@ -99,9 +131,14 @@ export function EventScreen({ view, busy, onChoose }: Props) {
           <button
             key={c.id}
             type="button"
-            className={`card choice ${c.enabled ? '' : 'choice-locked'} ${c.fatalWarning ? 'choice-fatal' : ''} ${isArmed ? 'choice-armed' : ''}`}
+            className={`card choice ${c.enabled ? '' : 'choice-locked'} ${c.fatalWarning ? 'choice-fatal' : ''} ${isArmed ? 'choice-armed' : ''} ${holding === c.id ? 'choice-holding' : ''}`}
             disabled={!c.enabled || busy}
             onClick={() => pick(c)}
+            onPointerDown={() => startHold(c)}
+            onPointerUp={cancelHold}
+            onPointerLeave={cancelHold}
+            onPointerCancel={cancelHold}
+            onContextMenu={(e) => guarded(c) && e.preventDefault()}
           >
             <span className="choice-label">
               {!c.enabled && (
@@ -141,6 +178,12 @@ export function EventScreen({ view, busy, onChoose }: Props) {
                 <Icon name="warning" size={16} />
                 {c.fatalWarning.replace(/^⚠\s*/, '')}
                 {isArmed ? ' — 한 번 더 누르면 확정' : ''}
+              </span>
+            )}
+            {holding === c.id && <span className="hold-bar" aria-hidden="true" />}
+            {!c.fatalWarning && c.risk === 'HIGH' && c.enabled && (
+              <span className="hold-hint tiny">
+                {isArmed ? '한 번 더 누르면 확정' : '길게 누르거나 두 번 눌러 확정'}
               </span>
             )}
           </button>

@@ -62,6 +62,12 @@ export interface AutoPlayResult {
   jobSeriesFinished: boolean;
   /** S19 시즌 목표 (종류별 시도·달성) */
   seasons: { kind: string; achieved: boolean }[];
+  /** C3 계절·연례 사건을 만난 횟수 */
+  seasonal: number;
+  /** C4 휴직 횟수, D1 엔딩 때 능력 레벨 합 */
+  leaves: number;
+  leaveOffers: number;
+  skillLevels: number;
 }
 
 function pickChoice(
@@ -139,9 +145,14 @@ function pickChoice(
                     ? 25
                     : e.type === 'EXECUTIVE_PROMOTION'
                       ? 120
-                      : e.type === 'SCHEDULE_EVENT' && expert && depth === 0
-                        ? followUpValue(e.eventId)
-                        : longTerm(e)),
+                      : e.type === 'LEAVE_START'
+                        ? // C4 휴직: 매달 추가 회복(최대치에 막히는 만큼은 빼지 않는 단순 합) − 못 받는 월급
+                          Object.values(content.pack.rules.leave.recovery).reduce((a, b) => a + b, 0) *
+                            e.months +
+                          money(-((monthly * (1000 - e.payPermille)) / 1000) * e.months)
+                        : e.type === 'SCHEDULE_EVENT' && expert && depth === 0
+                          ? followUpValue(e.eventId)
+                          : longTerm(e)),
       0,
     );
   /**
@@ -217,6 +228,13 @@ function careerStats(
       return s?.job !== undefined && s.episode === s.total;
     }),
     seasons: (state.seasonHistory ?? []).map((r) => ({ kind: r.kind, achieved: r.achieved })),
+    leaves: state.eventOccurrences.filter((o) => o.eventId === 'evt_leave_return').length,
+    leaveOffers: state.eventOccurrences.filter(
+      (o) => o.eventId === 'evt_leave_burnout' || o.eventId === 'evt_leave_medical',
+    ).length,
+    skillLevels: Object.values(state.skills).reduce((a, b) => a + b, 0),
+    seasonal: state.eventOccurrences.filter((o) => content.events.get(o.eventId)?.tags?.includes('seasonal'))
+      .length,
   };
 }
 

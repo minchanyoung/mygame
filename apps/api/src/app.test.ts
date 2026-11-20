@@ -5,7 +5,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { loadContentPack } from '@company-life/content';
 import type { CreateRunResponse, PublicChoice, PublicRunView } from '@company-life/shared';
 import { buildApp } from './app';
-import { FileRunStore, MemoryDailyStore, MemoryRunStore, type RunStore } from './store';
+import { FileRunStore, MemoryDailyStore, MemoryRunStore, MemoryStatsStore, type RunStore } from './store';
 
 const contents = [loadContentPack()];
 const makeApp = (store: RunStore = new MemoryRunStore()) => buildApp({ store, contents });
@@ -491,8 +491,8 @@ describe('playtest tools over HTTP', () => {
     );
 
     const debug = (await app.inject({ url: `/api/playtest/runs/${body.runId}/debug`, headers })).json();
-    // 기본 40% ± 배경 특성 보정(천재형 +10, 압박에 약함 −10) + 보통 난이도 보정(−5)
-    expect([25, 35, 45]).toContain(
+    // 기본 40% ± 배경 특성 보정(천재형 +10, 압박에 약함 −10) + 보통 난이도 보정(−6)
+    expect([24, 34, 44]).toContain(
       debug.activeEventChoices.find((c: { id: string }) => c.id === 'first_response').exactChancePercent,
     );
   });
@@ -660,5 +660,43 @@ describe('S21 오늘의 출근', () => {
     expect(board.top[0]).not.toHaveProperty('playerId');
     expect(board.mine).toBeNull();
     expect((await app.inject({ url: '/api/daily?date=../../x' })).statusCode).toBe(400);
+  });
+});
+
+describe('E4 플레이 통계', () => {
+  const rec = (runId: string, category: 'FAILURE' | 'NORMAL', age: number, choice: string) => ({
+    runId,
+    at: '2026-11-20T00:00:00.000Z',
+    contentVersion: 'x',
+    difficulty: 'NORMAL',
+    daily: false,
+    jobId: 'DEV',
+    endingType: category === 'NORMAL' ? 'RETIREMENT' : 'OUSTED',
+    category,
+    age,
+    highestRank: category === 'NORMAL' ? 'DEPARTMENT_HEAD' : 'MANAGER',
+    choices: Array.from({ length: 10 }, () => `evt_dev_hotfix:${choice}:S`),
+  });
+
+  it('토큰이 없으면 숨기고, 맞으면 난이도별 실패율·몰린 선택을 보여 준다', async () => {
+    const stats = new MemoryStatsStore();
+    await stats.append(rec('a', 'FAILURE', 40, 'rollback'));
+    await stats.append(rec('b', 'NORMAL', 60, 'rollback'));
+    await stats.append(rec('a', 'FAILURE', 40, 'rollback')); // 같은 판은 한 번만
+    const app = buildApp({ store: new MemoryRunStore(), contents, stats, statsToken: 'secret' });
+    expect((await app.inject({ url: '/api/stats' })).statusCode).toBe(404);
+    const res = await app.inject({ url: '/api/stats', headers: { 'x-stats-token': 'secret' } });
+    const body = res.json();
+    expect(body.runs).toBe(2);
+    expect(body.byDifficulty[0]).toMatchObject({
+      difficulty: 'NORMAL',
+      failBefore50Percent: 50,
+      botTarget: '10~25%',
+    });
+    expect(body.skewedChoices[0]).toMatchObject({
+      eventId: 'evt_dev_hotfix',
+      picks: 20,
+      topSharePercent: 100,
+    });
   });
 });

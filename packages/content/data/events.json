@@ -19750,5 +19750,2589 @@
         ]
       }
     ]
+  },
+  {
+    "id": "evt_season_newyear_speech",
+    "version": 1,
+    "status": "published",
+    "title": "시무식",
+    "description": "새해 첫 출근. 대강당에서 대표의 신년사가 40분째 이어지고 있다.",
+    "category": "work",
+    "slot": "work",
+    "rarity": "common",
+    "weight": 60,
+    "cooldownMonths": 10,
+    "tags": ["seasonal"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "months": [1]
+    },
+    "choices": [
+      {
+        "id": "take_notes",
+        "label": "받아 적으며 끝까지 듣는다",
+        "reply": "(올해 키워드: 도전·혁신·원팀… 메모)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "BOSS",
+            "text": "{me} 씨 메모한 거 팀 공유 좀 해 줘요. 나 졸았어."
+          }
+        ]
+      },
+      {
+        "id": "sneak_work",
+        "label": "무릎 위 노트북으로 몰래 일한다",
+        "reply": "(신년사 BGM 삼아 메일 정리)",
+        "outcome": {
+          "baseChance": 0.65
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "focus",
+              "amount": 3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "메일함이 비었다. 신년사는 아직 안 끝났다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "맨 앞줄에서 노트북은 좀… 사진 찍혔어요."
+            }
+          ]
+        }
+      }
+    ],
+    "channel": "전사 공지",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "대표이사",
+        "text": "올해도 우리는 도전, 혁신, 그리고 원팀입니다!"
+      }
+    ]
+  },
+  {
+    "id": "evt_season_lunar",
+    "version": 1,
+    "status": "published",
+    "title": "설 연휴",
+    "description": "나흘짜리 설 연휴. 고향 가는 기차표는 이미 매진이고, 단톡방엔 친척들의 안부가 쌓인다.",
+    "category": "daily",
+    "slot": "life",
+    "rarity": "common",
+    "weight": 60,
+    "cooldownMonths": 10,
+    "tags": ["seasonal"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "months": [2]
+    },
+    "choices": [
+      {
+        "id": "go_home",
+        "label": "버스라도 타고 고향에 간다",
+        "reply": "(엄마, 이번엔 내려갈게)",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -300000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "\"결혼은?\" \"연봉은?\" 질문 세례 속에서도 엄마 밥은 맛있었다."
+          }
+        ]
+      },
+      {
+        "id": "rest_alone",
+        "label": "이번엔 혼자 푹 쉰다",
+        "reply": "(이번 설은 못 내려가요. 몸조심하세요!)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "나흘 내내 잤다. 조금 외로웠고, 많이 개운했다."
+          }
+        ]
+      },
+      {
+        "id": "work_holiday",
+        "label": "밀린 일을 연휴에 처리한다",
+        "reply": "(연휴엔 메일이 안 와서 일이 잘 된다…)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -5
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "BOSS",
+            "text": "연휴에 그걸 다 해 놨어요? …고맙긴 한데 좀 쉬어요."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_season_march_newcomers",
+    "version": 1,
+    "status": "published",
+    "title": "3월, 신입이 온다",
+    "description": "공채 신입들이 배치됐다. 팀마다 OJT 담당 선배를 한 명씩 정해야 한다.",
+    "category": "work",
+    "slot": "work",
+    "rarity": "common",
+    "weight": 60,
+    "cooldownMonths": 10,
+    "tags": ["seasonal"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "months": [3],
+      "ranks": ["ASSISTANT_MANAGER", "MANAGER", "DEPUTY_HEAD", "DEPARTMENT_HEAD"]
+    },
+    "choices": [
+      {
+        "id": "volunteer",
+        "label": "내가 OJT를 맡는다",
+        "reply": "제가 맡을게요. 저도 그때 많이 헤맸거든요.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 3
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NAMED",
+            "name": "신입",
+            "text": "선배님 덕분에 첫 주 살아남았어요!"
+          }
+        ]
+      },
+      {
+        "id": "pass",
+        "label": "이번 분기 일정이 빡빡하다고 넘긴다",
+        "reply": "이번엔 제가 좀 어려울 것 같아요…",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "BOSS",
+            "text": "그래요, 다른 사람한테 부탁할게요."
+          }
+        ]
+      }
+    ],
+    "channel": "팀 단톡방",
+    "dialogue": [
+      {
+        "speaker": "BOSS",
+        "text": "올해 우리 팀 신입 OJT 누가 맡아 줄 사람?"
+      }
+    ]
+  },
+  {
+    "id": "evt_season_tax_refund",
+    "version": 1,
+    "status": "published",
+    "title": "13월의 월급",
+    "description": "연말정산 마감 주간. 영수증을 모으면 환급, 귀찮으면 그만큼 손해다.",
+    "category": "daily",
+    "slot": "life",
+    "rarity": "common",
+    "weight": 60,
+    "cooldownMonths": 10,
+    "tags": ["seasonal"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "months": [3]
+    },
+    "choices": [
+      {
+        "id": "collect_all",
+        "label": "영수증을 하나하나 챙긴다",
+        "reply": "(의료비, 월세, 기부금… 하나씩 업로드)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -3
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.75
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "CASH_DELTA",
+              "amount": 800000
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "환급 예상액이 떴다. 13월의 월급은 진짜였다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "CASH_DELTA",
+              "amount": 100000
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "열심히 챙겼는데 공제 한도에 걸렸다. 그래도 조금은 돌아왔다."
+            }
+          ]
+        }
+      },
+      {
+        "id": "auto",
+        "label": "간소화 자료만 그대로 낸다",
+        "reply": "(다음, 다음, 제출)",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": 200000
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "5분 만에 끝났다. 동료들은 80만 원을 돌려받았다고 했다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_season_family_month",
+    "version": 1,
+    "status": "published",
+    "title": "가정의 달",
+    "description": "어린이날, 어버이날, 스승의 날. 5월의 달력은 빨간 날만큼 지출도 빨갛다.",
+    "category": "daily",
+    "slot": "life",
+    "rarity": "common",
+    "weight": 60,
+    "cooldownMonths": 10,
+    "tags": ["seasonal"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "months": [5]
+    },
+    "choices": [
+      {
+        "id": "gift",
+        "label": "부모님께 용돈과 선물을 챙긴다",
+        "reply": "(카네이션이랑 봉투, 이번엔 넉넉하게)",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -500000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "\"뭘 이런 걸 다…\" 하시던 엄마가 사진을 가족 단톡방에 올렸다."
+          }
+        ]
+      },
+      {
+        "id": "video_call",
+        "label": "영상통화로 마음만 전한다",
+        "reply": "(이번 달은 좀 빠듯해서… 다음에 맛있는 거 사 드릴게요)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "화면 너머 아빠는 괜찮다고 했다. 정말 괜찮아 보였다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_season_summer_vacation",
+    "version": 1,
+    "status": "published",
+    "title": "여름휴가",
+    "description": "팀 휴가 일정표가 돌기 시작했다. 극성수기 일주일을 잡을지, 눈치를 볼지.",
+    "category": "daily",
+    "slot": "life",
+    "rarity": "common",
+    "weight": 60,
+    "cooldownMonths": 10,
+    "tags": ["seasonal"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "months": [7, 8]
+    },
+    "choices": [
+      {
+        "id": "abroad",
+        "label": "극성수기에 해외로 떠난다",
+        "reply": "(일주일, 비행기, 바다. 메일 알림은 끈다)",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -1500000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 6
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "돌아오니 메일이 312통. 그래도 피부는 탔고 마음은 개었다."
+          }
+        ]
+      },
+      {
+        "id": "short_trip",
+        "label": "국내로 짧게 다녀온다",
+        "reply": "(2박 3일이면 충분해)",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -400000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "바닷가 민박에서 아무것도 안 했다. 그게 좋았다."
+          }
+        ]
+      },
+      {
+        "id": "skip",
+        "label": "휴가를 반납하고 일한다",
+        "reply": "(올해는 휴가 안 쓰겠습니다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -6
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "BOSS",
+            "text": "휴가 반납은 고맙긴 한데… 연차 수당은 안 나와요."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_season_chuseok",
+    "version": 1,
+    "status": "published",
+    "title": "추석 연휴",
+    "description": "닷새짜리 추석 연휴. 그런데 연휴 당직 대타를 구한다는 공지가 올라왔다.",
+    "category": "daily",
+    "slot": "life",
+    "rarity": "common",
+    "weight": 60,
+    "cooldownMonths": 10,
+    "tags": ["seasonal"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "months": [9]
+    },
+    "choices": [
+      {
+        "id": "go_home",
+        "label": "고향에 내려간다",
+        "reply": "(송편 빚으러 갑니다)",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -300000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "할머니가 용돈을 쥐여 주셨다. 이 나이에도."
+          }
+        ]
+      },
+      {
+        "id": "cover_shift",
+        "label": "연휴 당직 대타를 선다",
+        "reply": "(제가 당직 설게요. 특근 수당 주시죠?)",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": 400000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -4
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "PEER",
+            "text": "{me} 님 덕분에 저 고향 가요. 선물 사 올게요!"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_season_workshop",
+    "version": 1,
+    "status": "published",
+    "title": "가을 워크숍",
+    "description": "1박 2일 전사 워크숍. 저녁 장기자랑에 팀마다 한 명씩 나가야 한다.",
+    "category": "work",
+    "slot": "work",
+    "rarity": "common",
+    "weight": 60,
+    "cooldownMonths": 10,
+    "tags": ["seasonal"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "months": [10]
+    },
+    "choices": [
+      {
+        "id": "perform",
+        "label": "내가 장기자랑에 나간다",
+        "reply": "(제가 나갈게요. 노래방 18번 있습니다)",
+        "outcome": {
+          "baseChance": 0.55
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 5
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PEERS",
+              "stat": "favor",
+              "amount": 4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "앵콜이 나왔다. 다음 날부터 다른 팀 사람들이 인사를 했다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -5
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -1
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "음정이 반 키 어긋났다. 단톡방에 영상이 돌았다."
+            }
+          ]
+        }
+      },
+      {
+        "id": "cheer",
+        "label": "응원석에서 조용히 박수 친다",
+        "reply": "(나는 박수 담당)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "새벽 2시까지 이어진 술자리를 피해 일찍 잤다. 현명했다."
+          }
+        ]
+      }
+    ],
+    "channel": "전사 공지",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "총무팀",
+        "text": "[공지] 가을 워크숍 · 팀별 장기자랑 1명 필참"
+      }
+    ]
+  },
+  {
+    "id": "evt_season_business_plan",
+    "version": 1,
+    "status": "published",
+    "title": "내년 사업계획 시즌",
+    "description": "11월은 사업계획의 달. 내년 숫자를 정하는 보고서가 팀마다 몰려 있다.",
+    "category": "work",
+    "slot": "work",
+    "rarity": "common",
+    "weight": 60,
+    "cooldownMonths": 10,
+    "tags": ["seasonal"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "months": [11]
+    },
+    "choices": [
+      {
+        "id": "overtime",
+        "label": "야근해서 제대로 만든다",
+        "reply": "이번 주는 제가 야근해서 초안 완성하겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -6
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.65
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 5
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "본부장님이 우리 팀 계획이 제일 현실적이래요."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "고생했는데… 전략 방향이 바뀌어서 다시 써야 할 것 같아요."
+            }
+          ]
+        }
+      },
+      {
+        "id": "copy_last",
+        "label": "작년 계획서를 다듬어 낸다",
+        "reply": "(작년 파일 열고, 숫자만 바꾸고…)",
+        "outcome": {
+          "baseChance": 0.6
+        },
+        "onSuccess": {
+          "effects": [],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "아무도 눈치채지 못했다. 사업계획이란 원래 그런 것일지도."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -6
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "BOSS",
+              "text": "{me} 씨, 이거 작년 오타까지 그대로네요."
+            }
+          ]
+        }
+      }
+    ],
+    "channel": "팀 단톡방",
+    "dialogue": [
+      {
+        "speaker": "BOSS",
+        "text": "내년 사업계획 초안, 다음 주 금요일까지예요."
+      }
+    ]
+  },
+  {
+    "id": "evt_season_yearend_party",
+    "version": 1,
+    "status": "published",
+    "title": "송년회",
+    "description": "올해 마지막 회식. 1차는 고깃집, 2차는 노래방, 3차는 아무도 모른다.",
+    "category": "work",
+    "slot": "work",
+    "rarity": "common",
+    "weight": 60,
+    "cooldownMonths": 10,
+    "tags": ["seasonal"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "months": [12]
+    },
+    "choices": [
+      {
+        "id": "all_rounds",
+        "label": "2차까지 함께한다",
+        "reply": "(오늘은 끝까지 갑니다!)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 1
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": 4
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "BOSS",
+            "stat": "favor",
+            "amount": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "BOSS",
+            "text": "{me} 씨 올해 정말 고생 많았어요. 내년에도 잘 부탁해요."
+          }
+        ]
+      },
+      {
+        "id": "first_only",
+        "label": "1차만 하고 들어간다",
+        "reply": "(내일 일찍 일이 있어서… 먼저 들어가 보겠습니다!)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "집에 오니 10시. 연말이 이렇게 조용해도 되나 싶었다."
+          }
+        ]
+      }
+    ],
+    "channel": "팀 단톡방",
+    "dialogue": [
+      {
+        "speaker": "BOSS",
+        "text": "송년회 다음 주 목요일! 빠지는 사람 없죠?"
+      }
+    ]
+  },
+  {
+    "id": "evt_co_saseong_blind_date",
+    "version": 1,
+    "status": "published",
+    "title": "사원증 소개팅",
+    "description": "사원증을 목에 건 채 퇴근했더니, 친구가 소개팅을 세 개나 잡아 왔다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_saseong"]
+    },
+    "channel": "개인 메시지",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "친구",
+        "text": "야 너 사성 다니는 거 말했더니 다들 만나 보고 싶대 ㅋㅋ"
+      }
+    ],
+    "choices": [
+      {
+        "id": "go",
+        "label": "주말을 소개팅으로 채운다",
+        "reply": "(토요일 점심, 저녁, 일요일 브런치…)",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -200000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "세 번 모두 \"회사 좋으시네요\"로 시작해 \"바쁘시죠?\"로 끝났다."
+          }
+        ]
+      },
+      {
+        "id": "decline",
+        "label": "회사 말고 나를 봐 줄 사람을 기다린다",
+        "reply": "(다음에, 다음에…)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "사원증을 가방에 넣고 다니기 시작했다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_never_cafe",
+    "version": 1,
+    "status": "published",
+    "title": "사내 카페의 유혹",
+    "description": "사내 카페의 시즌 음료가 나왔다. 줄은 30분, 회의는 15분 뒤.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_never_ever"]
+    },
+    "channel": "사내 공지",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "사내 카페",
+        "text": "[신메뉴] 초록 말차 라떼 출시! 오늘 하루 무료"
+      }
+    ],
+    "choices": [
+      {
+        "id": "line_up",
+        "label": "줄을 선다",
+        "reply": "(회의 5분만 늦을게요…)",
+        "outcome": {
+          "baseChance": 0.5
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": 5
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "회의는 10분 늦게 시작했다. 말차 라떼는 맛있었다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": 2
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "회의에 늦었다. 팀장의 눈썹이 말차보다 진했다."
+            }
+          ]
+        }
+      },
+      {
+        "id": "skip",
+        "label": "회의를 먼저 챙긴다",
+        "reply": "(내일 마시면 되지)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "내일은 유료였다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_elgee_baseball",
+    "version": 1,
+    "status": "published",
+    "title": "야구단 우승",
+    "description": "회사 야구단이 29년 만에 우승했다. 대표가 전 직원 보너스를 약속했다는 소문.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_elgee"]
+    },
+    "channel": "사내 공지",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "사내 게시판",
+        "text": "우승 기념 특별 격려금 지급 예정!! (사실임)"
+      }
+    ],
+    "choices": [
+      {
+        "id": "celebrate",
+        "label": "퇴근 후 팀원들과 우승 축하를 한다",
+        "reply": "(오늘은 치맥이다!)",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": -60000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 6
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "모르는 옆 팀 사람과 어깨동무를 하고 응원가를 불렀다."
+          }
+        ]
+      },
+      {
+        "id": "bonus_only",
+        "label": "격려금만 조용히 챙긴다",
+        "reply": "(통장 확인)",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": 500000
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "격려금이 들어왔다. 응원가는 몰랐지만 감사했다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_hyunso_line",
+    "version": 1,
+    "status": "published",
+    "title": "라인이 멈췄다",
+    "description": "공장 라인이 멈췄다는 연락에 사무직까지 현장으로 소집됐다. 군대식 점호가 시작된다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_hyunso"]
+    },
+    "channel": "긴급 공지",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "생산본부",
+        "text": "전 직원 현장 집합. 원인 파악 전까지 퇴근 없습니다."
+      }
+    ],
+    "choices": [
+      {
+        "id": "help",
+        "label": "작업복을 입고 현장에 붙는다",
+        "reply": "(현장 지원 가겠습니다!)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -6
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "새벽 4시 라인이 다시 돌았다. 공장장이 처음으로 이름을 불러 줬다."
+          }
+        ]
+      },
+      {
+        "id": "desk",
+        "label": "사무실에서 보고서로 지원한다",
+        "reply": "(원인 분석 자료는 제가 정리하겠습니다)",
+        "outcome": {
+          "baseChance": 0.6
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 2
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "focus",
+              "amount": -4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "보고서가 임원 보고에 그대로 쓰였다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "\"현장에 안 나온 사람\" 명단에 이름이 올랐다."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_co_gagao_english_name",
+    "version": 1,
+    "status": "published",
+    "title": "영어 이름 정하기",
+    "description": "수평 문화의 첫걸음은 영어 이름. 입사 동기는 이미 \"Brian\"을 가져갔다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_gagao"]
+    },
+    "channel": "HR 공지",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "HR",
+        "text": "사내에서 쓰실 영어 이름 오늘까지 등록 부탁드려요~"
+      }
+    ],
+    "choices": [
+      {
+        "id": "fun",
+        "label": "튀는 이름을 고른다 (예: Zeus)",
+        "reply": "(제 이름은 Zeus입니다)",
+        "outcome": {
+          "baseChance": 0.5
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 3
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PEERS",
+              "stat": "favor",
+              "amount": 3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "\"Zeus님\"이라 부를 때마다 회의실이 웃었다. 다들 이름을 기억했다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "대표가 \"Zeus님은 직급이 뭐죠?\"라고 물었다. 침묵이 흘렀다."
+            }
+          ]
+        }
+      },
+      {
+        "id": "safe",
+        "label": "무난하게 고른다 (예: Daniel)",
+        "reply": "(Daniel로 할게요)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "팀에 Daniel이 셋이 됐다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_escake_affiliate",
+    "version": 1,
+    "status": "published",
+    "title": "내 소속은 어디인가",
+    "description": "계열사 재편 공지. 명함의 회사 이름이 또 바뀐다. 어디로 가는지 본인도 모른다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_escake"]
+    },
+    "channel": "사내 공지",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "경영지원",
+        "text": "조직 개편으로 소속 법인이 변경될 예정입니다. 상세는 추후 안내."
+      }
+    ],
+    "choices": [
+      {
+        "id": "ask_around",
+        "label": "수소문해서 미리 알아본다",
+        "reply": "(인사팀 동기에게 커피 한 잔)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "새 법인은 같은 건물 같은 층이었다. 명함만 바뀌었다."
+          }
+        ]
+      },
+      {
+        "id": "wait",
+        "label": "그냥 기다린다",
+        "reply": "(어차피 바뀌면 바뀌는 거지)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "3주 동안 소문이 다섯 번 바뀌었다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_isekai_store",
+    "version": 1,
+    "status": "published",
+    "title": "주말 매장 지원",
+    "description": "유통 성수기. 본사 직원도 주말에 매장 지원을 나가라는 공지가 떴다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_isekai"]
+    },
+    "channel": "영업 공지",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "영업지원팀",
+        "text": "[필수] 이번 주말 매장 지원 인력 배정표 첨부"
+      }
+    ],
+    "choices": [
+      {
+        "id": "go",
+        "label": "매장에 나가 계산대에 선다",
+        "reply": "(주말 매장 지원 갑니다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -5
+          },
+          {
+            "type": "CASH_DELTA",
+            "amount": 150000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "고객 동선이 머리에 들어왔다. 월요일 회의에서 할 말이 생겼다."
+          }
+        ]
+      },
+      {
+        "id": "swap",
+        "label": "동기와 날짜를 바꿔 한 주 미룬다",
+        "reply": "(이번 주는 동기한테 부탁…)",
+        "guaranteedEffects": [
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "PEERS",
+            "stat": "favor",
+            "amount": -2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "다음 주는 더 붐볐다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_coubread_rocket",
+    "version": 1,
+    "status": "published",
+    "title": "로켓 같은 업무 속도",
+    "description": "오늘 아침에 정한 일을 오늘 오후에 배포하라고 한다. 로켓처럼.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_coubread"]
+    },
+    "channel": "제품팀",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "PO",
+        "text": "오늘 6시 배포 가능하죠? 고객이 기다려요 🚀"
+      }
+    ],
+    "choices": [
+      {
+        "id": "launch",
+        "label": "오늘 안에 해낸다",
+        "reply": "가능합니다. 6시까지 맞추겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -6
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.6
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "5시 58분 배포. 슬랙에 로켓 이모지가 쏟아졌다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "6시 30분 롤백. 로켓은 발사대에서 멈췄다."
+            }
+          ]
+        }
+      },
+      {
+        "id": "push_back",
+        "label": "내일 오전으로 협상한다",
+        "reply": "품질 확인하고 내일 오전에 내보내면 어떨까요?",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -1
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "PO가 \"로켓은 멈추지 않아요\"라고 했지만 결국 내일 오전에 나갔다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_baedal_pun",
+    "version": 1,
+    "status": "published",
+    "title": "회의는 말장난으로",
+    "description": "주간 회의. 기획안보다 먼저 나와야 하는 건 말장난이다. 내 차례가 다가온다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_baedal_gyeore"]
+    },
+    "channel": "팀 회의",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "팀장",
+        "text": "자, 오늘의 드립 담당 {me} 님~"
+      }
+    ],
+    "choices": [
+      {
+        "id": "pun",
+        "label": "준비한 말장난을 던진다",
+        "reply": "\"이번 분기 목표는… 배달 완료가 아니라 배달 완료(完了)입니다\"",
+        "outcome": {
+          "baseChance": 0.55
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 3
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PEERS",
+              "stat": "favor",
+              "amount": 3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "회의실이 터졌다. 오늘의 드립상 수상."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "정적. 에어컨 소리만 들렸다."
+            }
+          ]
+        }
+      },
+      {
+        "id": "serious",
+        "label": "진지하게 안건부터 말한다",
+        "reply": "저는 그냥 안건부터…",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "\"재미없다~\" 야유가 나왔지만 회의는 빨리 끝났다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_toast_swell",
+    "version": 1,
+    "status": "published",
+    "title": "부풀어 오르는 일",
+    "description": "\"간단한 송금 버튼 하나만\" 추가하자던 일이 일주일 만에 서비스 개편이 됐다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_toast"]
+    },
+    "channel": "제품팀",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "PM",
+        "text": "그김에 화면 전체 리뉴얼도 같이 가면 좋을 것 같아요 ㅎㅎ"
+      }
+    ],
+    "choices": [
+      {
+        "id": "scope",
+        "label": "범위를 잘라 원래 일만 끝낸다",
+        "reply": "이번 스프린트는 버튼 하나만 하겠습니다.",
+        "outcome": {
+          "baseChance": 0.6
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 2
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "focus",
+              "amount": 3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "버튼 하나가 제때 나갔다. 의외로 다들 만족했다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "\"그 정도 의지로는 안 돼요\" 소리를 들었다."
+            }
+          ]
+        }
+      },
+      {
+        "id": "accept",
+        "label": "부푼 대로 다 맡는다",
+        "reply": "해 보죠! 리뉴얼까지 같이 가겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "새 화면은 예뻤다. 대신 2주 동안 집에 늦게 갔다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_pyeongbeom_anniv",
+    "version": 1,
+    "status": "published",
+    "title": "근속 기념 수건",
+    "description": "평범상사 창립 기념일. 올해의 기념품은 회사 이름이 수놓인 수건이다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_pyeongbeom"]
+    },
+    "channel": "사내 공지",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "총무팀",
+        "text": "창립 기념품(수건) 1인 1매 배부합니다. 좋은 하루 되세요~"
+      }
+    ],
+    "choices": [
+      {
+        "id": "cherish",
+        "label": "수건을 고이 챙긴다",
+        "reply": "(벌써 이 수건이 세 장째다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "평범함이 이렇게 편안할 줄은 몰랐다."
+          }
+        ]
+      },
+      {
+        "id": "regift",
+        "label": "집들이 선물로 쓴다",
+        "reply": "(새 수건은 선물로…)",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": 30000
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "친구는 \"회사 이름이 너무 평범해서 좋다\"고 했다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_geureok_legacy",
+    "version": 1,
+    "status": "published",
+    "title": "그럭저럭 잘 돌아가는 서버",
+    "description": "10년째 아무도 건드리지 않은 서버가 오늘따라 이상한 소리를 낸다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_geureok_soft"]
+    },
+    "channel": "운영 알림",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "운영팀",
+        "text": "서버실에서 삐— 소리 나요. 그냥 둬도 될까요?"
+      }
+    ],
+    "choices": [
+      {
+        "id": "fix",
+        "label": "점검 일정을 잡고 손을 본다",
+        "reply": "이번 주에 점검 잡겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -4
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.7
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "팬 하나를 갈았다. 서버는 다시 그럭저럭 돌아갔다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -2
+            },
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "점검 중에 30분 멈췄다. \"그냥 두지 그랬어요\" 소리를 들었다."
+            }
+          ]
+        }
+      },
+      {
+        "id": "leave",
+        "label": "그럭저럭 돌아가니 둔다",
+        "reply": "(10년 버텼으면 1년은 더 버티겠지)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "소리는 일주일 뒤 저절로 멈췄다. 이유는 아무도 모른다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_mirae_vision_slogan",
+    "version": 1,
+    "status": "published",
+    "title": "비전 선포식",
+    "description": "대표가 새 비전을 선포했다. \"2030 글로벌 톱 텐\". 직원은 스무 명이다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_mirae_vision"]
+    },
+    "channel": "전체 회의",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "대표",
+        "text": "여러분, 우리는 2030년 세계 10대 컨설팅사가 됩니다!"
+      }
+    ],
+    "choices": [
+      {
+        "id": "cheer",
+        "label": "앞줄에서 힘차게 박수를 친다",
+        "reply": "(박수!!)",
+        "guaranteedEffects": [
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "BOSS",
+            "stat": "favor",
+            "amount": 4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "대표가 나를 보며 고개를 끄덕였다. 복지는 그대로였다."
+          }
+        ]
+      },
+      {
+        "id": "ask_budget",
+        "label": "\"예산은 어떻게 되나요?\"라고 묻는다",
+        "reply": "혹시 그 비전을 위한 예산이나 인력 계획도 있을까요?",
+        "outcome": {
+          "baseChance": 0.4
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "대표가 \"좋은 질문\"이라며 다음 달 채용 계획을 꺼냈다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": -4
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "BOSS",
+              "stat": "favor",
+              "amount": -4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "선포식 분위기가 싸해졌다."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "evt_co_beongae_turnover",
+    "version": 1,
+    "status": "published",
+    "title": "또 퇴사",
+    "description": "이번 달에만 세 번째 송별회. 남은 사람의 일은 번개처럼 늘어난다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_beongae_logistics"]
+    },
+    "channel": "팀 단톡방",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "팀 단톡방",
+        "text": "[송별] ○○님 마지막 출근일입니다 ㅠㅠ"
+      }
+    ],
+    "choices": [
+      {
+        "id": "cover",
+        "label": "떠난 사람 일을 맡는다",
+        "reply": "(그 일은 제가 받을게요)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "물류 동선 하나를 통째로 외웠다. 대체 불가능한 사람이 되어 가는 중이다."
+          }
+        ]
+      },
+      {
+        "id": "boundary",
+        "label": "내 일만 하겠다고 선을 긋는다",
+        "reply": "제 업무 범위 밖이라 어려울 것 같습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "일은 결국 막내에게 갔다. 막내도 다음 달에 그만뒀다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_yeoljeong_equity",
+    "version": 1,
+    "status": "published",
+    "title": "스톡옵션 대신",
+    "description": "월급 인상 대신 스톡옵션을 주겠다고 한다. 회사 가치는 대표의 말 속에만 있다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_yeoljeong_pay"]
+    },
+    "channel": "대표실",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "대표",
+        "text": "우리 곧 유니콘이야. 연봉 대신 지분 어때?"
+      }
+    ],
+    "choices": [
+      {
+        "id": "equity",
+        "label": "스톡옵션을 받는다",
+        "reply": "(믿어 보겠습니다…)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 3
+          }
+        ],
+        "outcome": {
+          "baseChance": 0.15
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "CASH_DELTA",
+              "amount": 5000000
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "거짓말처럼 투자 유치가 됐다. 일부를 현금화했다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "mental",
+              "amount": -3
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "종이 한 장이 서랍에 들어갔다. 회사 가치는 여전히 대표의 말 속에 있다."
+            }
+          ]
+        }
+      },
+      {
+        "id": "cash",
+        "label": "현금으로 달라고 한다",
+        "reply": "죄송하지만 월세는 지분으로 못 내서요.",
+        "guaranteedEffects": [
+          {
+            "type": "CASH_DELTA",
+            "amount": 300000
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "BOSS",
+            "stat": "favor",
+            "amount": -3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "대표가 \"열정이 부족하네\"라며 30만 원을 올려 줬다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_co_daechung_rule",
+    "version": 1,
+    "status": "published",
+    "title": "사장님 말씀이 곧 사규",
+    "description": "사장님이 오늘부터 \"점심은 다 같이 짜장면\"이라고 선언했다.",
+    "category": "company",
+    "rarity": "uncommon",
+    "weight": 12,
+    "cooldownMonths": 24,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["company_flavor"],
+    "conditions": {
+      "employment": "EMPLOYED",
+      "companies": ["company_daechung_construction"]
+    },
+    "channel": "사장님",
+    "dialogue": [
+      {
+        "speaker": "NAMED",
+        "name": "사장님",
+        "text": "오늘부터 점심은 전원 짜장면이야. 단합!"
+      }
+    ],
+    "choices": [
+      {
+        "id": "follow",
+        "label": "군말 없이 짜장면을 먹는다",
+        "reply": "(짜장 곱빼기요)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": -2
+          },
+          {
+            "type": "NPC_RELATION_DELTA",
+            "target": "BOSS",
+            "stat": "favor",
+            "amount": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "3주째 짜장면. 사장님이 처음으로 이름을 불렀다."
+          }
+        ]
+      },
+      {
+        "id": "suggest",
+        "label": "\"가끔 짬뽕도 되나요?\" 건의한다",
+        "reply": "사장님, 화요일은 짬뽕도 되나요?",
+        "outcome": {
+          "baseChance": 0.5
+        },
+        "onSuccess": {
+          "effects": [
+            {
+              "type": "RESOURCE_DELTA",
+              "key": "reputation",
+              "amount": 3
+            },
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "PEERS",
+              "stat": "favor",
+              "amount": 4
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "\"그래, 화요일은 짬뽕.\" 직원들이 몰래 엄지를 들었다."
+            }
+          ]
+        },
+        "onFailure": {
+          "effects": [
+            {
+              "type": "NPC_RELATION_DELTA",
+              "target": "BOSS",
+              "stat": "favor",
+              "amount": -5
+            }
+          ],
+          "dialogue": [
+            {
+              "speaker": "NARRATION",
+              "text": "\"사규는 사규야.\" 그날부터 곱빼기가 됐다."
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "version": 1,
+    "status": "published",
+    "rarity": "uncommon",
+    "weight": 30,
+    "cooldownMonths": 36,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["recovery", "leave"],
+    "slot": "life",
+    "category": "daily",
+    "id": "evt_leave_burnout",
+    "title": "휴직을 생각하다",
+    "description": "아침마다 회사 앞에서 숨이 막힌다. 동기가 조심스럽게 \"잠깐 쉬어 가는 것도 방법\"이라고 했다.",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "age": {
+        "max": 57
+      },
+      "resources": {
+        "mental": {
+          "max": 45
+        }
+      },
+      "flagsNone": [
+        {
+          "key": "on_leave",
+          "scope": "TEMPORARY"
+        }
+      ]
+    },
+    "choices": [
+      {
+        "id": "three",
+        "label": "3개월 무급 휴직을 낸다",
+        "description": "월급 없이 석 달. 매달 크게 회복하지만 그동안 평판이 조금씩 식는다",
+        "reply": "(팀장님, 드릴 말씀이 있습니다…)",
+        "guaranteedEffects": [
+          {
+            "type": "LEAVE_START",
+            "months": 3,
+            "payPermille": 0
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_leave_return",
+            "delayMonths": 4
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "on_leave",
+            "scope": "TEMPORARY",
+            "expiresInMonths": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "휴직계에 도장이 찍혔다. 다음 달부터 알람을 끈다."
+          }
+        ]
+      },
+      {
+        "id": "six",
+        "label": "6개월 무급 휴직을 낸다",
+        "description": "반년을 쉰다. 그해 연말 평가는 받지 않고, 승진 근속도 그만큼 멈춘다",
+        "reply": "(반년 쉬겠습니다. 저를 먼저 살리고 싶어요)",
+        "guaranteedEffects": [
+          {
+            "type": "LEAVE_START",
+            "months": 6,
+            "payPermille": 0
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_leave_return",
+            "delayMonths": 7
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "on_leave",
+            "scope": "TEMPORARY",
+            "expiresInMonths": 7
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "팀장은 한참 말이 없다가 \"몸이 먼저죠\"라고 했다."
+          }
+        ]
+      },
+      {
+        "id": "endure",
+        "label": "조금만 더 버틴다",
+        "reply": "(아니야, 이번 프로젝트만 끝내고…)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -2
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "버티기로 했다. 버틸 수 있는 만큼만이길."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": 1,
+    "status": "published",
+    "rarity": "uncommon",
+    "weight": 30,
+    "cooldownMonths": 36,
+    "maxOccurrencesPerRun": 2,
+    "tags": ["recovery", "leave"],
+    "slot": "life",
+    "category": "daily",
+    "id": "evt_leave_medical",
+    "title": "의사의 진단서",
+    "description": "정기 검진에서 재검 판정이 나왔다. 의사는 진단서를 써 주며 몇 달은 쉬어야 한다고 했다.",
+    "conditions": {
+      "employment": "EMPLOYED",
+      "age": {
+        "max": 57
+      },
+      "resources": {
+        "health": {
+          "max": 45
+        }
+      },
+      "flagsNone": [
+        {
+          "key": "on_leave",
+          "scope": "TEMPORARY"
+        }
+      ]
+    },
+    "choices": [
+      {
+        "id": "sick_leave",
+        "label": "병가를 내고 3개월 쉰다",
+        "description": "유급 병가: 월급의 절반을 받으며 석 달 회복",
+        "reply": "(진단서 제출합니다. 회복하고 돌아올게요)",
+        "guaranteedEffects": [
+          {
+            "type": "LEAVE_START",
+            "months": 3,
+            "payPermille": 500
+          },
+          {
+            "type": "SCHEDULE_EVENT",
+            "eventId": "evt_leave_return",
+            "delayMonths": 4
+          },
+          {
+            "type": "FLAG_SET",
+            "key": "on_leave",
+            "scope": "TEMPORARY",
+            "expiresInMonths": 4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "병가가 승인됐다. 처음으로 낮에 산책을 했다."
+          }
+        ]
+      },
+      {
+        "id": "treat_and_work",
+        "label": "통원 치료하며 출근한다",
+        "reply": "(점심시간에 병원 다녀오겠습니다)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -4
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "점심마다 병원에 갔다. 몸은 조금씩, 일은 조금 느리게."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_leave_month",
+    "version": 1,
+    "status": "published",
+    "scheduledOnly": true,
+    "title": "휴직 중",
+    "description": "알람 없는 아침. 회사 단톡방은 알림을 꺼 두었다.",
+    "category": "daily",
+    "slot": "work",
+    "rarity": "common",
+    "weight": 1,
+    "tags": ["leave"],
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "choices": [
+      {
+        "id": "rest",
+        "label": "아무것도 하지 않는다",
+        "reply": "(오늘도 낮잠)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "health",
+            "amount": 2
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "햇볕이 드는 오후, 아무 생각 없이 잤다."
+          }
+        ]
+      },
+      {
+        "id": "study",
+        "label": "쉬면서 공부를 한다",
+        "reply": "(이참에 미뤄 둔 공부를)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": 4
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "도서관 창가 자리가 내 자리가 됐다."
+          }
+        ]
+      },
+      {
+        "id": "peek",
+        "label": "회사 메일을 몰래 확인한다",
+        "reply": "(…혹시 무슨 일 없나)",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 1
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": -3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "읽지 않은 메일 214통. 괜히 열었다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "evt_leave_return",
+    "version": 1,
+    "status": "published",
+    "scheduledOnly": true,
+    "title": "복직 첫날",
+    "description": "몇 달 만의 출근. 사원증이 낯설고, 내 자리에는 다른 사람의 머그컵이 있다.",
+    "category": "work",
+    "rarity": "common",
+    "weight": 1,
+    "tags": ["leave"],
+    "conditions": {
+      "employment": "EMPLOYED"
+    },
+    "channel": "팀 단톡방",
+    "dialogue": [
+      {
+        "speaker": "BOSS",
+        "text": "{me} 씨 돌아왔네요! 몸은 좀 괜찮아요?"
+      },
+      {
+        "speaker": "PEER",
+        "text": "자리 정리해 뒀어요. 머그컵은… 제 거예요 ㅎㅎ"
+      }
+    ],
+    "choices": [
+      {
+        "id": "full_speed",
+        "label": "밀린 일을 바로 따라잡는다",
+        "reply": "네, 덕분에 잘 쉬었습니다. 바로 따라잡을게요!",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "focus",
+            "amount": -5
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": 3
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "일주일 만에 감을 되찾았다. \"역시\"라는 말이 들렸다."
+          }
+        ]
+      },
+      {
+        "id": "ease_in",
+        "label": "천천히 적응한다",
+        "reply": "조금씩 감 잡으면서 따라가겠습니다.",
+        "guaranteedEffects": [
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "mental",
+            "amount": 3
+          },
+          {
+            "type": "RESOURCE_DELTA",
+            "key": "reputation",
+            "amount": -1
+          }
+        ],
+        "resultDialogue": [
+          {
+            "speaker": "NARRATION",
+            "text": "첫 주는 회의만 들었다. 서두르지 않기로 했다."
+          }
+        ]
+      }
+    ]
   }
 ]

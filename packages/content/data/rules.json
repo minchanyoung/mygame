@@ -290,6 +290,11 @@
     "milestones": [25, 50, 75],
     "milestoneMental": 3
   },
+  "practice": { "lv1": 20, "lv2": 50 },
+  "leave": {
+    "eventId": "evt_leave_month",
+    "recovery": { "health": 6, "mental": 8, "focus": 3, "reputation": -1 }
+  },
   "season": {
     "eventId": "evt_season_plan",
     "ageMin": 25,
@@ -336,8 +341,8 @@
       "livingCostPermille": 950,
       "startCashBonus": 3000000
     },
-    "NORMAL": { "chanceShift": -0.05, "lossPermille": 1000, "livingCostPermille": 1000, "startCashBonus": 0 },
-    "REAL": { "chanceShift": -0.06, "lossPermille": 1100, "livingCostPermille": 1100, "startCashBonus": 0 }
+    "NORMAL": { "chanceShift": -0.06, "lossPermille": 1000, "livingCostPermille": 1000, "startCashBonus": 0 },
+    "REAL": { "chanceShift": -0.07, "lossPermille": 1100, "livingCostPermille": 1100, "startCashBonus": 0 }
   },
   "retirement": {
     "comfortable": 600000000,

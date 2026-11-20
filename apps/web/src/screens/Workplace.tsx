@@ -1,3 +1,4 @@
+import { RelationMap } from '../components/RelationMap';
 import { CareerCertificate } from '../components/CareerCertificate';
 import { Avatar } from '../components/Avatar';
 import { useState } from 'react';
@@ -43,6 +44,15 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
       {tab === 'company' && (
         <>
           <EmployeeBadge view={view} />
+          {view.leave && (
+            <div className="card leave-banner" role="status">
+              <strong className="small">🌙 휴직 중 · {view.leave.monthsLeft}개월 남음</strong>
+              <span className="tiny muted">
+                월급 {view.leave.payPercent}% · 매달 크게 회복해요. 그동안 회사 일은 멈추고, 올해 평가와 승진
+                근속도 쉬어 갑니다.
+              </span>
+            </div>
+          )}
           <Warnings view={view} />
           <CompactGauges view={view} onOpen={setTrail} />
           <MoneyLine view={view} />
@@ -65,6 +75,7 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
       {tab === 'people' && (
         <>
           <h2>우리 팀</h2>
+          <RelationMap view={view} />
           <ul className="npc-list">
             {view.npcs.map((n) => (
               <li key={n.npcId} className="card">
@@ -115,6 +126,31 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
           <MoneyRow view={view} />
           <CareerCard view={view} />
           <CareerCertificate view={view} />
+          <div className="card gap-2">
+            <strong>능력 연습</strong>
+            <span className="tiny muted">
+              능력이 도와주는 선택지에서 성공할 때마다 1회. 쌓이면 능력이 생기거나 자라요.
+            </span>
+            {view.practice.map((p) => (
+              <div key={p.id} className="practice-row">
+                <span className="small">
+                  {p.name} {p.level > 0 ? `Lv.${p.level}` : ''}
+                </span>
+                {p.next === null ? (
+                  <span className="tiny muted">최고 레벨</span>
+                ) : (
+                  <>
+                    <div className="mini-bar" aria-hidden="true">
+                      <span style={{ width: `${Math.min(100, Math.round((p.count / p.next) * 100))}%` }} />
+                    </div>
+                    <span className="tiny muted num">
+                      {p.count}/{p.next}
+                    </span>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
           <div className="card">
             <strong>발견한 특성</strong>
             {view.skills.length + view.negativeTraits.length === 0 ? (
@@ -170,7 +206,11 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
         {tab === 'company' && (
           <div className="cta-wrap">
             <button type="button" className="btn btn-primary" onClick={onStartMonth} disabled={busy}>
-              {busy ? '출근 중…' : `${view.turn.monthOfYear}월 출근하기`}
+              {busy
+                ? '진행 중…'
+                : view.leave
+                  ? `${view.turn.monthOfYear}월 쉬기`
+                  : `${view.turn.monthOfYear}월 출근하기`}
             </button>
           </div>
         )}

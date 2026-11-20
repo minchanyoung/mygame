@@ -498,6 +498,10 @@ export interface PublicRunView {
     totalMonths: number;
     entries: { age: number; month: number; kind: 'JOIN' | 'TRANSFER' | 'PROMOTION'; text: string }[];
   } | null;
+  /** D1 능력 연습: 그 능력이 돕는 선택지에서 성공한 횟수와 다음 레벨 기준 (Lv.2면 next null) */
+  practice: { id: string; name: string; level: number; count: number; next: number | null }[];
+  /** C4 휴직 중이면 남은 개월·월급 배율 */
+  leave: { monthsLeft: number; payPercent: number } | null;
   /** S22 선배의 유산 (지난 판 대표 별명의 출발 보너스) */
   legacy: { name: string; emoji: string; fromAge: number; perkLabel: string } | null;
   characterCards: PublicCharacterCard[];

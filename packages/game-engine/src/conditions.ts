@@ -69,8 +69,14 @@ export function matchesConditions(
     const allowed = Array.isArray(cond.employment) ? cond.employment : [cond.employment];
     if (!allowed.includes(state.employment.status)) return false;
   }
+  if (
+    cond.months &&
+    !cond.months.includes(turnInfo(state.turnIndex, content.pack.rules.startAge).monthOfYear)
+  )
+    return false;
   if (cond.age && !inRange(turnInfo(state.turnIndex, content.pack.rules.startAge).age, cond.age))
     return false;
+  if (cond.companies && !(job && cond.companies.includes(job.companyId))) return false;
   if (cond.companyGrades) {
     const grade = job ? content.companies.get(job.companyId)?.grade : undefined;
     if (!grade || !cond.companyGrades.includes(grade)) return false;

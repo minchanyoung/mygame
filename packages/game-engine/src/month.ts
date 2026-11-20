@@ -1,3 +1,4 @@
+import { leaveSettlement, onLeave } from './leave';
 import { markSeasonAfterEvent, processSeason, seasonOfferDue } from './season';
 import {
   eventSlot,
@@ -65,7 +66,9 @@ export function applyMonthlySettlement(
   if (state.employment.status !== 'EMPLOYED' || !job) {
     throw new EngineError('INVARIANT_VIOLATION', 'monthly settlement requires employment');
   }
-  const gross = Math.floor(job.annualSalary / 12);
+  // C4 휴직 중이면 월급 배율과 추가 회복
+  const leave = leaveSettlement(state, content);
+  const gross = Math.floor((Math.floor(job.annualSalary / 12) * leave.payPermille) / 1000);
   const tax = Math.floor((gross * monthly.taxPermille) / 1000);
   const netSalary = gross - tax;
   // 물가 상승: 해마다 복리로 오른 생활비 (천 원 단위)
@@ -103,7 +106,11 @@ export function applyMonthlySettlement(
   for (const key of RESOURCE_KEYS) {
     const agingDelta = aging.reduce((s, a) => s + (a.naturalChange[key] ?? 0), 0);
     resources[key] = clampStat(
-      resources[key] + (monthly.naturalChange[key] ?? 0) + (burden[key] ?? 0) + agingDelta,
+      resources[key] +
+        (monthly.naturalChange[key] ?? 0) +
+        (burden[key] ?? 0) +
+        agingDelta +
+        (leave.recovery[key] ?? 0),
     );
   }
   return {
@@ -137,6 +144,16 @@ function pickMonthlyEvents(
       ? { ...s, status: 'EXPIRED' as const }
       : s,
   );
+  // C4 휴직 중에는 업무 칸 예약 사건을 복직 첫 달로 미룬다 (휴직 중 회사 일이 끼어들거나 만료되지 않게)
+  const leaveUntil = onLeave(state) ? state.leave!.untilTurn : null;
+  if (leaveUntil !== null) {
+    scheduledEvents = scheduledEvents.map((s) => {
+      const ev = content.events.get(s.eventId);
+      return s.status === 'PENDING' && s.dueTurn < leaveUntil && ev && eventSlot(ev) === 'work'
+        ? { ...s, dueTurn: leaveUntil }
+        : s;
+    });
+  }
   const selections: EventSelection[] = [];
   for (const slot of MONTH_SLOTS) {
     const due = scheduledEvents
@@ -169,6 +186,11 @@ function pickMonthlyEvents(
       scheduledEvents = scheduledEvents.map((x) =>
         x.scheduleId === scheduled.scheduleId ? { ...x, status: 'DONE' as const } : x,
       );
+      continue;
+    }
+    // C4 휴직 중 업무 칸은 '휴직 중' 사건
+    if (slot === 'work' && onLeave(state)) {
+      selections.push({ eventId: content.pack.rules.leave.eventId, participantNpcId: null });
       continue;
     }
     // S19 1월 일상 칸은 '새해 계획' (시즌 목표가 없고 조건이 맞을 때)

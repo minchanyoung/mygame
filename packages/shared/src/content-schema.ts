@@ -392,6 +392,18 @@ export const GameRulesSchema = z
         milestoneMental: z.number().int().min(0).max(20),
       })
       .strict(),
+    /** D1 반복으로 자라는 능력: 그 능력이 돕는 선택지에서 성공한 횟수 */
+    practice: z
+      .object({ lv1: z.number().int().min(1), lv2: z.number().int().min(1) })
+      .strict()
+      .refine((p) => p.lv1 < p.lv2, 'lv1 < lv2'),
+    /** C4 휴직: 휴직 중 업무 칸 사건, 매달 추가 회복 */
+    leave: z
+      .object({
+        eventId: z.string().min(1),
+        recovery: z.record(z.string(), z.number().int()),
+      })
+      .strict(),
     /** S19 3~5년 시즌 목표: 1월 '새해 계획' 사건으로 고르고, 기한 안에 이루면 보상 */
     season: z
       .object({
