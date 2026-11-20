@@ -1,3 +1,4 @@
+import { CareerCertificate } from '../components/CareerCertificate';
 import { Avatar } from '../components/Avatar';
 import { useState } from 'react';
 import type { PublicRunView, ResourceKey } from '@company-life/shared';
@@ -113,6 +114,7 @@ export function Workplace({ view, busy, onStartMonth, onHome }: Props) {
           <p className="tiny muted">게이지를 누르면 최근 3개월 동안 어디서 오르내렸는지 볼 수 있어요.</p>
           <MoneyRow view={view} />
           <CareerCard view={view} />
+          <CareerCertificate view={view} />
           <div className="card">
             <strong>발견한 특성</strong>
             {view.skills.length + view.negativeTraits.length === 0 ? (

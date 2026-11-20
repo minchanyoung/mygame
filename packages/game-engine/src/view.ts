@@ -289,6 +289,31 @@ function toPublicGoal(def: LifeGoalDefinition, state: GameRunState): PublicLifeG
   };
 }
 
+/** S23 경력 증명서: 입사·이직·승진 기록 (전체 기록에서, 오래된 순) */
+function toPublicCareer(state: GameRunState, content: ContentIndex): PublicRunView['career'] {
+  const job = state.employment.current;
+  if (!job || state.employment.status !== 'EMPLOYED') return null;
+  const startAge = content.pack.rules.startAge;
+  const kinds = { JOB_APPLICATION: 'JOIN', TRANSFER: 'TRANSFER', PROMOTION: 'PROMOTION' } as const;
+  const entries = state.eventHistory.flatMap((h) => {
+    const kind = kinds[h.kind as keyof typeof kinds];
+    if (!kind) return [];
+    const t = turnInfo(h.turnIndex, startAge);
+    return [{ age: t.age, month: t.monthOfYear, kind, text: h.summary }];
+  });
+  const since = turnInfo(job.startedTurn, startAge);
+  const first = state.eventHistory.find((h) => h.kind === 'JOB_APPLICATION');
+  return {
+    companyName: content.companies.get(job.companyId)?.name ?? job.companyId,
+    rankLabel: RANK_LABELS[job.rank],
+    jobLabel: JOB_LABELS[job.jobId],
+    sinceAge: since.age,
+    sinceMonth: since.monthOfYear,
+    totalMonths: first ? state.turnIndex - first.turnIndex : 0,
+    entries,
+  };
+}
+
 function toPublicSeason(state: GameRunState, content: ContentIndex): PublicSeason | null {
   const season = state.season;
   if (!season || state.employment.status !== 'EMPLOYED') return null;
@@ -869,6 +894,7 @@ export function toPublicView(state: GameRunState, content: ContentIndex): Public
     playtestModified: state.playtestModified,
     calendar: toCalendar(state, content),
     history: toHistory(state, content),
+    career: toPublicCareer(state, content),
     resourceTrail: toResourceTrail(state, content),
     lastStory: (() => {
       const ev = state.currentMonth?.eventResults.at(-1);

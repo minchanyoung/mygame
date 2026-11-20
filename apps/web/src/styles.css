@@ -3270,3 +3270,37 @@ fieldset:disabled {
   font-size: 28px;
   line-height: 1;
 }
+
+/* S23 경력 증명서 */
+.certificate-doc {
+  gap: var(--sp-3);
+}
+.cert-kv dd {
+  font-weight: 600;
+}
+.cert-entries {
+  margin: 0;
+  padding: var(--sp-3) 0 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cert-entries li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+}
+.cert-entries li > :first-child {
+  flex: 0 0 5.2em;
+}
+.cert-entries li > :last-child {
+  min-width: 0;
+}
+.cert-chip {
+  font-size: var(--fs-xs);
+}
+.cert-PROMOTION {
+  color: var(--gold);
+}
